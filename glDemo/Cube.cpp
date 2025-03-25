@@ -24,15 +24,41 @@ static float positionArray[] = {
 // Packed colour buffer for principle axes model
 static float colourArray[] = {
 
+	// Top face (red)
 	1.0f, 0.0f, 0.0f, 1.0f,
-	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 0.0f, 1.0f,
+
+	// Bottom face (green)
 	0.0f, 1.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 0.0f, 1.0f,
+
+	// Right face (blue)
+	0.0f, 0.0f, 1.0f, 1.0f,
+	0.0f, 0.0f, 1.0f, 1.0f,
+	0.0f, 0.0f, 1.0f, 1.0f,
+	0.0f, 0.0f, 1.0f, 1.0f,
+
+	// Front face (yellow)
+	1.0f, 1.0f, 0.0f, 1.0f,
+	1.0f, 1.0f, 0.0f, 1.0f,
+	1.0f, 1.0f, 0.0f, 1.0f,
 	1.0f, 1.0f, 0.0f, 1.0f,
 
-	0.0f, 0.0f, 1.0f, 1.0f,
+	// Left face (purple)
+	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f,
+
+	// Back face (cyan)
 	0.0f, 1.0f, 1.0f, 1.0f,
-	0.0f, 0.0f, 0.0f, 1.0f,
-	0.0f, 0.0f, 0.0f, 1.0f
+	0.0f, 1.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 1.0f, 1.0f
 };
 
 

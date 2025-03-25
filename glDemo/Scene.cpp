@@ -48,6 +48,19 @@ void Scene::AddGameObject(GameObject* _new)
 	m_GameObjects.push_back(_new);
 }
 
+void Scene::CycleCams()
+{
+	// Increment camera index
+	m_activeCameraIndex = (m_activeCameraIndex + 1) % m_Cameras.size();
+
+	// Update actuve cam
+	auto it = m_Cameras.begin();
+	advance(it, m_activeCameraIndex);
+	m_useCamera = *it;
+
+	cout << "Switched to Cam: " << m_useCamera->GetName() << endl;
+}
+
 //I want THAT Game Object by name
 GameObject* Scene::GetGameObject(string _GOName)
 {
@@ -161,7 +174,19 @@ void Scene::Render()
 		}
 	}
 
-	//TODO: now do the same for RP_TRANSPARENT here
+	for (auto gameObject : m_GameObjects)
+	{
+		if (gameObject->GetRP() & RP_TRANSPARENT)
+		{
+			GLuint SP = gameObject->GetShaderProg();
+			glUseProgram(SP);
+
+			m_useCamera->SetRenderValues(SP);
+			SetShaderUniforms(SP);
+			gameObject->PreRender();
+			gameObject->Render();
+		}
+	}
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)

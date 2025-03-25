@@ -27,6 +27,9 @@ public:
 	//add this GO to my list
 	void AddGameObject(GameObject* _new);
 
+	//method to cycle through cameras
+	void CycleCams();
+
 	//return a pointer to a given thing by its name
 	GameObject* GetGameObject(string _GOName);
 	Camera* GetCamera(string _camName);
@@ -65,6 +68,7 @@ protected:
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
+	int m_activeCameraIndex = 0;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };
 
