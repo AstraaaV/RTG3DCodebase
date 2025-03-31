@@ -41,6 +41,10 @@ vec3 g_beastPos = vec3(2.0f, 0.0f, 0.0f);
 float g_beastRotation = 0.0f;
 AIMesh* g_planetMesh = nullptr;
 
+vec3 g_duckPos = vec3(2.0f, 0.0f, 0.0f);
+float g_duckRotation = 0.0f;
+AIMesh* g_duckMesh = nullptr;
+
 int g_showing = 0;
 int g_NumExamples = 3;
 
@@ -261,6 +265,17 @@ void renderScene()
 
 			g_planetMesh->setupTextures();
 			g_planetMesh->render();
+		}
+
+		if (g_duckMesh) {
+
+			// Setup transforms
+			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
+			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(4.0, 4.0, 4.0));
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+
+			g_duckMesh->setupTextures();
+			g_duckMesh->render();
 		}
 	}
 	break;

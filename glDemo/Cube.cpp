@@ -9,16 +9,42 @@ using namespace glm;
 
 // Packed vertex buffer for cube
 static float positionArray[] = {
+	
+	//top
+	-1.0f, 1.0f, 1.0f, -1.0f,//top front left,0
+	-1.0f, 1.0f, -1.0f, -1.0f,//top back left,1
+	1.0f, 1.0f, -1.0f, -1.0f,//top back right,2
+	1.0f, 1.0f, 1.0f, -1.0f,//top front right,3
 
-	-1.0f, 1.0f, 1.0f, 1.0f,
-	-1.0f, 1.0f, -1.0f, 1.0f,
-	1.0f, 1.0f, -1.0f, 1.0f,
-	1.0f, 1.0f, 1.0f, 1.0f,
+	//bottom
+	-1.0f, -1.0f, 1.0f, 1.0f,//bottom front left,4
+	-1.0f, -1.0f, -1.0f, 1.0f,//bottom back left,5
+	1.0f, -1.0f, -1.0f, 1.0f,//bottom back right,6
+	1.0f, -1.0f, 1.0f, 1.0f,//bottom front right,7
 
-	-1.0f, -1.0f, 1.0f, 1.0f,
-	-1.0f, -1.0f, -1.0f, 1.0f,
-	1.0f, -1.0f, -1.0f, 1.0f,
-	1.0f, -1.0f, 1.0f, 1.0f
+	//right
+	1.0f, 1.0f, -1.0f, 1.0f,//top back right,8
+	1.0f, 1.0f, 1.0f, 1.0f,//top front right,9
+	1.0f, -1.0f, -1.0f, 1.0f,//bottom back right,10
+	1.0f, -1.0f, 1.0f, 1.0f,//bottom front right,11
+
+	//left
+	-1.0f, 1.0f, 1.0f, 1.0f,//top front left,12
+	-1.0f, 1.0f, -1.0f, 1.0f,//top back left,13
+	-1.0f, -1.0f, 1.0f, 1.0f,//bottom front left.14
+	-1.0f, -1.0f, -1.0f, 1.0f,//bottom back left,15
+
+	//front
+	-1.0f, 1.0f, 1.0f, 1.0f,//top front left,16
+	1.0f, 1.0f, 1.0f, 1.0f,//top front right,17
+	-1.0f, -1.0f, 1.0f, 1.0f,//bottom front left,18
+	1.0f, -1.0f, 1.0f, 1.0f,//bottom front right,19
+
+	//back
+	-1.0f, 1.0f, -1.0f, 1.0f,//top back left,20
+	1.0f, 1.0f, -1.0f, 1.0f,//top back right,21
+	-1.0f, -1.0f, -1.0f, 1.0f,//bottom back left,22
+	1.0f, -1.0f, -1.0f, 1.0f//bottom back right,23
 };
 
 // Packed colour buffer for principle axes model
@@ -48,17 +74,17 @@ static float colourArray[] = {
 	1.0f, 1.0f, 0.0f, 1.0f,
 	1.0f, 1.0f, 0.0f, 1.0f,
 
-	// Left face (purple)
-	1.0f, 0.0f, 1.0f, 1.0f,
-	1.0f, 0.0f, 1.0f, 1.0f,
-	1.0f, 0.0f, 1.0f, 1.0f,
-	1.0f, 0.0f, 1.0f, 1.0f,
+	// Left face (cyan)
+	0.0f, 1.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 1.0f, 1.0f,
 
-	// Back face (cyan)
-	0.0f, 1.0f, 1.0f, 1.0f,
-	0.0f, 1.0f, 1.0f, 1.0f,
-	0.0f, 1.0f, 1.0f, 1.0f,
-	0.0f, 1.0f, 1.0f, 1.0f
+	// Back face (magenta)
+	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f
 };
 
 
@@ -66,33 +92,35 @@ static float colourArray[] = {
 static unsigned int indexArray[] = {
 
 	// Top face
-	2, 1, 0,  
+	1, 0, 2,  
 	3, 2, 0,
 
 	// Bottom face
-	5, 6, 4, 
-	6, 7, 4,
+	4, 5, 6, 
+	4, 6, 7,
 
 	// Right face
-	3, 7, 2, 
-	7, 6, 2,
+	8, 9, 10, 
+	11, 10, 9,
 
 	// Front face
-	0, 4, 3,
-	4, 7, 3,
+	12, 13, 14,
+	13, 15, 14,
 
 	// Left face
-	0, 1, 5,
-	4, 0, 5,
+	16, 18, 17,
+	17, 18, 19,
 	
 	// Back face
-	2, 6, 1,
-	6, 5, 1
+	20, 21, 22,
+	21, 23, 22
 };
 
 
 
 Cube::Cube() {
+
+	m_type = "CUBE";
 
 	m_numFaces = 6 * 2;
 
@@ -102,14 +130,14 @@ Cube::Cube() {
 	// setup vbo for position attribute
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 32 * sizeof(float), positionArray, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 96 * sizeof(float), positionArray, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
 	// setup vbo for colour attribute
 	glGenBuffers(1, &m_colourBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_colourBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 32 * sizeof(float), colourArray, GL_STATIC_DRAW); 
+	glBufferData(GL_ARRAY_BUFFER, 96 * sizeof(float), colourArray, GL_STATIC_DRAW); 
 	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
 	glEnableVertexAttribArray(4);
 
