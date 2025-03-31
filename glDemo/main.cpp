@@ -48,6 +48,9 @@ AIMesh* g_duckMesh = nullptr;
 int g_showing = 0;
 int g_NumExamples = 3;
 
+int g_currentCam = 0;
+int g_NumCams = 3;
+
 //Global Game Object
 Scene* g_Scene = nullptr;
 
@@ -67,7 +70,6 @@ void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos);
 void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods);
 void mouseScrollHandler(GLFWwindow* _window, double _xoffset, double _yoffset);
 void mouseEnterHandler(GLFWwindow* _window, int _entered);
-
 
 int main()
 {
@@ -349,7 +351,17 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		case GLFW_KEY_SPACE:
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
+			break;
 
+		case GLFW_KEY_C:
+			if (g_Scene)
+			{
+				g_currentCam++;
+				g_currentCam = g_currentCam % g_NumCams;
+
+				g_Scene->CycleCams();
+			}
+			break;
 		default:
 		{
 		}

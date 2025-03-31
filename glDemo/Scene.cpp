@@ -50,6 +50,8 @@ void Scene::AddGameObject(GameObject* _new)
 
 void Scene::CycleCams()
 {
+	if (m_Cameras.empty()) return; //Stop cycle if cams dont exist
+	
 	// Increment camera index
 	m_activeCameraIndex = (m_activeCameraIndex + 1) % m_Cameras.size();
 
