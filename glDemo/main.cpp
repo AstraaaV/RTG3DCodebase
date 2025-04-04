@@ -327,9 +327,18 @@ void updateScene()
 // Function to call when window resized
 void resizeWindow(GLFWwindow* _window, int _width, int _height)
 {
+	if (_height == 0) _height = 1;
+
+	float aspectRatio = static_cast<float>(_width) / static_cast<float>(_height);
+	
 	if (g_mainCamera) {
 
 		g_mainCamera->setAspect((float)_width / (float)_height);
+	}
+
+	if (g_Scene)
+	{
+		g_Scene->Update(aspectRatio);
 	}
 
 	glViewport(0, 0, _width, _height);		// Draw into entire window

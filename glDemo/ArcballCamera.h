@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Camera.h"
 #include "core.h"
 
 // Model an arcball / pivot camera looking at the origin (0, 0, 0).  
@@ -7,7 +8,7 @@
 // Therefore 'forwards' is along the -z axis.  The camera is actually right/left handed agnostic.  
 // The encapsulated frustum however needs to know the differences for the projection matrix and frustum plane calculations
 
-class ArcballCamera {
+class ArcballCamera : public Camera {
 
 private:
 
