@@ -117,6 +117,12 @@
     <ClInclude Include="DirectionLight.h">
       <Filter>Scene Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IsometricCamera.h">
+      <Filter>Base Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FirstPersonCamera.h">
+      <Filter>Base Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -187,6 +193,12 @@
     </ClCompile>
     <ClCompile Include="DirectionLight.cpp">
       <Filter>Scene Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IsometricCamera.cpp">
+      <Filter>Base Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FirstPersonCamera.cpp">
+      <Filter>Base Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
