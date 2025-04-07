@@ -27,7 +27,7 @@ NEAR: 0.5
 FAR 100.0
 }
 {
-TYPE: CAMERA
+TYPE: FirstPerson
 NAME: CAM4
 POS:  0.0 5.0 -5.0
 LOOKAT: 0.0 0.0 0.0
