@@ -129,6 +129,26 @@ void FirstPersonCamera::setFarPlaneDistance(float _farPlaneDistance)
 	calculateDerivedValues();
 }
 
+void FirstPersonCamera::processKeys(CameraMovement direction, float deltaTime)
+{
+	float velocity = m_speed * deltaTime;
+
+	if (direction == CameraMovement::FORWARD)
+		m_position += m_front * velocity;
+	if (direction == CameraMovement::BACKWARD)
+		m_position -= m_front * velocity;
+	if (direction == CameraMovement::LEFT)
+		m_position -= m_right * velocity;
+	if (direction == CameraMovement::RIGHT)
+		m_position += m_right * velocity;
+	if (direction == CameraMovement::UP)
+		m_position += m_up * velocity;
+	if (direction == CameraMovement::DOWN)
+		m_position -= m_up * velocity;
+
+	calculateDerivedValues();
+}
+
 glm::mat4 FirstPersonCamera::viewTransform()
 {
 	return m_viewMatrix;

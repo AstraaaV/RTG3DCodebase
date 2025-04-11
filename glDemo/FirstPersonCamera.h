@@ -3,6 +3,16 @@
 #include "Camera.h"
 #include "core.h"
 
+enum class CameraMovement
+{
+	FORWARD,
+	BACKWARD,
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN
+};
+
 class FirstPersonCamera : public Camera
 {
 private:
@@ -44,6 +54,8 @@ public:
 
 	float getFarPlaneDistance();
 	void setFarPlaneDistance(float _farPlaneDistance);
+
+	void processKeys(CameraMovement direction, float deltaTime);
 
 	glm::mat4 viewTransform(); // return a const reference to the view transform matrix for the camera
 	glm::mat4 projectionTransform(); // return a const reference the projection transform for the camera.  This is a pass-through method and calls projectionMatrix on the encapsulated ViewFrustum
