@@ -8,6 +8,8 @@ class Cube: public Model, public GameObject {
 
 private:
 
+	string m_type;
+
 	GLuint				m_numFaces = 0;
 	GLuint				m_vao = 0;
 

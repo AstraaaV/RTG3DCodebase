@@ -2,6 +2,8 @@
 #include "core.h"
 #include "TextureLoader.h"
 #include "ArcballCamera.h"
+#include "FirstPersonCamera.h"
+#include "IsometricCamera.h"
 #include "GUClock.h"
 #include "PrincipleAxes.h"
 #include "shader_setup.h"
@@ -26,6 +28,8 @@ double				g_prevMouseX, g_prevMouseY;
 // Global Example objects
 // shouldn't really be anything in here for the final submission
 ArcballCamera* g_mainCamera = nullptr;
+FirstPersonCamera* g_fpCamera = nullptr;
+IsometricCamera* g_isoCamera = nullptr;
 CGPrincipleAxes* g_principleAxes = nullptr;
 Cube* g_cube = nullptr;
 
@@ -63,6 +67,7 @@ const unsigned int g_initHeight = 512;
 
 // Function prototypes
 void renderScene();
+void processKeys(GLFWwindow* window, float deltaTime);
 void updateScene();
 void resizeWindow(GLFWwindow* _window, int _width, int _height);
 void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods);
@@ -140,6 +145,14 @@ int main()
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
 
 	g_mainCamera = new ArcballCamera(0.0f, 0.0f, 1.98595f, 55.0f, 1.0f, 0.1f, 500.0f);
+	
+	// First person camera
+	g_fpCamera = new FirstPersonCamera();
+	g_fpCamera->setAspect((float)g_initWidth / g_initHeight);
+
+	// Isometric camera
+	g_isoCamera = new IsometricCamera();
+	g_isoCamera->setAspect((float)g_initWidth / g_initHeight);
 
 	g_principleAxes = new CGPrincipleAxes();
 
@@ -177,6 +190,9 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		updateScene();
+
+		processKeys(window, (float)g_gameClock->gameTimeDelta());
+
 		renderScene();						// Render into the current buffer
 		glfwSwapBuffers(window);			// Displays what was just rendered (using double buffering).
 
@@ -206,10 +222,28 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 cameraTransform = g_mainCamera->projectionTransform() * g_mainCamera->viewTransform();
+	mat4 cameraTransform;
 
-	mat4 cameraProjection = g_mainCamera->projectionTransform();
-	mat4 cameraView = g_mainCamera->viewTransform() * translate(identity<mat4>(), -g_beastPos);
+	mat4 cameraProjection;
+	mat4 cameraView;
+
+	if (g_currentCam == 0)
+	{
+		cameraProjection = g_mainCamera->projectionTransform();
+		cameraView = g_mainCamera->viewTransform();
+	}
+	else if (g_currentCam == 1)
+	{
+		cameraProjection = g_fpCamera->projectionTransform();
+		cameraView = g_fpCamera->viewTransform();
+	}
+	else if (g_currentCam == 2)
+	{
+		cameraProjection = g_isoCamera->projectionTransform();
+		cameraView = g_isoCamera->viewTransform();
+	}
+
+	cameraTransform = cameraProjection * cameraView;
 
 #// Render principle axes - no modelling transforms so just use cameraTransform
 	if (true)
@@ -304,6 +338,24 @@ void renderScene()
 
 }
 
+void processKeys(GLFWwindow* window, float deltaTime)
+{
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		g_fpCamera->processKeys(CameraMovement::FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		g_fpCamera->processKeys(CameraMovement::BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		g_fpCamera->processKeys(CameraMovement::LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		g_fpCamera->processKeys(CameraMovement::RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		g_fpCamera->processKeys(CameraMovement::DOWN, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		g_fpCamera->processKeys(CameraMovement::UP, deltaTime);
+
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+		g_currentCam = (g_currentCam + 1) % 3;
+}
 
 // Function called to animate elements in the scene
 void updateScene() 
@@ -360,16 +412,6 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		case GLFW_KEY_SPACE:
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
-			break;
-
-		case GLFW_KEY_C:
-			if (g_Scene)
-			{
-				g_currentCam++;
-				g_currentCam = g_currentCam % g_NumCams;
-
-				g_Scene->CycleCams();
-			}
 			break;
 		default:
 		{
