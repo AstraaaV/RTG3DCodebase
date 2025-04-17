@@ -123,6 +123,9 @@
     <ClInclude Include="FirstPersonCamera.h">
       <Filter>Base Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Base Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -198,6 +201,9 @@
       <Filter>Base Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FirstPersonCamera.cpp">
+      <Filter>Base Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
       <Filter>Base Source Files</Filter>
     </ClCompile>
   </ItemGroup>

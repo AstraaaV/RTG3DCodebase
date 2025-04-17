@@ -17,8 +17,12 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	//TODO: We are being really naught and not deleting everything as we finish
-	//what shoudl really go here and in similar places throughout the code base?
+	for (auto cam : m_Cameras) delete cam;
+	for (auto light : m_Lights) delete light;
+	for (auto model : m_Models) delete model;
+	for (auto texture : m_Textures) delete texture;
+	for (auto shader : m_Shaders) delete shader;
+	for (auto go : m_GameObjects) delete go;
 }
 
 //tick all my Game Objects, lights and cameras
@@ -55,7 +59,7 @@ void Scene::CycleCams()
 	// Increment camera index
 	m_activeCameraIndex = (m_activeCameraIndex + 1) % m_Cameras.size();
 
-	// Update actuve cam
+	// Update active cam
 	auto it = m_Cameras.begin();
 	advance(it, m_activeCameraIndex);
 	m_useCamera = *it;
@@ -198,7 +202,6 @@ void Scene::SetShaderUniforms(GLuint _shaderprog)
 	{
 		(*it)->SetRenderValues(_shaderprog);
 	}
-
 }
 
 void Scene::Load(ifstream& _file)

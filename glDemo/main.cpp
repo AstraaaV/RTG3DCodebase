@@ -40,6 +40,11 @@ vec3 g_DLdirection = vec3(0.0f, 1.0f, 0.0f);
 vec3 g_DLcolour = vec3(1.0f, 1.0f, 1.0f);
 vec3 g_DLambient = vec3(0.2f, 0.2f, 0.2f);
 
+GLuint g_texPointLightShader;
+vec3 g_PLposition = vec3(1.0f, 1.0f, 1.0f);
+vec3 g_PLcolour = vec3(1.0f, 1.0f, 0.0f);
+vec3 g_PLambient = vec3(0.2f, 0.2f, 0.2f);
+
 AIMesh* g_creatureMesh = nullptr;
 vec3 g_beastPos = vec3(2.0f, 0.0f, 0.0f);
 float g_beastRotation = 0.0f;
@@ -211,8 +216,6 @@ int main()
 		g_gameClock->stop();
 		g_gameClock->reportTimingData();
 	}
-
-	return 0;
 }
 
 
@@ -281,6 +284,7 @@ void renderScene()
 		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
 		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
+
 		if (g_creatureMesh) {
 
 			// Setup transforms
@@ -316,7 +320,27 @@ void renderScene()
 	}
 	break;
 
-	case 1:
+	case 1: //Point Light
+	{
+		glUseProgram(g_texPointLightShader);
+		GLint pLocation;
+
+		//set cam matrices
+		Helper::SetUniformLocation(g_texPointLightShader, "viewMatrix", &pLocation);
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+		Helper::SetUniformLocation(g_texPointLightShader, "projMatrix", &pLocation);
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+	
+		Helper::SetUniformLocation(g_texPointLightShader, "pointPos", &pLocation);
+		glUniform3fv(pLocation, 1, (GLfloat*)&g_PLposition);
+		Helper::SetUniformLocation(g_texPointLightShader, "pointCol", &pLocation);
+		glUniform3fv(pLocation, 1, (GLfloat*)&g_PLcolour);
+		Helper::SetUniformLocation(g_texPointLightShader, "ambientCol", &pLocation);
+		glUniform3fv(pLocation, 1, (GLfloat*)&g_PLambient);
+		break;
+	}
+
+	case 2:
 	{
 		// Render cube 
 		glUseProgram(g_flatColourShader);
@@ -332,7 +356,7 @@ void renderScene()
 		g_cube->render();
 		break;
 	}
-	case 2:
+	case 3:
 		g_Scene->Render();
 	}
 
