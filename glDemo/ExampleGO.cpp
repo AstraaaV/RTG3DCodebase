@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "helper.h"
 
 ExampleGO::ExampleGO()
 {
@@ -37,6 +38,11 @@ void ExampleGO::PreRender()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
+
+	GLint pLocation;
+	float time = glfwGetTime();
+	Helper::SetUniformLocation(m_ShaderProg, "u_time", &pLocation);
+	glUniform1f(pLocation, time);
 
 	//TODO: this does sort of replicate stuff in the AIMesh class, could we make them more compatible.
 
