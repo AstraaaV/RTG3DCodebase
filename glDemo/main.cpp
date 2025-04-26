@@ -192,8 +192,15 @@ int main()
 	// Main loop
 	// 
 
+	float g_deltaTime = 0.0f; // Declares global deltaTime
+	float lastFrame = 0.0f; // Stores time of last frame
+
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = glfwGetTime();
+		g_deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		updateScene();
 
 		processKeys(window, (float)g_gameClock->gameTimeDelta());
@@ -226,7 +233,6 @@ void renderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	mat4 cameraTransform;
-
 	mat4 cameraProjection;
 	mat4 cameraView;
 
@@ -378,7 +384,9 @@ void processKeys(GLFWwindow* window, float deltaTime)
 		g_fpCamera->processKeys(CameraMovement::UP, deltaTime);
 
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-		g_currentCam = (g_currentCam + 1) % 3;
+	{
+		g_currentCam = (g_currentCam + 1) % g_NumCams;
+	}
 }
 
 // Function called to animate elements in the scene
@@ -437,6 +445,7 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
 			break;
+
 		default:
 		{
 		}

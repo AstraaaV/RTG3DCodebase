@@ -64,7 +64,8 @@ void Scene::CycleCams()
 	advance(it, m_activeCameraIndex);
 	m_useCamera = *it;
 
-	cout << "Switched to Cam: " << m_useCamera->GetName() << endl;
+	cout << "Switched from Cam: " << m_useCamera->GetName()
+		<< " to Cam: " << (*it)->GetName() << endl;
 }
 
 //I want THAT Game Object by name
@@ -333,8 +334,6 @@ void Scene::Load(ifstream& _file)
 		_file.ignore(256, '\n');
 		cout << "}\n";
 	}
-
-
 }
 
 void Scene::Init()
