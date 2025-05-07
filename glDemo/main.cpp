@@ -373,6 +373,19 @@ void renderScene()
 			}
 		}
 
+		// Ceiling
+		for (int x = 0; x < 5; x++)
+		{
+			for (int z = 0; z < 5; z++)
+			{
+				mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 3.1f, z * 2.2f)) *
+									  glm::scale(identity<mat4>(), vec3(2.0f, 0.2f, 2.0f));
+
+				glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+				g_cube->render();
+			}
+		}
+
 		// Front wall (with door)
 		for (int x = 0; x < 5; x++)
 		{
