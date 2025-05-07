@@ -157,11 +157,11 @@ Shader* Scene::GetShader(string _shaderName)
 //Render Everything
 void Scene::Render()
 {
-	//TODO: Set up for the Opaque Render Pass will go here
 	//check out the example stuff back in main.cpp to see what needs setting up here
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
+		// The bitwise operation checks if the object is set to be rendered in opaque pass
+		if ((*it)->GetRP() & RP_OPAQUE)
 		{
 			//set shader program using
 			GLuint SP = (*it)->GetShaderProg();
@@ -343,7 +343,7 @@ void Scene::Init()
 	int count = 0;
 	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); ++it)
 	{
-		(*it)->Init(100, 100, this);// TODO: set correct screen sizes here
+		(*it)->Init(512, 512, this);
 
 		//if a camera is called MAIN
 		//this will be the starting camera used

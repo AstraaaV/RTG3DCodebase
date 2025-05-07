@@ -47,6 +47,15 @@ void ExampleGO::PreRender()
 	//TODO: this does sort of replicate stuff in the AIMesh class, could we make them more compatible.
 
 	//TODO: NORMAL MAPS!
+
+	GLuint m_normalMap{};
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_normalMap);
+
+	GLint normLoc;
+	Helper::SetUniformLocation(m_ShaderProg, "u_normalMap", &normLoc);
+	glUniform1i(normLoc, 1);
 }
 
 void ExampleGO::Render()

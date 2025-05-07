@@ -137,7 +137,7 @@ NAME: DUCK
 FILE: Assets\\Textures\\rubber_duck_toy_diff_4k.jpg
 }
 
-SHADERS 2
+SHADERS 3
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -148,8 +148,13 @@ NAME: TEXDIR
 VERTFILE: Assets\\Shaders\\texture-directional.vert
 FRAGFILE: Assets\\Shaders\\texture-directional.frag
 }
+{
+NAME: TEXPOINT
+VERTFILE: Assets\\Shaders\\texture-pointlight.vert
+FRAGFILE: Assets\\Shaders\\texture-pointlight.frag
+}
 
-GAMEOBJECTS 4
+GAMEOBJECTS 5
 {
 TYPE: EXAMPLE
 NAME: BEAST
@@ -193,4 +198,15 @@ ROTINC: 0.0 0.3 0.0
 MODEL: CUBE
 TEXTURE: BEAST
 SHADER: FLAT
+}
+{
+TYPE: EXAMPLE
+NAME: TORCHCUBE
+POS: 2.0 1.5 0.0
+ROT: 0.0 0.0 0.0 
+SCALE: 1.0 1.0 1.0
+ROTINC: 0.0 0.0 0.0
+MODEL: CUBE
+TEXTURE: BEAST
+SHADER: TEXPOINT
 }

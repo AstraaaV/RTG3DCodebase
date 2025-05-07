@@ -29,6 +29,7 @@ protected:
 	string m_ShaderName, m_TexName, m_ModelName;
 
 	GLuint m_texture;
+	GLuint m_normalMap;
 	Model* m_model;
 };
 
