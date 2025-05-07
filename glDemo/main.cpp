@@ -54,6 +54,17 @@ vec3 g_duckPos = vec3(2.0f, 0.0f, 0.0f);
 float g_duckRotation = 0.0f;
 AIMesh* g_duckMesh = nullptr;
 
+// Torch positions
+std::vector<glm::vec3> g_torchPos =
+{
+	vec3(2.2f, 2.5f, 0.2f), // Back, middle-left
+	vec3(6.6f, 2.5f, 0.2f), // Back, middle-right
+	vec3(0.2f, 2.5f, 4.4f), // Left, center
+	vec3(8.6f, 2.5f, 4.4f), // Right, center
+	vec3(2.2f, 2.5f, 8.6f), // Front, left
+	vec3(6.6f, 2.5f, 8.6f) // Front, right
+};
+
 int g_showing = 0;
 int g_NumExamples = 3;
 
@@ -326,27 +337,7 @@ void renderScene()
 	}
 	break;
 
-	case 1: //Point Light
-	{
-		glUseProgram(g_texPointLightShader);
-		GLint pLocation;
-
-		//set cam matrices
-		Helper::SetUniformLocation(g_texPointLightShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_texPointLightShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-	
-		Helper::SetUniformLocation(g_texPointLightShader, "pointPos", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_PLposition);
-		Helper::SetUniformLocation(g_texPointLightShader, "pointCol", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_PLcolour);
-		Helper::SetUniformLocation(g_texPointLightShader, "ambientCol", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_PLambient);
-		break;
-	}
-
-	case 2:
+	case 1:
 	{
 		// Render cube 
 		glUseProgram(g_flatColourShader);
@@ -427,8 +418,37 @@ void renderScene()
 			g_cube->render();
 		}
 
+		glUseProgram(g_texPointLightShader);
+
+		for (int i = 0; i < g_torchPos.size(); i++)
+		{
+			GLint pLocation;
+
+			//set cam matrices
+			Helper::SetUniformLocation(g_texPointLightShader, "viewMatrix", &pLocation);
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+			Helper::SetUniformLocation(g_texPointLightShader, "projMatrix", &pLocation);
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+
+			Helper::SetUniformLocation(g_texPointLightShader, "pointPos", &pLocation);
+			glUniform3fv(pLocation, 1, (GLfloat*)&g_PLposition);
+			Helper::SetUniformLocation(g_texPointLightShader, "pointCol", &pLocation);
+			glUniform3fv(pLocation, 1, (GLfloat*)&g_PLcolour);
+			Helper::SetUniformLocation(g_texPointLightShader, "ambientCol", &pLocation);
+			glUniform3fv(pLocation, 1, (GLfloat*)&g_PLambient);
+
+			// Torch cube
+			mat4 modelTransform = glm::translate(identity<mat4>(), g_torchPos[i]) *
+				glm::scale(identity<mat4>(), vec3(0.3f, 0.3f, 0.3f));
+		
+			Helper::SetUniformLocation(g_texPointLightShader, "modelMatrix", &pLocation);
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+		
+			g_cube->render();
+		}
+		break;
 	}
-	case 3:
+	case 2:
 		g_Scene->Render();
 	}
 
