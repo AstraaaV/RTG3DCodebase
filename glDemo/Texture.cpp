@@ -175,5 +175,9 @@ Texture::Texture(ifstream& _file)
 
 Texture::~Texture()
 {
-	//TODO: What should I really be doing here?
+	if (m_texID)
+	{
+		glDeleteTextures(1, &m_texID);
+		m_texID = 0;
+	}
 }

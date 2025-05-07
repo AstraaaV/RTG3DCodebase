@@ -18,9 +18,6 @@ public:
 
 	// Tick this light
 	virtual void Tick(float _dt, GLFWwindow* window);
-	//TODO: We don't have our own tick
-	// a nice feature would be a day / night cycle effect 
-
 protected:
 	vec3 m_direction;
 

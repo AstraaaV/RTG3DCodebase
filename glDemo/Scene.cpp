@@ -28,20 +28,33 @@ Scene::~Scene()
 //tick all my Game Objects, lights and cameras
 void Scene::Update(float _dt, GLFWwindow* window)
 {
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		if (!m_camSwitchPressed)
+		{
+			CycleCams();
+			m_camSwitchPressed = true;
+		}
+	}
+	else
+	{
+		m_camSwitchPressed = false;
+	}
+
 	//update all lights
-	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
+	for (auto it = m_Lights.begin(); it != m_Lights.end(); it++)
 	{
 		(*it)->Tick(_dt, window);
 	}
 
 	//update all cameras
-	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
+	for (auto it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
 		(*it)->Tick(_dt, window);
 	}
 
 	//update all GameObjects
-	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
 		(*it)->Tick(_dt, window);
 	}

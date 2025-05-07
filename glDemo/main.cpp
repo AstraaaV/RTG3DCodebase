@@ -471,11 +471,6 @@ void processKeys(GLFWwindow* window, float deltaTime)
 		g_fpCamera->processKeys(CameraMovement::DOWN, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		g_fpCamera->processKeys(CameraMovement::UP, deltaTime);
-
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-	{
-		g_currentCam = (g_currentCam + 1) % g_NumCams;
-	}
 }
 
 // Function called to animate elements in the scene
