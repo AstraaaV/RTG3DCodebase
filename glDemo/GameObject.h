@@ -21,7 +21,7 @@ public:
 
 	//update the GameObject
 	//TODO: possibly pass keyboard / mouse stuff down here for player controls?
-	virtual void Tick(float _dt);
+	virtual void Tick(float _dt, GLFWwindow* window);
 
 	virtual void PreRender();//set up any shader values needed for this object
 	virtual void Render();//render this object

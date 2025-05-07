@@ -23,7 +23,7 @@ void GameObject::Load(ifstream& _file)
 	StringHelp::Float3(_file, "ROT INC", m_rot_incr.x, m_rot_incr.y, m_rot_incr.z);
 }
 
-void GameObject::Tick(float _dt)
+void GameObject::Tick(float _dt, GLFWwindow* _window)
 {
 	m_rot += m_rot_incr;
 

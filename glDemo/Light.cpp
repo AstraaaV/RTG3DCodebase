@@ -3,6 +3,7 @@
 
 #include "helper.h"
 #include "stringHelp.h"
+#include <GLFW/glfw3.h>
 
 Light::Light()
 {
@@ -24,7 +25,7 @@ void Light::Load(ifstream& _file)
 /////////////////////////////////////////////////////////////////////////////////////
 // Update() - 
 /////////////////////////////////////////////////////////////////////////////////////
-void Light::Tick(float _dt)
+void Light::Tick(float _dt, GLFWwindow* window)
 {
 }
 

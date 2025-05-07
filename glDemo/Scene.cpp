@@ -26,24 +26,24 @@ Scene::~Scene()
 }
 
 //tick all my Game Objects, lights and cameras
-void Scene::Update(float _dt)
+void Scene::Update(float _dt, GLFWwindow* window)
 {
 	//update all lights
 	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
 	{
-		(*it)->Tick(_dt);
+		(*it)->Tick(_dt, window);
 	}
 
 	//update all cameras
 	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
-		(*it)->Tick(_dt);
+		(*it)->Tick(_dt, window);
 	}
 
 	//update all GameObjects
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		(*it)->Tick(_dt);
+		(*it)->Tick(_dt, window);
 	}
 }
 

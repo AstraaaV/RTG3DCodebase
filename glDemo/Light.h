@@ -3,6 +3,8 @@
 #include "glm/gtc/matrix_transform.hpp" 
 #include "glm/gtc/type_ptr.hpp"
 
+struct GLFWwindow;
+
 using namespace glm;
 
 #include <string>
@@ -22,7 +24,7 @@ public:
 	virtual void Load(ifstream& _file);
 
 	//tick this light
-	virtual void Tick(float _dt);
+	virtual void Tick(float _dt, GLFWwindow* window);
 
 	//Getters and Setters
 	void SetName(string _name) { m_name = _name; }

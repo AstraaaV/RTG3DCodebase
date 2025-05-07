@@ -26,18 +26,31 @@ Camera::~Camera()
 /////////////////////////////////////////////////////////////////////////////////////
 void Camera::Init(float _screenWidth, float _screenHeight, Scene* _scene)
 {
-	//TODO: move the calculation of the Projection Matrix to Camera::Tick
-	// so that we can do the same rescaling of the aspect ratio to match the current window
-	float aspect_ratio = _screenWidth / _screenHeight;
-	m_projectionMatrix = glm::perspective(glm::radians(m_fov), aspect_ratio, m_near, m_far);
+	setAspect(_screenWidth / _screenHeight);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Update() - 
 /////////////////////////////////////////////////////////////////////////////////////
-void Camera::Tick(float _dt)
+void Camera::Tick(float _dt, GLFWwindow* window)
 {
 	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, vec3(0, 1, 0));
+
+	// Update aspect ratio based on window size
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+
+	// No dividing by zero
+	if (height == 0) height = 1;
+
+	float asp = static_cast<float>(width) / static_cast<float>(height);
+	setAspect(asp);
+}
+
+void Camera::setAspect(float asp)
+{
+	m_aspect = asp;
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), asp, m_near, m_far);
 }
 
 void Camera::Load(ifstream& _file)

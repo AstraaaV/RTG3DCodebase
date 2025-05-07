@@ -31,7 +31,9 @@ public:
 
 	//tick this camera
 	//TODO: possibly pass keyboard / mouse stuff down here for player controls?
-	virtual void Tick(float _dt);
+	virtual void Tick(float _dt, GLFWwindow* window);
+
+	virtual void setAspect(float asp);
 
 	//load camera info from the mainfest
 	virtual void Load(ifstream& _file);
@@ -75,6 +77,7 @@ protected:
 	float m_fov; //field of view
 	float m_near;//near plane distance
 	float m_far;//far plane distance
+	float m_aspect = 1.0f;
 
 	string m_name;
 	string m_type;

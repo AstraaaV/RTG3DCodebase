@@ -23,9 +23,9 @@ void ExampleGO::Load(ifstream& _file)
 
 }
 
-void ExampleGO::Tick(float _dt)
+void ExampleGO::Tick(float _dt, GLFWwindow* window)
 {
-	GameObject::Tick(_dt);
+	GameObject::Tick(_dt, window);
 }
 
 void ExampleGO::PreRender()

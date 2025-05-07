@@ -92,6 +92,8 @@ void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods
 void mouseScrollHandler(GLFWwindow* _window, double _xoffset, double _yoffset);
 void mouseEnterHandler(GLFWwindow* _window, int _entered);
 
+GLFWwindow* g_window = nullptr;
+
 int main()
 {
 	//
@@ -486,7 +488,7 @@ void updateScene()
 		tDelta = (float)g_gameClock->gameTimeDelta();
 	}
 
-	g_Scene->Update(tDelta);
+	g_Scene->Update(tDelta, g_window);
 }
 
 
@@ -508,7 +510,7 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 
 	if (g_Scene)
 	{
-		g_Scene->Update(aspectRatio);
+		g_Scene->Update(aspectRatio, g_window);
 	}
 
 	glViewport(0, 0, _width, _height);		// Draw into entire window

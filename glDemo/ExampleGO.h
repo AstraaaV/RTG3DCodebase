@@ -16,7 +16,7 @@ public:
 	virtual void Load(ifstream& _file);
 
 	//update _window allows for Keyboard access
-	virtual void Tick(float _dt);
+	virtual void Tick(float _dt, GLFWwindow* window);
 
 	//render this object
 	virtual void PreRender();
