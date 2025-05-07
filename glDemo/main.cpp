@@ -350,17 +350,70 @@ void renderScene()
 	{
 		// Render cube 
 		glUseProgram(g_flatColourShader);
+
 		GLint pLocation;
 		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+		
 		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+		
 		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
-		mat4 modelTransform = glm::translate(identity<mat4>(), vec3(2.0, 0.0, 2.0));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+		
+		// Floor
+		for (int x = 0; x < 5; x++)
+		{
+			for (int z = 0; z < 5; z++)
+			{
+				mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, -1.1f, z * 2.2f)) *
+									  glm::scale(identity<mat4>(), vec3(2.0f, 0.2f, 2.0f));
 
-		g_cube->render();
-		break;
+				glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+				g_cube->render();
+			}
+		}
+
+		// Front wall (with door)
+		for (int x = 0; x < 5; x++)
+		{
+			if (x == 2) continue; // gap for the door
+			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 1.0f, 8.8f)) *
+								  glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 0.3f));
+
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+			g_cube->render();
+		}
+
+		// Back wall
+		for (int x = 0; x < 5; x++)
+		{
+			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 1.0f, 0.0f)) *
+							 glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 0.3f));
+
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+			g_cube->render();
+		}
+
+		// Left wall
+		for (int z = 0; z < 4; z++)
+		{
+			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(0.0f, 1.0f, z * 2.2f)) *
+								  glm::scale(identity<mat4>(), vec3(0.3f, 4.0f, 2.0f));
+
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+			g_cube->render();
+		}
+
+		// Right wall
+		for (int z = 0; z < 4; z++)
+		{
+			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(8.8f, 1.0f, z * 2.2f)) *
+								  glm::scale(identity<mat4>(), vec3(0.3f, 4.0f, 2.0f));
+
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+			g_cube->render();
+		}
+
 	}
 	case 3:
 		g_Scene->Render();
