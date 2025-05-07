@@ -4,6 +4,7 @@
 enum RenderPass
 {
 	RP_NONE = 0,
-	RP_OPAQUE = 1,
-	RP_TRANSPARENT = 2
+	RP_BACKGROUND = 1 << 0,
+	RP_OPAQUE = 1 << 1,
+	RP_TRANSPARENT = 1 << 2,
 };

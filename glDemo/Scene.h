@@ -70,6 +70,5 @@ protected:
 	int m_useCameraIndex = 0;
 	int m_activeCameraIndex = 0;
 	bool m_camSwitchPressed = false;
-	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };
 

@@ -170,6 +170,27 @@ Shader* Scene::GetShader(string _shaderName)
 //Render Everything
 void Scene::Render()
 {
+	// Render background objects
+	//glDepthMask(GL_FALSE);
+	for (auto gameObject : m_GameObjects)
+	{
+		if (gameObject->GetRP() & RP_BACKGROUND)
+		{
+			GLuint SP = gameObject->GetShaderProg();
+			glUseProgram(SP);
+
+			glDisable(GL_CULL_FACE);
+
+			m_useCamera->SetRenderValues(SP);
+			SetShaderUniforms(SP);
+			gameObject->PreRender();
+			gameObject->Render();
+		}
+	}
+	//glDepthMask(GL_TRUE);
+
+	// Render Opaque objects
+
 	//check out the example stuff back in main.cpp to see what needs setting up here
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
@@ -340,6 +361,11 @@ void Scene::Load(ifstream& _file)
 		_file >> dummy >> type; _file.ignore(256, '\n');
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
+
+		if (newGO->GetName() == "BACKGROUND")
+		{
+			newGO->SetRenderPass(RP_BACKGROUND);
+		}
 
 		m_GameObjects.push_back(newGO);
 

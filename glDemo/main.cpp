@@ -65,7 +65,7 @@ std::vector<glm::vec3> g_torchPos =
 	vec3(6.6f, 2.5f, 8.6f) // Front, right
 };
 
-int g_showing = 0;
+int g_showing = 2;
 int g_NumExamples = 3;
 
 int g_currentCam = 0;
