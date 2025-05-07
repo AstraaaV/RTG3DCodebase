@@ -36,12 +36,18 @@ void Camera::Tick(float _dt, GLFWwindow* window)
 {
 	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, vec3(0, 1, 0));
 
+	// Ensure window is valid before using it
+	if (!window) {
+		std::cerr << "ERROR: GLFW window is null in Camera::Tick()" << std::endl;
+		return;
+	}
+
 	// Update aspect ratio based on window size
-	int width, height;
+	int width = 1, height = 1;
 	glfwGetFramebufferSize(window, &width, &height);
 
-	// No dividing by zero
-	if (height == 0) height = 1;
+	if (width <= 0) width = 1;
+	if (height <= 0) height = 1;
 
 	float asp = static_cast<float>(width) / static_cast<float>(height);
 	setAspect(asp);

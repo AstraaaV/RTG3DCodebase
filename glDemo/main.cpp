@@ -84,7 +84,7 @@ const unsigned int g_initHeight = 512;
 // Function prototypes
 void renderScene();
 void processKeys(GLFWwindow* window, float deltaTime);
-void updateScene();
+void updateScene(GLFWwindow* window);
 void resizeWindow(GLFWwindow* _window, int _width, int _height);
 void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods);
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos);
@@ -114,6 +114,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
 
 	GLFWwindow* window = glfwCreateWindow(g_initWidth, g_initHeight, "GDV5001", NULL, NULL);
+	g_window = window;
 
 	// Check window was created successfully
 	if (window == NULL)
@@ -214,7 +215,7 @@ int main()
 		g_deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		updateScene();
+		updateScene(window);
 
 		processKeys(window, (float)g_gameClock->gameTimeDelta());
 
@@ -478,7 +479,7 @@ void processKeys(GLFWwindow* window, float deltaTime)
 }
 
 // Function called to animate elements in the scene
-void updateScene() 
+void updateScene(GLFWwindow* window) 
 {
 	float tDelta = 0.0f;
 
@@ -510,7 +511,7 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 
 	if (g_Scene)
 	{
-		g_Scene->Update(aspectRatio, g_window);
+		g_Scene->Update(0.0f, g_window);
 	}
 
 	glViewport(0, 0, _width, _height);		// Draw into entire window

@@ -27,6 +27,17 @@ void Light::Load(ifstream& _file)
 /////////////////////////////////////////////////////////////////////////////////////
 void Light::Tick(float _dt, GLFWwindow* window)
 {
+	static float timeOfDay = 0.0f;
+	timeOfDay += _dt;
+
+	float dayCycleSpeed = 0.1f;
+	float lightFactor = (sin(timeOfDay * dayCycleSpeed) + 1.0f) / 2.0f;
+
+	glm::vec3 daySky = glm::vec3(1.0f, 1.0f, 0.8f);
+	glm::vec3 nightSky = glm::vec3(0.1f, 0.1f, 0.2f);
+
+	m_col = glm::mix(nightSky, daySky, lightFactor);
+	m_amb = glm::vec3(0.2f) * lightFactor;
 }
 
 //send values to the shaders to allow the use of this light
