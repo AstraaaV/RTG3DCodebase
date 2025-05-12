@@ -171,15 +171,17 @@ Shader* Scene::GetShader(string _shaderName)
 void Scene::Render()
 {
 	// Render background objects
-	//glDepthMask(GL_FALSE);
+	glDepthMask(GL_FALSE);
+	glCullFace(GL_FRONT);
+	glDisable(GL_CULL_FACE);
+
 	for (auto gameObject : m_GameObjects)
 	{
 		if (gameObject->GetRP() & RP_BACKGROUND)
 		{
+			std::cout << "Rendering: " << gameObject->GetName() << std::endl;
 			GLuint SP = gameObject->GetShaderProg();
 			glUseProgram(SP);
-
-			glDisable(GL_CULL_FACE);
 
 			m_useCamera->SetRenderValues(SP);
 			SetShaderUniforms(SP);
@@ -187,7 +189,9 @@ void Scene::Render()
 			gameObject->Render();
 		}
 	}
-	//glDepthMask(GL_TRUE);
+	glCullFace(GL_BACK);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
 
 	// Render Opaque objects
 
@@ -362,9 +366,13 @@ void Scene::Load(ifstream& _file)
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
 
-		if (newGO->GetName() == "BACKGROUND")
+		if (type == "BACKGROUND" || newGO->GetName().find("SKY_") != std::string::npos)
 		{
 			newGO->SetRenderPass(RP_BACKGROUND);
+		}
+		else
+		{
+			newGO->SetRenderPass(RP_OPAQUE);
 		}
 
 		m_GameObjects.push_back(newGO);

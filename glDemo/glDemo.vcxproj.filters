@@ -126,6 +126,9 @@
     <ClInclude Include="PointLight.h">
       <Filter>Base Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Background.h">
+      <Filter>Base Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -204,6 +207,9 @@
       <Filter>Base Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PointLight.cpp">
+      <Filter>Base Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Background.cpp">
       <Filter>Base Source Files</Filter>
     </ClCompile>
   </ItemGroup>
