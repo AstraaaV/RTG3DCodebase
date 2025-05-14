@@ -25,6 +25,8 @@ GUClock* g_gameClock = nullptr;
 bool				g_mouseDown = false;
 double				g_prevMouseX, g_prevMouseY;
 
+bool				g_camSwitchPressed = false;
+
 // Texture handling
 GLuint g_wallTex = 0;
 
@@ -82,10 +84,10 @@ std::vector<std::string> g_mapLayout = {
 	"WWWWWWWWWW"
 };
 
-int g_showing = 2;
+int g_showing = 1;
 int g_NumExamples = 3;
 
-int g_currentCam = 0;
+int g_currentCam = 1;
 int g_NumCams = 3;
 
 //Global Game Object
@@ -141,7 +143,7 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //hides cursor
 
 	// Set callback functions to handle different events
 	glfwSetFramebufferSizeCallback(window, resizeWindow); // resize window callback
@@ -262,32 +264,18 @@ int main()
 	}
 }
 
-
 // renderScene - function to render the current scene
 void renderScene()
 {
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 cameraTransform;
-	mat4 cameraProjection;
-	mat4 cameraView;
+	Camera* activeCam = g_Scene->GetActiveCamera();
+	if (!activeCam) return;
 
-	if (g_currentCam == 0)
-	{
-		cameraProjection = g_mainCamera->projectionTransform();
-		cameraView = g_mainCamera->viewTransform();
-	}
-	else if (g_currentCam == 1)
-	{
-		cameraProjection = g_fpCamera->projectionTransform();
-		cameraView = g_fpCamera->viewTransform();
-	}
-	else if (g_currentCam == 2)
-	{
-		cameraProjection = g_isoCamera->projectionTransform();
-		cameraView = g_isoCamera->viewTransform();
-	}
+	mat4 cameraProjection = activeCam->GetProj();
+	mat4 cameraView = activeCam->GetView();
+	mat4 cameraTransform = cameraProjection * cameraView;
 
 	cameraTransform = cameraProjection * cameraView;
 
@@ -498,6 +486,22 @@ void renderScene()
 		
 			g_cube->render();
 		}
+
+		//debug
+		glUseProgram(g_texDirLightShader);
+		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
+
+		FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
+		glm::vec3 camPos = fpCam ? fpCam->getPosition() : glm::vec3(0);
+		mat4 modelTransform = glm::translate(identity<mat4>(), camPos) *
+							  glm::scale(identity<mat4>(), vec3(0.2f, 0.2f, 0.2f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+		g_cube->render();
+
 		break;
 	}
 	case 2:
@@ -508,18 +512,28 @@ void renderScene()
 
 void processKeys(GLFWwindow* window, float deltaTime)
 {
+	Camera* activeCam = g_Scene->GetActiveCamera();
+	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(activeCam);
+	if (!fpCam)
+	{
+		cout << "Active cam is NOT FPC\n";
+		return;
+	}
+	cout << "Using FPC for movement\n";
+		
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		g_fpCamera->processKeys(CameraMovement::FORWARD, deltaTime);
+		fpCam->processKeys(CameraMovement::FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		g_fpCamera->processKeys(CameraMovement::BACKWARD, deltaTime);
+		fpCam->processKeys(CameraMovement::BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		g_fpCamera->processKeys(CameraMovement::LEFT, deltaTime);
+		fpCam->processKeys(CameraMovement::LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		g_fpCamera->processKeys(CameraMovement::RIGHT, deltaTime);
+		fpCam->processKeys(CameraMovement::RIGHT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		g_fpCamera->processKeys(CameraMovement::DOWN, deltaTime);
+		fpCam->processKeys(CameraMovement::DOWN, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		g_fpCamera->processKeys(CameraMovement::UP, deltaTime);
+		fpCam->processKeys(CameraMovement::UP, deltaTime);
 }
 
 // Function called to animate elements in the scene
@@ -579,6 +593,17 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			g_showing = g_showing % g_NumExamples;
 			break;
 
+		case GLFW_KEY_C:
+			if (_action == GLFW_PRESS && !g_camSwitchPressed)
+			{
+				g_Scene->CycleCams();
+				g_camSwitchPressed = true;
+			}
+			else if (_action == GLFW_RELEASE)
+			{
+				g_camSwitchPressed = false;
+			}
+
 		default:
 		{
 		}
@@ -599,19 +624,37 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos) 
 {
-	if (g_mouseDown) {
+	std::cout << "Mouse moved: " << _xpos << ", " << _ypos << std::endl;
 
-		//float tDelta = gameClock->gameTimeDelta();
+	static bool fpMouse = true;
 
-		float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
-		float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
+	Camera* activeCam = g_Scene->GetActiveCamera();
+	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
+	if (!fpCam)
+	{
+		std::cout << "Active Cam: " << (fpCam ? "FirstPersonCamera" : "Not using FP Cam.") << std::endl;
+		return;
+	}
 
-		if (g_mainCamera)
-			g_mainCamera->rotateCamera(-dy, -dx);
-
+	if (fpMouse)
+	{
 		g_prevMouseX = _xpos;
 		g_prevMouseY = _ypos;
+		fpMouse = false;
 	}
+
+	float dx = static_cast<float>(_xpos - g_prevMouseX);
+	float dy = static_cast<float>(_ypos - g_prevMouseY);
+	g_prevMouseX = _xpos;
+	g_prevMouseY = _ypos;
+
+	float yaw = fpCam->getYaw() + dx * fpCam->getSensitivity();
+	float pitch = fpCam->getPitch() - dy * fpCam->getSensitivity();
+
+	pitch = glm::clamp(pitch, -89.0f, 89.0f); // avoids flipping
+
+	fpCam->setYaw(yaw);
+	fpCam->setPitch(pitch);
 }
 
 void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods) 

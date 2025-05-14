@@ -58,6 +58,8 @@ public:
 	float getFarPlaneDistance();
 	void setFarPlaneDistance(float _farPlaneDistance);
 
+	float getSensitivity() const { return m_sensitivity; }
+
 	void processKeys(CameraMovement direction, float deltaTime);
 
 	glm::mat4 viewTransform(); // return a const reference to the view transform matrix for the camera

@@ -50,6 +50,10 @@ public:
 	//initialise links between items in the scene
 	void Init();
 
+	void SetActiveCamera(Camera* cam);
+
+	Camera* GetActiveCamera() { return m_useCamera; }
+
 protected:
 
 	//data structures containing pointers to all our stuff

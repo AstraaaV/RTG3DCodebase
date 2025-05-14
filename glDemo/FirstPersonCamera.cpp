@@ -82,6 +82,7 @@ float FirstPersonCamera::getPitch() const
 void FirstPersonCamera::setPitch(float _pitch)
 {
 	this->m_pitch = _pitch;
+	updateCamVectors();
 	calculateDerivedValues();
 }
 
@@ -93,6 +94,7 @@ float FirstPersonCamera::getYaw() const
 void FirstPersonCamera::setYaw(float _yaw)
 {
 	this->m_yaw = _yaw;
+	updateCamVectors();
 	calculateDerivedValues();
 }
 

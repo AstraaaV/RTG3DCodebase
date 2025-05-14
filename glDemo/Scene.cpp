@@ -69,16 +69,20 @@ void Scene::CycleCams()
 {
 	if (m_Cameras.empty()) return; //Stop cycle if cams dont exist
 	
-	// Increment camera index
-	m_activeCameraIndex = (m_activeCameraIndex + 1) % m_Cameras.size();
+	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
 
 	// Update active cam
 	auto it = m_Cameras.begin();
-	advance(it, m_activeCameraIndex);
+	advance(it, m_useCameraIndex);
+	
+	if (m_useCamera)
+		cout << "Switched from Cam: " << m_useCamera->GetName();
+	else
+		cout << "Switch from Cam: (none)" << (*it)->GetName() << endl;
+
 	m_useCamera = *it;
 
-	cout << "Switched from Cam: " << m_useCamera->GetName()
-		<< " to Cam: " << (*it)->GetName() << endl;
+	cout << " to Cam: " << m_useCamera->GetName() << endl;
 }
 
 //I want THAT Game Object by name
@@ -414,4 +418,9 @@ void Scene::Init()
 	{
 		(*it)->Init(this);
 	}
+}
+
+void Scene::SetActiveCamera(Camera* cam)
+{
+	m_useCamera = cam;
 }
