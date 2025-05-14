@@ -63,6 +63,17 @@ FirstPersonCamera::FirstPersonCamera(float _speed, float _sensitivity, float _pi
 	calculateDerivedValues();
 }
 
+glm::vec3 FirstPersonCamera::getPosition() const
+{
+	return m_position;
+}
+
+void FirstPersonCamera::setPosition(const glm::vec3& _position)
+{
+	this->m_position = _position;
+	calculateDerivedValues();
+}
+
 float FirstPersonCamera::getPitch() const
 {
 	return m_pitch;

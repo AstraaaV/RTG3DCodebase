@@ -13,6 +13,7 @@ private:
 	GLuint				m_numFaces = 0;
 	GLuint				m_vao = 0;
 
+	GLuint				m_texCoordBuffer;
 	GLuint				m_vertexBuffer;
 	GLuint				m_colourBuffer;
 	GLuint				m_indexBuffer;

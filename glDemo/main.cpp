@@ -25,6 +25,9 @@ GUClock* g_gameClock = nullptr;
 bool				g_mouseDown = false;
 double				g_prevMouseX, g_prevMouseY;
 
+// Texture handling
+GLuint g_wallTex = 0;
+
 // Global Example objects
 // shouldn't really be anything in here for the final submission
 ArcballCamera* g_mainCamera = nullptr;
@@ -63,6 +66,20 @@ std::vector<glm::vec3> g_torchPos =
 	vec3(8.6f, 2.5f, 4.4f), // Right, center
 	vec3(2.2f, 2.5f, 8.6f), // Front, left
 	vec3(6.6f, 2.5f, 8.6f) // Front, right
+};
+
+// Map layout 2d
+std::vector<std::string> g_mapLayout = {
+	"WWWWWWWWWW",
+	"W        W",
+	"W WWWWWW W",
+	"W W    W W",
+	"W W WW W W",
+	"W W WW W W",
+	"W W    W W",
+	"W WWWWWW W",
+	"W        W",
+	"WWWWWWWWWW"
 };
 
 int g_showing = 2;
@@ -162,12 +179,18 @@ int main()
 
 	g_texDirLightShader = setupShaders(string("Assets\\Shaders\\texture-directional.vert"), string("Assets\\Shaders\\texture-directional.frag"));
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
+	g_wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
 
 	g_mainCamera = new ArcballCamera(0.0f, 0.0f, 1.98595f, 55.0f, 1.0f, 0.1f, 500.0f);
 	
 	// First person camera
 	g_fpCamera = new FirstPersonCamera();
 	g_fpCamera->setAspect((float)g_initWidth / g_initHeight);
+
+	// Spacing in map
+	float spacing = 2.2f;
+	glm::vec3 spawnPos = glm::vec3(1 * spacing, 0.0f, 1 * spacing);
+	g_fpCamera->setPosition(spawnPos);
 
 	// Isometric camera
 	g_isoCamera = new IsometricCamera();
@@ -343,16 +366,22 @@ void renderScene()
 	case 1:
 	{
 		// Render cube 
-		glUseProgram(g_flatColourShader);
+		glUseProgram(g_texDirLightShader);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, g_wallTex);
 
 		GLint pLocation;
-		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
+		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
+		glUniform1i(pLocation, 0);
+
+		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
 		
-		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
+		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
 		
-		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
+		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
 		
 		// Floor
 		for (int x = 0; x < 5; x++)
@@ -380,8 +409,28 @@ void renderScene()
 			}
 		}
 
+		// Render walls using map layout
+		for (int row = 0; row < g_mapLayout.size(); row++)
+		{
+			for (int col = 0; col < g_mapLayout[row].length(); col++)
+			{
+				if (g_mapLayout[row][col] == 'W')
+				{
+					float x = col * 2.2f;
+					float z = row * 2.2f;
+
+					// wall cube
+					mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
+						glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 2.0f));
+
+					glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+					g_cube->render();
+				}
+			}
+		}
+
 		// Front wall (with door)
-		for (int x = 0; x < 5; x++)
+		/*for (int x = 0; x < 5; x++)
 		{
 			if (x == 2) continue; // gap for the door
 			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 1.0f, 8.8f)) *
@@ -419,7 +468,7 @@ void renderScene()
 
 			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
 			g_cube->render();
-		}
+		}*/
 
 		glUseProgram(g_texPointLightShader);
 

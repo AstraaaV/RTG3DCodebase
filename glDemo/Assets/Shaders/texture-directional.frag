@@ -26,7 +26,7 @@ void main(void) {
 
 	// calculate lambertian (l)
 	vec3 N = normalize(inputFragment.surfaceNormal);
-	float l = dot(N, DIRDir);
+	float l = max(dot(N, DIRDir), 0.0);
 
 	// Calculate diffuse brightness / colour for fragment
 	vec4 surfaceColour = texture2D(texture, inputFragment.texCoord);

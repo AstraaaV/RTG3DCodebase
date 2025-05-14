@@ -5,7 +5,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
 layout (location=0) in vec3 vertexPos;
-layout (location=2) in vec3 vertexTexCoord;
+layout (location=2) in vec2 vertexTexCoord;
 layout (location=3) in vec3 vertexNormal;
 
 out SimplePacket {

@@ -7,6 +7,45 @@ using namespace glm;
 
 // Example data for cube model
 
+// UV coords
+static float texCoordArray[] = {
+	//top
+	0.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+
+	//bottom
+	0.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+
+	//right
+	0.0f, 1.0f,
+	1.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+
+	//left
+	0.0f, 1.0f,
+	1.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+
+	//front
+	0.0f, 1.0f,
+	1.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+
+	//back
+	0.0f, 1.0f,
+	1.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f
+};
+
 // Packed vertex buffer for cube
 static float positionArray[] = {
 	
@@ -127,6 +166,13 @@ Cube::Cube() {
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
+	// setup vbo for texCoord attribute
+	glGenBuffers(1, &m_texCoordBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_texCoordBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoordArray), texCoordArray, GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(2);
+
 	// setup vbo for position attribute
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -155,6 +201,7 @@ Cube::~Cube() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	glDeleteBuffers(1, &m_texCoordBuffer);
 	glDeleteBuffers(1, &m_vertexBuffer);
 	glDeleteBuffers(1, &m_colourBuffer);
 	glDeleteBuffers(1, &m_indexBuffer);

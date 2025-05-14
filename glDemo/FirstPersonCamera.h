@@ -37,6 +37,9 @@ public:
 	FirstPersonCamera();
 	FirstPersonCamera(float _speed, float _sensitivity, float _pitch, float _yaw, float _fovY, float _aspect, float _nearPlane, float _farPlane);
 
+	glm::vec3 getPosition() const;
+	void setPosition(const glm::vec3& _position);
+
 	float getPitch() const;
 	void setPitch(float _pitch);
 
