@@ -13,6 +13,7 @@ class Light;
 class Model;
 class Texture;
 class Shader;
+class Cube;
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -54,6 +55,8 @@ public:
 
 	Camera* GetActiveCamera() { return m_useCamera; }
 
+	void AddCamera(Camera* cam);
+
 protected:
 
 	//data structures containing pointers to all our stuff
@@ -69,6 +72,8 @@ protected:
 	std::list<Texture*>		m_Textures;
 	std::list<Shader*>		m_Shaders;
 	std::list<GameObject*> m_GameObjects;
+
+	Cube* m_cube = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;

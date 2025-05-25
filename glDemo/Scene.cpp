@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObjectFactory.h"
+#include "Cube.h"
 #include <assert.h>
 
 Scene::Scene()
@@ -23,6 +24,12 @@ Scene::~Scene()
 	for (auto texture : m_Textures) delete texture;
 	for (auto shader : m_Shaders) delete shader;
 	for (auto go : m_GameObjects) delete go;
+
+	if (m_cube)
+	{
+		delete m_cube;
+		m_cube = nullptr;
+	}
 }
 
 //tick all my Game Objects, lights and cameras
@@ -418,9 +425,17 @@ void Scene::Init()
 	{
 		(*it)->Init(this);
 	}
+
+	// Create cube
+	m_cube = new Cube();
 }
 
 void Scene::SetActiveCamera(Camera* cam)
 {
 	m_useCamera = cam;
+}
+
+void Scene::AddCamera(Camera* cam)
+{
+	m_Cameras.push_back(cam);
 }

@@ -37,8 +37,8 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 	glGenBuffers(1, &m_meshNormalBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_meshNormalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, mesh->mNumVertices * sizeof(aiVector3D), mesh->mNormals, GL_STATIC_DRAW);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(1);
 
 	// *** normal mapping *** Setup VBO for tangent and bi-tangent data
 	glGenBuffers(1, &m_meshTangentBuffer);

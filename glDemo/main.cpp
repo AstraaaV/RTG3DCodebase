@@ -27,6 +27,8 @@ double				g_prevMouseX, g_prevMouseY;
 
 bool				g_camSwitchPressed = false;
 
+bool g_lightsEnabled = true;
+
 // Texture handling
 GLuint g_wallTex = 0;
 
@@ -41,9 +43,9 @@ Cube* g_cube = nullptr;
 GLuint g_flatColourShader;
 
 GLuint g_texDirLightShader;
-vec3 g_DLdirection = vec3(0.0f, 1.0f, 0.0f);
+vec3 g_DLdirection = glm::normalize(vec3(-1.0f, -1.0f, -1.0f));
 vec3 g_DLcolour = vec3(1.0f, 1.0f, 1.0f);
-vec3 g_DLambient = vec3(0.2f, 0.2f, 0.2f);
+vec3 g_DLambient = vec3(0.4f, 0.4f, 0.4f);
 
 GLuint g_texPointLightShader;
 vec3 g_PLposition = vec3(1.0f, 1.0f, 1.0f);
@@ -73,14 +75,14 @@ std::vector<glm::vec3> g_torchPos =
 // Map layout 2d
 std::vector<std::string> g_mapLayout = {
 	"WWWWWWWWWW",
-	"W        W",
-	"W WWWWWW W",
-	"W W    W W",
-	"W W WW W W",
-	"W W WW W W",
-	"W W    W W",
-	"W WWWWWW W",
-	"W        W",
+	"W..T....PW",
+	"W.WWWWW..W",
+	"W.W....W.W",
+	"W.W.WW.W.W",
+	"W.W.WW.W.W",
+	"W.W....W.W",
+	"W.WWWWW..W",
+	"W..D.....W",
 	"WWWWWWWWWW"
 };
 
@@ -163,7 +165,7 @@ int main()
 #pragma endregion
 
 	// Initialise scene - geometry and shaders etc
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // setup background colour to be black
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // setup background colour to be black
 	glClearDepth(1.0f);
 
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -183,16 +185,83 @@ int main()
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
 	g_wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
 
+	if (g_wallTex == 0)
+	{
+		cout << "Texture failed to load." << endl;
+	}
+
 	g_mainCamera = new ArcballCamera(0.0f, 0.0f, 1.98595f, 55.0f, 1.0f, 0.1f, 500.0f);
-	
+
 	// First person camera
 	g_fpCamera = new FirstPersonCamera();
+	g_fpCamera->SetName("MAIN");
 	g_fpCamera->setAspect((float)g_initWidth / g_initHeight);
+	
+	//
+	//Set up Scene class
+	//
+
+	g_Scene = new Scene();
+
+	ifstream manifest;
+	manifest.open("manifest.txt");
+
+	g_Scene->Load(manifest);
+	g_Scene->Init();
+
+	g_showing = 1;
+
+	manifest.close();
+
+	if (!g_Scene->GetActiveCamera())
+	{
+		cout << "No active camera set after Init." << endl;
+	}
+	else
+	{
+		cout << "Active camera is: " << g_Scene->GetActiveCamera()->GetName() << endl;
+	}
+	
+	g_Scene->AddCamera(g_fpCamera);
+	g_Scene->SetActiveCamera(g_fpCamera);
+
+	bool camSpawnSet = false;
+
+	for (int row = 0; row < g_mapLayout.size(); ++row)
+	{
+		for (int col = 0; col < g_mapLayout[row].length(); ++col)
+		{
+			if (g_mapLayout[row][col] == 'P')
+			{
+				float x = col * 2.2f;
+				float z = row * 2.2f;
+				g_fpCamera->setPosition(glm::vec3(x, 1.5f, z));
+				camSpawnSet = true;
+				break;
+			}
+		}
+	}
+
+	g_torchPos.clear();
+
+	for (int row = 0; row < g_mapLayout.size(); ++row)
+	{
+		for (int col = 0; col < g_mapLayout[row].length(); ++col)
+		{
+			if (g_mapLayout[row][col] == 'T')
+			{
+				float x = col * 2.2f;
+				float y = 2.5f;
+				float z = row * 2.2f;
+				g_torchPos.push_back(glm::vec3(x, y, z));
+			}
+		}
+	}
 
 	// Spacing in map
 	float spacing = 2.2f;
 	glm::vec3 spawnPos = glm::vec3(1 * spacing, 0.0f, 1 * spacing);
-	g_fpCamera->setPosition(spawnPos);
+	if (g_fpCamera) g_fpCamera->setPosition(glm::vec3(2.2f,1.5f,2.2f));
 
 	// Isometric camera
 	g_isoCamera = new IsometricCamera();
@@ -211,20 +280,6 @@ int main()
 	if (g_planetMesh) {
 		g_planetMesh->addTexture(string("Assets\\Textures\\Hodges_G_MountainRock1.jpg"), FIF_JPEG);
 	}
-
-	//
-	//Set up Scene class
-	//
-
-	g_Scene = new Scene();
-
-	ifstream manifest;
-	manifest.open("manifest.txt");
-
-	g_Scene->Load(manifest);
-	g_Scene->Init();
-
-	manifest.close();
 
 
 	//
@@ -356,19 +411,31 @@ void renderScene()
 		// Render cube 
 		glUseProgram(g_texDirLightShader);
 
+		GLint pLocation;
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, g_wallTex);
 
-		GLint pLocation;
 		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
 		glUniform1i(pLocation, 0);
 
+		// Lighting
+		Helper::SetUniformLocation(g_texDirLightShader, "lightsEnabled", &pLocation);
+		glUniform1i(pLocation, g_lightsEnabled ? 1 : 0);
+
+		// Directional
+		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
+		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLdirection);
+		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
+		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
+		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
+		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
+
+		// Matrices
 		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		
 		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		
+
 		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
 		
 		// Floor
@@ -402,18 +469,35 @@ void renderScene()
 		{
 			for (int col = 0; col < g_mapLayout[row].length(); col++)
 			{
-				if (g_mapLayout[row][col] == 'W')
+
+				char tile = g_mapLayout[row][col];
+				float x = col * 2.2f;
+				float z = row * 2.2f;
+
+				mat4 modelTransform;
+
+				switch(tile)
 				{
-					float x = col * 2.2f;
-					float z = row * 2.2f;
-
-					// wall cube
-					mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
+				case 'W': // Wall
+					modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
 						glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 2.0f));
+					break;
 
-					glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-					g_cube->render();
+				case 'T': // Torch
+					modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.5f, z)) *
+						glm::scale(identity<mat4>(), vec3(0.3f, 2.0f, 0.3f));
+					break;
+
+				case 'D': // Door
+					modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
+						glm::scale(identity<mat4>(), vec3(1.0f, 2.0f, 0.3f));
+					break;
+
+				default:
+					continue;
 				}
+				glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+				g_cube->render();
 			}
 		}
 
@@ -512,6 +596,11 @@ void renderScene()
 
 void processKeys(GLFWwindow* window, float deltaTime)
 {
+	static bool debugOn = false;
+
+	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+		debugOn = !debugOn;
+
 	Camera* activeCam = g_Scene->GetActiveCamera();
 	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(activeCam);
 	if (!fpCam)
@@ -519,8 +608,15 @@ void processKeys(GLFWwindow* window, float deltaTime)
 		cout << "Active cam is NOT FPC\n";
 		return;
 	}
-	cout << "Using FPC for movement\n";
-		
+
+	static bool printed = false;
+	if (!printed)
+	{
+		cout << "Using FPC for movement\n";
+		printed = true;
+	}
+	
+	static glm::vec3 lastPos = fpCam->getPosition();
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		fpCam->processKeys(CameraMovement::FORWARD, deltaTime);
@@ -534,6 +630,14 @@ void processKeys(GLFWwindow* window, float deltaTime)
 		fpCam->processKeys(CameraMovement::DOWN, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 		fpCam->processKeys(CameraMovement::UP, deltaTime);
+
+	glm::vec3 currentPos = fpCam->getPosition();
+	if (currentPos != lastPos)
+	{
+		cout << "Cam moved to: " << currentPos.x << ", " << currentPos.y << ", " << currentPos.z << endl;
+		lastPos = currentPos;
+	}
+
 }
 
 // Function called to animate elements in the scene
@@ -548,6 +652,15 @@ void updateScene(GLFWwindow* window)
 	}
 
 	g_Scene->Update(tDelta, g_window);
+
+	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
+
+	if (fpCam)
+	{
+		vec3 pos = fpCam->getPosition();
+		pos.z += 0.1f;
+		fpCam->setPosition(pos);
+	}
 }
 
 
@@ -604,6 +717,11 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 				g_camSwitchPressed = false;
 			}
 
+		case GLFW_KEY_L:
+			g_lightsEnabled = !g_lightsEnabled;
+			cout << "Lights enabled: " << (g_lightsEnabled ? "ON" : "OFF") << endl;
+			break;
+
 		default:
 		{
 		}
@@ -624,7 +742,11 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos) 
 {
-	std::cout << "Mouse moved: " << _xpos << ", " << _ypos << std::endl;
+	static int frameCount = 0;
+	if (++frameCount % 30 == 0)
+	{
+		std::cout << "Mouse moved: " << _xpos << ", " << _ypos << std::endl;
+	}
 
 	static bool fpMouse = true;
 

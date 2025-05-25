@@ -9,7 +9,7 @@ layout(binding = 0) uniform sampler2D texture;
 uniform vec3 DIRDir;
 uniform vec3 DIRCol;
 uniform vec3 DIRAmb;
-
+uniform bool lightsEnabled;
 
 in SimplePacket {
 	
@@ -24,14 +24,21 @@ layout (location=0) out vec4 fragColour;
 
 void main(void) {
 
+	vec4 surfaceColour = texture(texture, inputFragment.texCoord);
+
+	if(!lightsEnabled)
+	{
+		fragColour = surfaceColour;
+		return;
+	}
+
 	// calculate lambertian (l)
 	vec3 N = normalize(inputFragment.surfaceNormal);
 	float l = max(dot(N, DIRDir), 0.0);
 
 	// Calculate diffuse brightness / colour for fragment
-	vec4 surfaceColour = texture2D(texture, inputFragment.texCoord);
 	vec3 diffuseColour = surfaceColour.rgb * DIRCol * l;
 
-	fragColour = vec4(DIRAmb,1.0)+vec4(diffuseColour, 1.0);
+	fragColour = vec4(DIRAmb + diffuseColour, 1.0);
 	//fragColour = vec4(vec3(l, l, l), 1.0);
 }

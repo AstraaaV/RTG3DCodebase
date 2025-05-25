@@ -28,9 +28,9 @@ FAR: 100.0
 }
 {
 TYPE: FirstPerson
-NAME: CAM4
-POS:  0.0 5.0 -5.0
-LOOKAT: 0.0 0.0 0.0
+NAME: MAIN
+POS:  2.2 1.5 2.2
+LOOKAT: 2.2 0.0 4.4
 FOV: 45.0
 NEAR: 0.5
 FAR: 100.0

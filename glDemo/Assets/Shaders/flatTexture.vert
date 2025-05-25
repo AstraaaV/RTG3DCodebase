@@ -11,7 +11,7 @@ layout (location=4) in vec3 vertexColour;
 
 out SimplePacket {
 
-  vec3 texCoord;
+  vec2 texCoord;
 
 } outputVertex;
 

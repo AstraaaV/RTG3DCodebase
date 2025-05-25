@@ -171,3 +171,19 @@ glm::mat4 FirstPersonCamera::projectionTransform()
 {
 	return m_projectionMatrix;
 }
+
+void FirstPersonCamera::Tick(float dt, GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		processKeys(CameraMovement::FORWARD, dt);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		processKeys(CameraMovement::BACKWARD, dt);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		processKeys(CameraMovement::LEFT, dt);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		processKeys(CameraMovement::RIGHT, dt);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		processKeys(CameraMovement::DOWN, dt);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		processKeys(CameraMovement::UP, dt);
+}

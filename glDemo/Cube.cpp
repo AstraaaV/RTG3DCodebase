@@ -155,7 +155,44 @@ static unsigned int indexArray[] = {
 	21, 23, 22
 };
 
+static float normalArray[] =
+{
+	// Top
+	0.0f, 1.0f, 0.0f,
+	0.0f, 1.0f, 0.0f,
+	0.0f, 1.0f, 0.0f,
+	0.0f, 1.0f, 0.0f,
 
+	// Bottom
+	0.0f, -1.0f, 0.0f,
+	0.0f, -1.0f, 0.0f,
+	0.0f, -1.0f, 0.0f,
+	0.0f, -1.0f, 0.0f,
+
+	// Right
+	1.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f,
+
+	// Left
+	-1.0f, 0.0f, 0.0f,
+	-1.0f, 0.0f, 0.0f,
+	-1.0f, 0.0f, 0.0f,
+	-1.0f, 0.0f, 0.0f,
+
+	// Front
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+
+	// Back
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f
+};
 
 Cube::Cube() {
 
@@ -192,6 +229,13 @@ Cube::Cube() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), indexArray, GL_STATIC_DRAW);
 
+	// setup vbo for normals
+	glGenBuffers(1, &m_normalBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_normalBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(normalArray), normalArray, GL_STATIC_DRAW);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(3);
+
 	glBindVertexArray(0);
 }
 
@@ -205,6 +249,7 @@ Cube::~Cube() {
 	glDeleteBuffers(1, &m_vertexBuffer);
 	glDeleteBuffers(1, &m_colourBuffer);
 	glDeleteBuffers(1, &m_indexBuffer);
+	glDeleteBuffers(1, &m_normalBuffer);
 }
 
 
