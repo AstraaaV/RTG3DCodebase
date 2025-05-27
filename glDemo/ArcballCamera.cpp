@@ -21,7 +21,7 @@ ArcballCamera::ArcballCamera()
 	m_near = 0.1f;
 	m_far = 100.0f;
 	m_type = "Arcball";
-	m_type = "ArcballCam";
+	m_name = "ArcballCam";
 }
 
 void ArcballCamera::Init(float screenW, float screenH, Scene* scene)
