@@ -45,10 +45,6 @@ GLuint g_texDirLightShader;
 
 GLuint g_texPointLightShader;
 
-AIMesh* g_creatureMesh = nullptr;
-vec3 g_beastPos = vec3(2.0f, 0.0f, 0.0f);
-float g_beastRotation = 0.0f;
-
 // Torch positions
 std::vector<glm::vec3> torches =
 {
@@ -155,7 +151,10 @@ int main()
 	// Setup the Example Objects
 	//
 
-	g_texDirLightShader = setupShaders(string("Assets\\Shaders\\texture-directional.vert"), string("Assets\\Shaders\\texture-directional.frag"));
+	GLuint dirShader = setupShaders("Assets\\Shaders\\texture-directional.vert", "Assets\\Shaders\\texture-directional.frag");
+	GLuint pointShader = setupShaders("Assets\\Shaders\\texture-point.vert", "Assets\\Shaders\\texture-point.frag");
+
+
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
 	g_wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
 
@@ -176,6 +175,9 @@ int main()
 	//
 
 	g_Scene = new Scene();
+	g_Scene->SetWallTexture(g_wallTex);
+	g_Scene->SetTexDirLightShader(dirShader);
+	g_Scene->SetTexPointLightShader(pointShader);
 
 	ifstream manifest;
 	manifest.open("manifest.txt");
@@ -228,11 +230,6 @@ int main()
 	g_isoCamera->setAspect((float)g_initWidth / g_initHeight);
 
 	g_principleAxes = new CGPrincipleAxes();
-
-	g_creatureMesh = new AIMesh(string("Assets\\beast\\beast.obj"));
-	if (g_creatureMesh) {
-		g_creatureMesh->addTexture(string("Assets\\beast\\beast_texture.bmp"), FIF_BMP);
-	}
 
 	//
 	// Main loop
@@ -307,7 +304,8 @@ void renderScene()
 	{
 	case 0:
 	{
-		glUseProgram(g_texDirLightShader);
+		GLuint dirShader = g_Scene->GetTexDirLightShader();
+		glUseProgram(dirShader);
 
 		GLint pLocation;
 		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
@@ -334,7 +332,7 @@ void renderScene()
 
 		GLint pLocation;
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, g_wallTex);
+		glBindTexture(GL_TEXTURE_2D, g_Scene->GetWallTexture());
 
 		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
 		glUniform1i(pLocation, 0);

@@ -77,13 +77,21 @@ public:
 	glm::vec3 GetDirLightDirection() const { return m_dirLightDirection; }
 	glm::vec3 GetDirLightColour() const { return m_dirLightColour; }
 	glm::vec3 GetDirLightAmbient() const { return m_dirLightAmbient; }
+	GLuint GetTexDirLightShader() const { return m_texDirLightShader; }
 
 	glm::vec3 GetPointLightPosition() const { return m_pointLightPosition; }
 	glm::vec3 GetPointLightColour() const { return m_pointLightColour; }
 	glm::vec3 GetPointLightAmbient() const { return m_pointLightAmbient; }
+	GLuint GetTexPointLightShader() const { return m_texPointLightShader; }
+
+	void SetTexDirLightShader(GLuint shader) { m_texDirLightShader = shader; }
+	void SetTexPointLightShader(GLuint shader) { m_texPointLightShader = shader; }
 
 	void SetLightsEnabled(bool enabled) { m_lightsEnabled = enabled; }
 	bool GetLightsEnabled() const { return m_lightsEnabled; }
+
+	void SetWallTexture(GLuint tex) { m_wallTexture = tex; }
+	GLuint GetWallTexture() const { return m_wallTexture; }
 
 protected:
 
@@ -107,10 +115,12 @@ protected:
 	glm::vec3 m_dirLightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f));
 	glm::vec3 m_dirLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_dirLightAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	GLuint m_texDirLightShader = 0;
 
 	glm::vec3 m_pointLightPosition = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_pointLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_pointLightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
+	GLuint m_texPointLightShader = 0;
 
 	Cube* m_cube = nullptr;
 
@@ -125,5 +135,7 @@ protected:
 	AIMesh* m_creatureMesh = nullptr;
 	glm::vec3 m_beastPos = glm::vec3(2.0f, 0.0f, 0.0f);
 	float m_beastRotation = 0.0f;
+
+	GLuint m_wallTexture;
 };
 
