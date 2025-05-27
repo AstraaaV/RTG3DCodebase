@@ -1,24 +1,36 @@
 #include "core.h"
 #include "Light.h"
+#include "core.h"
 
 #include "helper.h"
 #include "stringHelp.h"
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 Light::Light()
 {
-	m_type = "LIGHT";
-	m_pos.x = 0.0f;
-	m_pos.y = 0.0f;
-	m_pos.z = 0.0f;
+	m_type = "LIGHT", m_name = "Light";
+	
+	m_pos = glm::vec3(0.0f);
+	m_dir = glm::vec3(0.0f, -1.0f, 0.0f);
+	m_col = glm::vec3(1.0f);
+	m_amb = glm::vec3(0.2f);
+	m_intensity = 1.0f;
+
+}
+
+Light::~Light()
+{
 }
 
 void Light::Load(ifstream& _file)
 {
 	StringHelp::String(_file, "NAME", m_name);
 	StringHelp::Float3(_file, "POS", m_pos.x, m_pos.y, m_pos.z);
+	StringHelp::Float3(_file, "DIR", m_dir.x, m_dir.y, m_dir.z);
 	StringHelp::Float3(_file, "COL", m_col.x, m_col.y, m_col.z);
 	StringHelp::Float3(_file, "AMB", m_amb.x, m_amb.y, m_amb.z);
+	StringHelp::Float(_file, "INTENSITY", m_intensity);
 
 }
 
@@ -40,21 +52,23 @@ void Light::Tick(float _dt, GLFWwindow* window)
 	m_amb = glm::vec3(0.2f) * lightFactor;
 }
 
-//send values to the shaders to allow the use of this light
-// <m_name>Pos <m_name>Col <m_name>Amb
-void Light::SetRenderValues(unsigned int _prog)
+void Light::SetRenderValues(GLuint _shaderProg)
 {
 	GLint loc;
-	string posString = m_name + "Pos";
-	string colString = m_name + "Col";
-	string ambString = m_name + "Amb";
 
-	if (Helper::SetUniformLocation(_prog, posString.c_str(), &loc))
-		glUniform3fv(loc, 1, glm::value_ptr(GetPos()));
+	std::string base = m_name + ".";
+	Helper::SetUniformLocation(_shaderProg, (base + "position").c_str(), &loc);
+	glUniform3fv(loc, 1, glm::value_ptr(m_pos));
 
-	if (Helper::SetUniformLocation(_prog, colString.c_str(), &loc))
-		glUniform3fv(loc, 1, glm::value_ptr(GetCol()));
+	Helper::SetUniformLocation(_shaderProg, (base + "direction").c_str(), &loc);
+	glUniform3fv(loc, 1, glm::value_ptr(m_dir));
 
-	if (Helper::SetUniformLocation(_prog, ambString.c_str(), &loc))
-		glUniform3fv(loc, 1, glm::value_ptr(GetAmb()));
+	Helper::SetUniformLocation(_shaderProg, (base + "colour").c_str(), &loc);
+	glUniform3fv(loc, 1, glm::value_ptr(m_col));
+
+	Helper::SetUniformLocation(_shaderProg, (base + "ambient").c_str(), &loc);
+	glUniform3fv(loc, 1, glm::value_ptr(m_amb));
+
+	Helper::SetUniformLocation(_shaderProg, (base + "intensity").c_str(), &loc);
+	glUniform1f(loc, m_intensity);
 }

@@ -7,48 +7,31 @@ using namespace glm;
 
 GameObject::GameObject()
 {
-	m_type = "GAMEOBJECT";
+	m_name = "GameObject";
+	m_pos = glm::vec3(0.0f);
+	m_renderPass = 0;
+	m_scene = nullptr;
 }
 
 GameObject::~GameObject()
 {
 }
 
-void GameObject::Load(ifstream& _file)
+void GameObject::Init(Scene* scene)
 {
-	StringHelp::String(_file, "NAME", m_name);
-	StringHelp::Float3(_file, "POS", m_pos.x, m_pos.y, m_pos.z);
-	StringHelp::Float3(_file, "ROT", m_rot.x, m_rot.y, m_rot.z);
-	StringHelp::Float3(_file, "SCALE", m_scale.x, m_scale.y, m_scale.z);
-	StringHelp::Float3(_file, "ROT INC", m_rot_incr.x, m_rot_incr.y, m_rot_incr.z);
+	m_scene = scene;
 }
 
-void GameObject::Tick(float _dt, GLFWwindow* _window)
+void GameObject::Tick(float deltaTime, GLFWwindow* window)
 {
-	m_rot += m_rot_incr;
-
-	m_worldMatrix = glm::translate(mat4(1.0), vec3(m_pos));
-	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-	m_worldMatrix = glm::scale(m_worldMatrix, glm::vec3(m_scale));
-}
-
-void GameObject::PreRender()
-{
-	// Setup model transform
-	GLint pLocation;
-	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&m_worldMatrix);
 }
 
 void GameObject::Render()
 {
-	//I have nothing to draw
 }
 
-void GameObject::Init(Scene* _scene)
+void GameObject::Load(std::ifstream& file)
 {
-	//I have nothing to link up to
+	StringHelp::String(file, "NAME", m_name);
+	StringHelp::Float3(file, "POS", m_pos.x, m_pos.y, m_pos.z);
 }

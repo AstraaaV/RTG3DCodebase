@@ -4,17 +4,17 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <AIMesh.h>
 
 using namespace std;
 
-class GameObject;
-class Camera;
-class Light;
-class Model;
-class Texture;
-class Shader;
-class Cube;
+#include "Camera.h"
+#include "Light.h"
+#include "Model.h"
+#include "Texture.h"
+#include "Shader.h"
+#include "GameObject.h"
+#include "Cube.h"
+#include "AIMesh.h"
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -23,85 +23,47 @@ public:
 	Scene();
 	~Scene();
 
-	//tick all GOs
+	void Init();
 	void Update(float _dt, GLFWwindow* window);
-
-	//add this GO to my list
-	void AddGameObject(GameObject* _new);
-
-	//method to cycle through cameras
-	void CycleCams();
-
-	//return a pointer to a given thing by its name
-	GameObject* GetGameObject(string _GOName);
-	Camera* GetCamera(string _camName);
-	Light* GetLight(string _lightName);
-	Texture* GetTexture(string _texName);
-	Model* GetModel(string _modelName);
-	Shader* GetShader(string _shaderName);
-
-	//Render Everything
 	void Render();
-
+	void BuildMap();
+	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection);
 	void RenderCreature(GLuint shaderProgram);
-
 	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix,
 		const glm::vec3& lightPos, const glm::vec3& lightCol, const glm::vec3& ambientCol);
 
-	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& prokection);
-
-	void BuildMap();
-
-	//set up all shader uniform values for all of our lights
 	void SetShaderUniforms(GLuint _shaderprog);
+	void GenerateTorchPos();
 
-	//load from file
-	void Load(ifstream& _file);
-
-	//initialise links between items in the scene
-	void Init();
-
+	void AddGameObject(GameObject* _new);
+	void AddCamera(Camera* cam);
 	void SetActiveCamera(Camera* cam);
+	void CycleCams();
 
 	Camera* GetActiveCamera() { return m_useCamera; }
-
 	Cube* GetCube() const { return m_cube; }
 
-	const std::vector<std::string>& GetMapLayout() const { return m_mapLayout; }
-
-	void AddCamera(Camera* cam);
-
-	void GenerateTorchPos();
-	const std::vector<glm::vec3>& GetTorchPositions() const { return m_torchPos; }
-
-	glm::vec3 GetDirLightDirection() const { return m_dirLightDirection; }
-	glm::vec3 GetDirLightColour() const { return m_dirLightColour; }
-	glm::vec3 GetDirLightAmbient() const { return m_dirLightAmbient; }
-	GLuint GetTexDirLightShader() const { return m_texDirLightShader; }
-
-	glm::vec3 GetPointLightPosition() const { return m_pointLightPosition; }
-	glm::vec3 GetPointLightColour() const { return m_pointLightColour; }
-	glm::vec3 GetPointLightAmbient() const { return m_pointLightAmbient; }
-	GLuint GetTexPointLightShader() const { return m_texPointLightShader; }
+	void SetWallTexture(GLuint tex) { m_wallTex = tex; }
+	GLuint GetWallTexture() const { return m_wallTex; }
 
 	void SetTexDirLightShader(GLuint shader) { m_texDirLightShader = shader; }
 	void SetTexPointLightShader(GLuint shader) { m_texPointLightShader = shader; }
 
-	void SetLightsEnabled(bool enabled) { m_lightsEnabled = enabled; }
-	bool GetLightsEnabled() const { return m_lightsEnabled; }
+	GLuint GetTexDirLightShader() const { return m_texDirLightShader; }
+	GLuint GetTexPointLightShader() const { return m_texPointLightShader; }
 
-	void SetWallTexture(GLuint tex) { m_wallTexture = tex; }
-	GLuint GetWallTexture() const { return m_wallTexture; }
+	glm::vec3 GetDirLightDirection() const { return m_dirLightDirection; }
+	glm::vec3 GetDirLightColour() const { return m_dirLightColour; }
+	glm::vec3 GetDirLightAmbient() const { return m_dirLightAmbient; }
+
+	glm::vec3 GetPointLightPosition() const { return m_pointLightPosition; }
+	glm::vec3 GetPointLightColour() const { return m_pointLightColour; }
+	glm::vec3 GetPointLightAmbient() const { return m_pointLightAmbient; }
+
+	void SetLightsEnabled(bool enabled) { m_lightsEnabled = enabled; }
+	void Load(ifstream& _file);
 
 protected:
-
-	//data structures containing pointers to all our stuff
-	int m_numCameras = 0;
-	int m_numLights = 0;
-	int m_numGameObjects = 0;
-	int m_numModels = 0;
-	int m_numTextures = 0;
-	int m_numShaders = 0;
 	std::list<Camera*>    m_Cameras;
 	std::list<Light*>    m_Lights;
 	std::list<Model*>		m_Models;
@@ -112,30 +74,33 @@ protected:
 	std::vector<std::string> m_mapLayout;
 	std::vector<glm::vec3> m_torchPos;
 
+
+	Cube* m_cube = nullptr;
+	AIMesh* m_creatureMesh = nullptr;
+
+	Camera* m_useCamera = nullptr; //current main camera in use
+	int m_useCameraIndex = 0;
+	bool m_camSwitchPressed = false;
+
+	bool m_lightsEnabled = false;
+
+	GLuint m_wallTex = 0;
+	GLuint m_texDirLightShader = 0;
+	GLuint m_texPointLightShader = 0;
+
+	int m_numCameras = 0;
+	int m_numGameObjects = 0;
+	int m_numLights = 0;
+	int m_numModels = 0;
+	int m_numShaders = 0;
+	int m_numTextures = 0;
+
 	glm::vec3 m_dirLightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f));
 	glm::vec3 m_dirLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_dirLightAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
-	GLuint m_texDirLightShader = 0;
 
 	glm::vec3 m_pointLightPosition = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_pointLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 m_pointLightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
-	GLuint m_texPointLightShader = 0;
-
-	Cube* m_cube = nullptr;
-
-	Camera* m_useCamera = nullptr; //current main camera in use
-	int m_useCameraIndex = 0;
-	int m_activeCameraIndex = 0;
-	bool m_camSwitchPressed = false;
-
-	bool m_lightsEnabled = true;
-
-	// Examples
-	AIMesh* m_creatureMesh = nullptr;
-	glm::vec3 m_beastPos = glm::vec3(2.0f, 0.0f, 0.0f);
-	float m_beastRotation = 0.0f;
-
-	GLuint m_wallTexture;
 };
 

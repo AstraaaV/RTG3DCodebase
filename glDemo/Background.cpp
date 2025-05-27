@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Model.h"
+#include <RenderPass.h>
 
 Background::Background()
 {
@@ -29,13 +30,12 @@ void Background::Tick(float _dt, GLFWwindow* window)
 
 void Background::PreRender()
 {
-	GameObject::PreRender();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 
 	GLint timeLoc;
-	Helper::SetUniformLocation(m_ShaderProg, "u_time", &timeLoc);
+	Helper::SetUniformLocation(m_shader, "u_time", &timeLoc);
 	glUniform1f(timeLoc, glfwGetTime());
 }
 
@@ -44,11 +44,11 @@ void Background::Render()
 	m_model->Render();
 }
 
-void Background::Init(Scene* _scene)
+void Background::Init(GLuint shader, GLuint texture, Model* model)
 {
-	m_ShaderProg = _scene->GetShader(m_ShaderName)->GetProg();
-	m_texture = _scene->GetTexture(m_TexName)->GetTexID();
-	m_model = _scene->GetModel(m_ModelName);
+	m_shader = shader;
+	m_texture = texture;
+	m_model = model;
 
 	SetRenderPass(RP_BACKGROUND); // Makes sure its in bg render pass
 

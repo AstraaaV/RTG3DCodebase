@@ -11,7 +11,16 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////////////
 Camera::Camera()
 {
-	m_type = "CAMERA";
+	m_pos = glm::vec3(0.0f, 0.0f, 3.0f);
+	m_lookAt = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_fov = 45.0f;
+	m_near = 0.1f;
+	m_far = 100.0f;
+	m_aspect = 1.0f;
+	m_type = "BaseCam";
+
+	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, glm::vec3(0, 1, 0));
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -21,12 +30,30 @@ Camera::~Camera()
 {
 }
 
+//set the base render values for this camera in the shaders
+void Camera::SetRenderValues(unsigned int shaderProgram)
+{
+	GLint loc;
+
+	glm::mat4 viewMatrix = GetView();
+	glm::mat4 projMatrix = GetProj();
+
+	//matrix for the view transform
+	if (Helper::SetUniformLocation(shaderProgram, "viewMatrix", &loc))
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+	//matrix for the projection transform
+	if (Helper::SetUniformLocation(shaderProgram, "projMatrix", &loc))
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(projMatrix));
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Init() - 
 /////////////////////////////////////////////////////////////////////////////////////
 void Camera::Init(float _screenWidth, float _screenHeight, Scene* _scene)
 {
-	setAspect(_screenWidth / _screenHeight);
+	m_aspect = _screenWidth / _screenHeight;
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -50,13 +77,7 @@ void Camera::Tick(float _dt, GLFWwindow* window)
 	if (height <= 0) height = 1;
 
 	float asp = static_cast<float>(width) / static_cast<float>(height);
-	setAspect(asp);
-}
-
-void Camera::setAspect(float asp)
-{
-	m_aspect = asp;
-	m_projectionMatrix = glm::perspective(glm::radians(m_fov), asp, m_near, m_far);
+	SetAspect(asp);
 }
 
 void Camera::Load(ifstream& _file)
@@ -67,22 +88,4 @@ void Camera::Load(ifstream& _file)
 	StringHelp::Float(_file, "FOV", m_fov);
 	StringHelp::Float(_file, "NEAR", m_near);
 	StringHelp::Float(_file, "FAR", m_far);
-}
-
-//set the base render values for this camera in the shaders
-void Camera::SetRenderValues(unsigned int _prog)
-{
-	GLint loc;
-
-	//matrix for the view transform
-	if (Helper::SetUniformLocation(_prog, "viewMatrix", &loc))
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(GetView()));
-
-	//matrix for the projection transform
-	if (Helper::SetUniformLocation(_prog, "projMatrix", &loc))
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(GetProj()));
-
-	//the current camera is at this position
-	if (Helper::SetUniformLocation(_prog, "camPos", &loc))
-		glUniform3fv(loc, 1, glm::value_ptr(GetPos()));
 }

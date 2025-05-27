@@ -30,8 +30,6 @@ void ExampleGO::Tick(float _dt, GLFWwindow* window)
 
 void ExampleGO::PreRender()
 {
-	GameObject::PreRender();
-
 	//only thing I need to do is tell the shader about my texture
 
 	glEnable(GL_TEXTURE_2D);
@@ -41,7 +39,7 @@ void ExampleGO::PreRender()
 
 	GLint pLocation;
 	float time = glfwGetTime();
-	Helper::SetUniformLocation(m_ShaderProg, "u_time", &pLocation);
+	Helper::SetUniformLocation(m_shader, "u_time", &pLocation);
 	glUniform1f(pLocation, time);
 
 	//TODO: this does sort of replicate stuff in the AIMesh class, could we make them more compatible.
@@ -54,7 +52,7 @@ void ExampleGO::PreRender()
 	glBindTexture(GL_TEXTURE_2D, m_normalMap);
 
 	GLint normLoc;
-	Helper::SetUniformLocation(m_ShaderProg, "u_normalMap", &normLoc);
+	Helper::SetUniformLocation(m_shader, "u_normalMap", &normLoc);
 	glUniform1i(normLoc, 1);
 }
 
@@ -63,9 +61,9 @@ void ExampleGO::Render()
 	m_model->Render();
 }
 
-void ExampleGO::Init(Scene* _scene)
+void ExampleGO::Init(Scene* _scene, GLuint shaderProg, GLuint textureID, Model* model)
 {
-	m_ShaderProg = _scene->GetShader(m_ShaderName)->GetProg();
-	m_texture = _scene->GetTexture(m_TexName)->GetTexID();
-	m_model = _scene->GetModel(m_ModelName);
+	m_shader = shaderProg;
+	m_texture = textureID;
+	m_model = model;
 }

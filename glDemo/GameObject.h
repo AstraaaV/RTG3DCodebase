@@ -1,8 +1,6 @@
 #pragma once
 #include "core.h"
-#include <stdio.h>
 #include <string>
-#include "RenderPass.h"
 
 using namespace std;
 class Scene;
@@ -16,42 +14,28 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	//load me from the file
-	virtual void Load(ifstream& _file);
+	virtual void Init(Scene* scene);
+	virtual void Tick(float deltaTime, GLFWwindow* window);
+	virtual void Render();
+	virtual void Load(std::ifstream& file);
 
-	//update the GameObject
-	//TODO: possibly pass keyboard / mouse stuff down here for player controls?
-	virtual void Tick(float _dt, GLFWwindow* window);
+	void SetName(const std::string& name) { m_name = name; }
+	std::string GetName() const { return m_name; }
 
-	virtual void PreRender();//set up any shader values needed for this object
-	virtual void Render();//render this object
+	glm::vec3 GetPosition() const { return m_pos; }
+	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
 
-	//various getters and setters
-	void SetName(string _name) { m_name = _name; }
-	string GetName() { return m_name; }
-	GLuint GetShaderProg() { return m_ShaderProg; }
-
-	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
-	virtual void Init(Scene* _scene);
-
-	//this GameObject should be drawn in THIS render pass
-	RenderPass GetRP() { return m_RP; }
-	void SetRenderPass(RenderPass rp) { m_RP = rp; }
+	void SetRenderPass(int pass) { m_renderPass = pass; }
+	int GetRenderPass() const { return m_renderPass; }
 
 protected:
 
 	string m_name;
 	string m_type;
 
-	vec3		m_pos;
-	vec3		m_rot;
-	vec3		m_scale;
-	vec3		m_rot_incr;
+	glm::vec3 m_pos = glm::vec3(0.0f);
+	int m_renderPass = 0;
 
-	glm::mat4	m_worldMatrix;
-
-	GLuint m_ShaderProg;
-
-	RenderPass m_RP = RP_OPAQUE;
+	Scene* m_scene = nullptr;
 };
 

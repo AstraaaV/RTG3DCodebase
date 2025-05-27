@@ -4,25 +4,23 @@
 #include "GameObject.h"
 #include "core.h"
 
-class Cube: public Model, public GameObject {
-
-private:
-
-	string m_type;
-
-	GLuint				m_numFaces = 0;
-	GLuint				m_vao = 0;
-
-	GLuint				m_texCoordBuffer;
-	GLuint				m_vertexBuffer;
-	GLuint				m_colourBuffer;
-	GLuint				m_indexBuffer;
-	GLuint				m_normalBuffer;
-
+class Cube: public Model, public GameObject
+{
 public:
 
 	Cube();
-	~Cube();
+	virtual ~Cube();
 
+	void Init(Scene* scene) override;
+	void Render() override;
+
+	void Load(std::ifstream& file) override;
 	void render();
+private:
+
+	GLuint m_vao = 0;
+	GLuint m_vbo = 0;
+	GLuint m_ebo = 0;
+
+	void setupMesh();
 };

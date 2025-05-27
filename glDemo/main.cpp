@@ -24,25 +24,17 @@ GUClock* g_gameClock = nullptr;
 // Mouse tracking
 bool				g_mouseDown = false;
 double				g_prevMouseX, g_prevMouseY;
-
 bool				g_camSwitchPressed = false;
-
 bool g_lightsEnabled = true;
 
 // Texture handling
 GLuint g_wallTex = 0;
-
-// Global Example objects
-// shouldn't really be anything in here for the final submission
 ArcballCamera* g_mainCamera = nullptr;
 FirstPersonCamera* g_fpCamera = nullptr;
 IsometricCamera* g_isoCamera = nullptr;
 CGPrincipleAxes* g_principleAxes = nullptr;
-
 GLuint g_flatColourShader;
-
 GLuint g_texDirLightShader;
-
 GLuint g_texPointLightShader;
 
 // Torch positions
@@ -58,11 +50,8 @@ std::vector<glm::vec3> torches =
 
 int g_showing = 1;
 int g_NumExamples = 3;
-
 int g_currentCam = 1;
 int g_NumCams = 3;
-
-//Global Game Object
 Scene* g_Scene = nullptr;
 
 // Window size
@@ -71,6 +60,7 @@ const unsigned int g_initHeight = 512;
 
 #pragma endregion
 
+GLFWwindow* g_window = nullptr;
 
 // Function prototypes
 void renderScene();
@@ -82,8 +72,6 @@ void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos);
 void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods);
 void mouseScrollHandler(GLFWwindow* _window, double _xoffset, double _yoffset);
 void mouseEnterHandler(GLFWwindow* _window, int _entered);
-
-GLFWwindow* g_window = nullptr;
 
 int main()
 {
@@ -97,10 +85,8 @@ int main()
 
 	// Initialise glfw and setup window
 	glfwInit();
-
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 	glfwWindowHint(GLFW_OPENGL_COMPAT_PROFILE, GLFW_TRUE);
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
 
@@ -128,7 +114,6 @@ int main()
 	// Initialise glew
 	glewInit();
 
-
 	// Setup window's initial size
 	resizeWindow(window, g_initWidth, g_initHeight);
 
@@ -137,13 +122,10 @@ int main()
 	// Initialise scene - geometry and shaders etc
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // setup background colour to be black
 	glClearDepth(1.0f);
-
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glPolygonMode(GL_BACK, GL_LINE);
-
 	glFrontFace(GL_CCW);
 	glEnable(GL_CULL_FACE);
-
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
@@ -154,7 +136,6 @@ int main()
 	GLuint dirShader = setupShaders("Assets\\Shaders\\texture-directional.vert", "Assets\\Shaders\\texture-directional.frag");
 	GLuint pointShader = setupShaders("Assets\\Shaders\\texture-pointlight.vert", "Assets\\Shaders\\texture-pointlight.frag");
 
-
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
 	g_wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
 
@@ -163,7 +144,7 @@ int main()
 		cout << "Texture failed to load." << endl;
 	}
 
-	g_mainCamera = new ArcballCamera(0.0f, 0.0f, 1.98595f, 55.0f, 1.0f, 0.1f, 500.0f);
+	g_mainCamera = new ArcballCamera();
 
 	//
 	//Set up Scene class
@@ -176,13 +157,13 @@ int main()
 	// First person camera
 	g_fpCamera = new FirstPersonCamera();
 	g_fpCamera->SetName("MAIN");
-	g_fpCamera->setAspect((float)g_initWidth / g_initHeight);
+	g_fpCamera->SetAspect((float)g_initWidth / g_initHeight);
 	g_Scene->AddCamera(g_fpCamera);
 
 	// Isometric camera
 	g_isoCamera = new IsometricCamera();
 	g_isoCamera->SetName("ISO");
-	g_isoCamera->setAspect((float)g_initWidth / g_initHeight);
+	g_isoCamera->SetAspect((float)g_initWidth / g_initHeight);
 	g_Scene->AddCamera(g_isoCamera);
 
 	g_Scene->SetActiveCamera(g_fpCamera);
@@ -193,7 +174,7 @@ int main()
 	//g_Scene->Load(manifest);
 	g_Scene->Init();
 
-	g_showing = 1;
+	g_showing = 2;
 
 	manifest.close();
 
@@ -468,7 +449,7 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 	
 	if (g_mainCamera) {
 
-		g_mainCamera->setAspect((float)_width / (float)_height);
+		g_mainCamera->SetAspect((float)_width / (float)_height);
 	}
 
 	if (g_Scene)

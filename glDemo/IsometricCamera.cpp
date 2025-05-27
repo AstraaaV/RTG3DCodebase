@@ -1,109 +1,73 @@
 #include "IsometricCamera.h"
+#include "Scene.h"
 
 using namespace std;
 using namespace glm;
 
-void IsometricCamera::calculateDerivedValues()
-{
-	const float theta_ = glm::radians<float>(m_theta);
-	const float phi_ = glm::radians<float>(m_phi);
-
-	glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(-35.26f), glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	// View matrix. combines rotations
-	m_viewMatrix = rotationY * rotationX;
-
-	// Projection matrix. orthographic for isometric
-	m_projectionMatrix = glm::ortho(-m_orthoSize * m_aspect, m_orthoSize * m_aspect,
-		-m_orthoSize, m_orthoSize, m_nearClipPlane, m_farClipPlane);
-}
-
 IsometricCamera::IsometricCamera()
 {
-	m_theta = 35.26f; // Top down view
-	m_phi = 45.0f; // Side view
+	m_focus = vec3(5.0f, 0.0f, 5.0f);
+	m_zoom = 15.0f;
+	m_angle = glm::radians(45.0f);
 
-	m_orthoSize = 10.0f; // Default orthographic size
-	m_aspect = 1.0f; // Aspect ratio
-	m_nearClipPlane = 0.1f; // Near clipping plane
-	m_farClipPlane = 1000.0f; // Far clipping plane
-
-	calculateDerivedValues();
+	m_fov = 45.0f;
+	m_near = 0.1f;
+	m_far = 100.0f;
+	m_type = "Isometric";
+	m_name = "IsometricCam";
 }
 
-IsometricCamera::IsometricCamera(float _theta, float _phi, float _orthoSize, float _aspect, float _nearClipPlane, float _farClipPlane)
+void IsometricCamera::Init(float screenW, float screenH, Scene* scene)
 {
-	this->m_theta = _theta;
-	this->m_phi = _phi;
-
-	this->m_orthoSize = _orthoSize;
-	this->m_aspect = _aspect;
-	this->m_nearClipPlane = _nearClipPlane;
-	this->m_farClipPlane = _farClipPlane;
-
-	calculateDerivedValues();
+	Camera::Init(screenW, screenH, scene);
+	Tick(0.0f, nullptr);
 }
 
-float IsometricCamera::getTheta()
+void IsometricCamera::Tick(float dt, GLFWwindow* window)
 {
-	return m_theta;
+	glm::vec3 offset
+	(
+		m_zoom * cos(m_angle),
+		m_zoom * sin(m_angle),
+		m_zoom * cos(m_angle)
+	);
+
+	m_pos = m_focus + offset;
+	m_lookAt = m_focus;
+
+	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, glm::vec3(0, 1, 0));
+
+	if (window)
+	{
+		int w = 1, h = 1;
+		glfwGetFramebufferSize(window, &w, &h);
+		if (w <= 0) w = 1;
+		if (h <= 0) h = 1;
+
+		SetAspect(static_cast<float>(w) / static_cast<float>(h));
+	}
 }
 
-float IsometricCamera::getPhi()
+void IsometricCamera::SetFocusPoint(const glm::vec3& focus)
 {
-	return m_phi;
+	m_focus = focus;
 }
 
-float IsometricCamera::getOrthoSize()
+void IsometricCamera::SetZoom(float zoomLevel)
 {
-	return m_orthoSize;
+	m_zoom = zoomLevel;
 }
 
-void IsometricCamera::setOrthoSize(float _orthoSize)
+glm::mat4 IsometricCamera::GetView() const
 {
-	this->m_orthoSize = _orthoSize;
-	calculateDerivedValues();
+	glm::vec3 position = m_pos;
+	glm::vec3 target = m_pos + m_direction;
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+	return glm::lookAt(position, target, up);
 }
 
-float IsometricCamera::getAspect()
+glm::mat4 IsometricCamera::GetProj() const
 {
-	return m_aspect;
-}
-
-void IsometricCamera::setAspect(float _aspect)
-{
-	this->m_aspect = _aspect;
-	calculateDerivedValues();
-}
-
-float IsometricCamera::getNearPlaneDistance()
-{
-	return m_nearClipPlane;
-}
-
-void IsometricCamera::setNearPlaneDistance(float _nearPlaneDistance)
-{
-	this->m_nearClipPlane = _nearPlaneDistance;
-	calculateDerivedValues();
-}
-
-float IsometricCamera::getFarPlaneDistance()
-{
-	return m_farClipPlane;
-}
-
-void IsometricCamera::setFarPlaneDistance(float _farPlaneDistance)
-{
-	this->m_farClipPlane = _farPlaneDistance;
-}
-
-glm::mat4 IsometricCamera::viewTransform()
-{
-	return m_viewMatrix;
-}
-
-glm::mat4 IsometricCamera::projectionTransform()
-{
-	return m_projectionMatrix;
+	float size = 10.0f;
+	return glm::ortho(-size * m_aspect, size * m_aspect, -size, size, m_near, m_far);
 }

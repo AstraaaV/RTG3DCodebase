@@ -10,11 +10,8 @@ using std::string;
 Camera* CameraFactory::makeNewCam(string _type)
 {
 	printf("CAM TYPE: %s \n", _type.c_str());
-	if (_type == "CAMERA")
-	{
-		return new Camera();
-	}
-	else if (_type == "Arcball")
+
+	if (_type == "Arcball")
 	{
 		return new ArcballCamera();
 	}

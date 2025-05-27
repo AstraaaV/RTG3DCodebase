@@ -22,13 +22,14 @@ public:
 	virtual void PreRender();
 	virtual void Render();
 
-	virtual void Init(Scene* _scene);
+	virtual void Init(Scene* _scene, GLuint shaderProg, GLuint textureID, Model* model);
 
 protected:
 
 	string m_ShaderName, m_TexName, m_ModelName;
 
 	GLuint m_texture;
+	GLuint m_shader;
 	GLuint m_normalMap;
 	Model* m_model;
 };
