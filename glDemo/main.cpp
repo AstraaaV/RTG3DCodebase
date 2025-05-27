@@ -165,24 +165,32 @@ int main()
 
 	g_mainCamera = new ArcballCamera(0.0f, 0.0f, 1.98595f, 55.0f, 1.0f, 0.1f, 500.0f);
 
-	// First person camera
-	g_fpCamera = new FirstPersonCamera();
-	g_fpCamera->SetName("MAIN");
-	g_fpCamera->setAspect((float)g_initWidth / g_initHeight);
-	
 	//
 	//Set up Scene class
 	//
-
 	g_Scene = new Scene();
 	g_Scene->SetWallTexture(g_wallTex);
 	g_Scene->SetTexDirLightShader(dirShader);
 	g_Scene->SetTexPointLightShader(pointShader);
 
+	// First person camera
+	g_fpCamera = new FirstPersonCamera();
+	g_fpCamera->SetName("MAIN");
+	g_fpCamera->setAspect((float)g_initWidth / g_initHeight);
+	g_Scene->AddCamera(g_fpCamera);
+
+	// Isometric camera
+	g_isoCamera = new IsometricCamera();
+	g_isoCamera->SetName("ISO");
+	g_isoCamera->setAspect((float)g_initWidth / g_initHeight);
+	g_Scene->AddCamera(g_isoCamera);
+
+	g_Scene->SetActiveCamera(g_fpCamera);
+
 	ifstream manifest;
 	manifest.open("manifest.txt");
 
-	g_Scene->Load(manifest);
+	//g_Scene->Load(manifest);
 	g_Scene->Init();
 
 	g_showing = 1;
@@ -197,43 +205,17 @@ int main()
 	{
 		cout << "Active camera is: " << g_Scene->GetActiveCamera()->GetName() << endl;
 	}
-	
-	g_Scene->AddCamera(g_fpCamera);
-	g_Scene->SetActiveCamera(g_fpCamera);
+
+
+	g_fpCamera->setPosition(glm::vec3(2.2f * 5, 1.5f, 2.2f * 5));
+	g_fpCamera->setYaw(-90.0f);
+	g_fpCamera->setPitch(-30.0f);
 
 	bool camSpawnSet = false;
 
-	const std::vector<std::string>& map = g_Scene->GetMapLayout();
-
-	for (int row = 0; row < map.size(); ++row)
-	{
-		for (int col = 0; col < map[row].length(); ++col)
-		{
-			if (map[row][col] == 'P')
-			{
-				float x = col * 2.2f;
-				float z = row * 2.2f;
-				g_fpCamera->setPosition(glm::vec3(5.0f, 10.0f, 15.0f));
-				g_fpCamera->setYaw(-90.0f);
-				g_fpCamera->setPitch(-30.0f);
-				camSpawnSet = true;
-				break;
-			}
-		}
-	}
-
-	// Spacing in map
-	float spacing = 2.2f;
-	glm::vec3 spawnPos = glm::vec3(1 * spacing, 0.0f, 1 * spacing);
-	if (g_fpCamera) g_fpCamera->setPosition(glm::vec3(2.2f,1.5f,2.2f));
-
-	// Isometric camera
-	g_isoCamera = new IsometricCamera();
-	g_isoCamera->setAspect((float)g_initWidth / g_initHeight);
-
 	g_principleAxes = new CGPrincipleAxes();
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
 	//
@@ -359,79 +341,48 @@ void renderScene()
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
 		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-
 		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
 		
-		g_Scene->RenderFloorCeiling(g_texDirLightShader, cameraView, cameraProjection, g_wallTex);
-
-		const std::vector<std::string>& map = g_Scene->GetMapLayout();
-
-		g_Scene->RenderMapLayout(g_texDirLightShader, cameraView, cameraProjection);
-
-		// Front wall (with door)
-		/*for (int x = 0; x < 5; x++)
-		{
-			if (x == 2) continue; // gap for the door
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 1.0f, 8.8f)) *
-								  glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 0.3f));
-
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-			g_cube->render();
-		}
-
-		// Back wall
-		for (int x = 0; x < 5; x++)
-		{
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 1.0f, 0.0f)) *
-							 glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 0.3f));
-
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-			g_cube->render();
-		}
-
-		// Left wall
-		for (int z = 0; z < 4; z++)
-		{
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(0.0f, 1.0f, z * 2.2f)) *
-								  glm::scale(identity<mat4>(), vec3(0.3f, 4.0f, 2.0f));
-
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-			g_cube->render();
-		}
-
-		// Right wall
-		for (int z = 0; z < 4; z++)
-		{
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(8.8f, 1.0f, z * 2.2f)) *
-								  glm::scale(identity<mat4>(), vec3(0.3f, 4.0f, 2.0f));
-
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-			g_cube->render();
-		}*/
-
-		g_Scene->RenderTorches(g_texPointLightShader, cameraView, cameraProjection, g_Scene->GetPointLightPosition(), g_Scene->GetPointLightColour(), g_Scene->GetPointLightAmbient());
-
-		//debug
-		glUseProgram(g_texDirLightShader);
-		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-
-		FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
-		glm::vec3 camPos = fpCam ? fpCam->getPosition() : glm::vec3(0);
-		mat4 modelTransform = glm::translate(identity<mat4>(), camPos) *
-							  glm::scale(identity<mat4>(), vec3(0.2f, 0.2f, 0.2f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+		// Floor
+		mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 5.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 0.1f, 10.0f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
 		g_Scene->GetCube()->render();
 
+		// Ceiling
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 4.0f, 5.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 0.1f, 10.0f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
+		g_Scene->GetCube()->render();
+
+		// Back Wall
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 5.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 4.0f, 0.1f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
+		g_Scene->GetCube()->render();
+
+		// Front Wall
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 10.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 4.0f, 0.1f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
+		g_Scene->GetCube()->render();
+
+		// Left Wall
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, 5.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 4.0f, 10.0f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
+		g_Scene->GetCube()->render();
+
+		// Right Wall
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 2.0f, 5.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 4.0f, 10.0f));
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
+		g_Scene->GetCube()->render();
 		break;
 	}
 	case 2:
 		g_Scene->Render();
 	}
-
 }
 
 void processKeys(GLFWwindow* window, float deltaTime)
@@ -542,46 +493,31 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			break;
 
 		case GLFW_KEY_SPACE:
-			g_showing++;
-			g_showing = g_showing % g_NumExamples;
+			g_showing = (g_showing + 1) % g_NumExamples;
 			break;
 
 		case GLFW_KEY_C:
-			if (_action == GLFW_PRESS && !g_camSwitchPressed)
+			if (!g_camSwitchPressed)
 			{
 				g_Scene->CycleCams();
+				cout << "Cam switched.\n";
 				g_camSwitchPressed = true;
 			}
-			else if (_action == GLFW_RELEASE)
-			{
-				g_camSwitchPressed = false;
-			}
+			break;
 
 		case GLFW_KEY_L:
-		{
-			bool current = g_Scene->GetLightsEnabled();
-			g_Scene->SetLightsEnabled(!current);
-			cout << "Lights enabled: " << (!current ? "On" : "Off") << endl;
+			g_lightsEnabled = !g_lightsEnabled;
+			g_Scene->SetLightsEnabled(g_lightsEnabled);
+			cout << "Lights enabled: " << (g_lightsEnabled ? "On" : "Off") << endl;
 			break;
 		}
-
-		default:
-		{
-		}
-		}
 	}
-	else if (_action == GLFW_RELEASE) 
+	else if(_action == GLFW_RELEASE)
 	{
-		// handle key release events
-		switch (_key)
-		{
-		default:
-		{
-		}
-		}
+		if (_key == GLFW_KEY_C)
+			g_camSwitchPressed = false;
 	}
 }
-
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos) 
 {

@@ -25,47 +25,26 @@ Scene::~Scene()
 	for (auto texture : m_Textures) delete texture;
 	for (auto shader : m_Shaders) delete shader;
 	for (auto go : m_GameObjects) delete go;
-
-	if (m_cube)
-	{
-		delete m_cube;
-		m_cube = nullptr;
-	}
+	if (m_cube) { delete m_cube; m_cube = nullptr; }
 }
 
 //tick all my Game Objects, lights and cameras
 void Scene::Update(float _dt, GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS && !m_camSwitchPressed)
 	{
-		if (!m_camSwitchPressed)
-		{
-			CycleCams();
-			m_camSwitchPressed = true;
-		}
+		CycleCams();
+		m_camSwitchPressed = true;
 	}
-	else
+	else if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE)
 	{
 		m_camSwitchPressed = false;
 	}
 
-	//update all lights
-	for (auto it = m_Lights.begin(); it != m_Lights.end(); it++)
-	{
-		(*it)->Tick(_dt, window);
-	}
-
-	//update all cameras
-	for (auto it = m_Cameras.begin(); it != m_Cameras.end(); it++)
-	{
-		(*it)->Tick(_dt, window);
-	}
-
-	//update all GameObjects
-	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
-	{
-		(*it)->Tick(_dt, window);
-	}
+	//update lights, cams, and game objects
+	for (auto light : m_Lights) light->Tick(_dt, window);
+	for (auto cam : m_Cameras) cam->Tick(_dt, window);
+	for (auto go : m_GameObjects) go->Tick(_dt, window);
 }
 
 void Scene::AddGameObject(GameObject* _new)
@@ -76,21 +55,12 @@ void Scene::AddGameObject(GameObject* _new)
 void Scene::CycleCams()
 {
 	if (m_Cameras.empty()) return; //Stop cycle if cams dont exist
-	
 	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
-
-	// Update active cam
-	auto it = m_Cameras.begin();
+	auto it = m_Cameras.begin(); // Update active cam
 	advance(it, m_useCameraIndex);
-	
-	if (m_useCamera)
-		cout << "Switched from Cam: " << m_useCamera->GetName();
-	else
-		cout << "Switch from Cam: (none)" << (*it)->GetName() << endl;
-
 	m_useCamera = *it;
 
-	cout << " to Cam: " << m_useCamera->GetName() << endl;
+	cout << "Switched to Cam: " << m_useCamera->GetName() << endl;
 }
 
 //I want THAT Game Object by name
@@ -183,65 +153,34 @@ Shader* Scene::GetShader(string _shaderName)
 void Scene::Render()
 {
 	// Render background objects
-	glDepthMask(GL_FALSE);
-	glCullFace(GL_FRONT);
-	glDisable(GL_CULL_FACE);
+	glDepthMask(GL_FALSE); glDisable(GL_CULL_FACE);
 
-	for (auto gameObject : m_GameObjects)
+	for (auto go : m_GameObjects)
 	{
-		if (gameObject->GetRP() & RP_BACKGROUND)
+		if (go->GetRP() & RP_BACKGROUND)
 		{
-			std::cout << "Rendering: " << gameObject->GetName() << std::endl;
-			GLuint SP = gameObject->GetShaderProg();
-			glUseProgram(SP);
+			std::cout << "Rendering: " << go->GetName() << std::endl;
+			glUseProgram(go->GetShaderProg());
 
-			m_useCamera->SetRenderValues(SP);
-			SetShaderUniforms(SP);
-			gameObject->PreRender();
-			gameObject->Render();
+			m_useCamera->SetRenderValues(go->GetShaderProg());
+			SetShaderUniforms(go->GetShaderProg());
+			go->PreRender();
+			go->Render();
 		}
 	}
-	glCullFace(GL_BACK);
-	glDepthMask(GL_TRUE);
-	glEnable(GL_CULL_FACE);
+	glDepthMask(GL_TRUE); glEnable(GL_CULL_FACE);
 
-	// Render Opaque objects
-
-	//check out the example stuff back in main.cpp to see what needs setting up here
-	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	// Opaque + Transparent
+	for (auto go : m_GameObjects)
 	{
-		// The bitwise operation checks if the object is set to be rendered in opaque pass
-		if ((*it)->GetRP() & RP_OPAQUE)
+		if (go->GetRP() & (RP_OPAQUE | RP_TRANSPARENT))
 		{
-			//set shader program using
-			GLuint SP = (*it)->GetShaderProg();
-			glUseProgram(SP);
+			glUseProgram(go->GetShaderProg());
 
-			//set up for uniform shader values for current camera
-			m_useCamera->SetRenderValues(SP);
-
-			//loop through setting up uniform shader values for anything else
-			SetShaderUniforms(SP);
-
-			//set any uniform shader values for the actual model
-			(*it)->PreRender();
-
-			//actually render the GameObject
-			(*it)->Render();
-		}
-	}
-
-	for (auto gameObject : m_GameObjects)
-	{
-		if (gameObject->GetRP() & RP_TRANSPARENT)
-		{
-			GLuint SP = gameObject->GetShaderProg();
-			glUseProgram(SP);
-
-			m_useCamera->SetRenderValues(SP);
-			SetShaderUniforms(SP);
-			gameObject->PreRender();
-			gameObject->Render();
+			m_useCamera->SetRenderValues(go->GetShaderProg());
+			SetShaderUniforms(go->GetShaderProg());
+			go->PreRender();
+			go->Render();
 		}
 	}
 }
@@ -251,10 +190,9 @@ void Scene::RenderCreature(GLuint shaderProgram)
 	if (!m_creatureMesh) return;
 
 	GLint pLocation;
-
 	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
-	mat4 modelTransform = glm::translate(identity<mat4>(), m_beastPos) * glm::eulerAngleY(glm::radians(m_beastRotation));
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+	mat4 transform = glm::translate(identity<mat4>(), m_beastPos) * glm::eulerAngleY(glm::radians(m_beastRotation));
+	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &transform[0][0]);
 
 	m_creatureMesh->setupTextures();
 	m_creatureMesh->render();
@@ -265,7 +203,6 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 	if (!m_cube) return;
 
 	GLint pLocation;
-
 	glUseProgram(shaderProgram);
 
 	Helper::SetUniformLocation(shaderProgram, "viewMatrix", &pLocation);
@@ -282,68 +219,11 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 
 	for (const auto& pos : m_torchPos)
 	{
-		mat4 modelTransform = glm::translate(identity<mat4>(), pos) *
-			glm::scale(identity<mat4>(), vec3(0.3f, 0.3f, 0.3f));
-
+		mat4 model = glm::translate(mat4(1), pos) * glm::scale(mat4(1), vec3(0.3f, 0.3f, 0.3f));
 		Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, &modelTransform[0][0]);
+		glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
 
 		m_cube->render();
-	}
-}
-
-void Scene::RenderFloorCeiling(GLuint shader, const glm::mat4& view, const glm::mat4& proj, GLuint texture)
-{
-	GLint pLocation;
-
-	glUseProgram(shader);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	Helper::SetUniformLocation(shader, "texture", &pLocation);
-	glUniform1i(pLocation, 0);
-
-	Helper::SetUniformLocation(shader, "lightsEnabled", &pLocation);
-	glUniform1i(pLocation, m_lightsEnabled ? 1 : 0);
-
-	Helper::SetUniformLocation(shader, "DIRDir", &pLocation);
-	glUniform3fv(pLocation, 1, (GLfloat*)&m_dirLightDirection);
-	Helper::SetUniformLocation(shader, "DIRCol", &pLocation);
-	glUniform3fv(pLocation, 1, (GLfloat*)&m_dirLightColour);
-	Helper::SetUniformLocation(shader, "DIRAmb", &pLocation);
-	glUniform3fv(pLocation, 1, (GLfloat*)&m_dirLightAmbient);
-
-	Helper::SetUniformLocation(shader, "viewMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&view);
-	Helper::SetUniformLocation(shader, "projMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&proj);
-
-	Helper::SetUniformLocation(shader, "modelMatrix", &pLocation);
-
-	// Floor
-	for (int x = 0; x < 5; x++)
-	{
-		for (int z = 0; z < 5; z++)
-		{
-			glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x * 2.2f, -1.1f, z * 2.2f)) *
-				glm::scale(glm::identity<glm::mat4>(), glm::vec3(2.0f, 0.2f, 2.0f));
-		
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&model);
-			m_cube->render();
-		}
-	}
-
-	// Ceiling
-	for (int x = 0; x < 5; x++)
-	{
-		for (int z = 0; z < 5; z++)
-		{
-			glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x * 2.2f, 3.1f, z * 2.2f)) *
-				glm::scale(glm::identity<glm::mat4>(), glm::vec3(2.0f, 0.2f, 2.0f));
-
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&model);
-			m_cube->render();
-		}
 	}
 }
 
@@ -352,13 +232,12 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 	if (!m_cube) return;
 
 	GLint pLocation;
-
 	glUseProgram(shaderProgram);
+
 	Helper::SetUniformLocation(shaderProgram, "viewMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&view);
 	Helper::SetUniformLocation(shaderProgram, "projMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&projection);
-
 	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
 
 	for (int row = 0; row < m_mapLayout.size(); ++row)
@@ -366,45 +245,66 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 		for (int col = 0; col < m_mapLayout[row].length(); ++col)
 		{
 			char tile = m_mapLayout[row][col];
-			float x = col * 2.2f;
-			float z = row * 2.2f;
-
-			glm::mat4 modelTransform;
+			float x = col * 2.2f, z = row * 2.2f;
+			mat4 model;
 
 			switch (tile)
 			{
 			case 'W': // Wall
-				modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
-					glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 2.0f));
+				model = translate(mat4(1), vec3(x, 1.0f, z)) *
+					scale(mat4(1), vec3(2.0f, 4.0f, 2.0f));
 				break;
 
 			case 'T': // Torch
-				modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.5f, z)) *
-					glm::scale(identity<mat4>(), vec3(0.3f, 2.0f, 0.3f));
+				model = translate(mat4(1), vec3(x, 1.5f, z)) *
+					scale(mat4(1), vec3(0.3f, 2.0f, 0.3f));
 				break;
 
 			case 'D': // Door
-				modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
-					glm::scale(identity<mat4>(), vec3(1.0f, 2.0f, 0.3f));
+				model = translate(mat4(1), vec3(x, 1.0f, z)) *
+					scale(mat4(1), vec3(1.0f, 2.0f, 0.3f));
 				break;
 
 			default:
 				continue;
 			}
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&model);
 			m_cube->render();
 		}
 	}
 
 }
 
-void Scene::SetShaderUniforms(GLuint _shaderprog)
+void Scene::BuildMap()
 {
-	//everything needs to know about all the lights
-	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
+	m_mapLayout.clear();
+	int width = 10, height = 10;
+
+	for (int row = 0; row < height; ++row)
 	{
-		(*it)->SetRenderValues(_shaderprog);
+		std::string line;
+		for (int col = 0; col < width; ++col)
+		{
+			if (row == 0 || col == 0 || row == height - 1 || col == width - 1)
+			{
+				line += 'W';
+			}
+			else if (row == height / 2 && col == width - 1)
+			{
+				line += 'P';
+			}
+			else if ((row + col) % 7 == 0)
+			{
+				line += 'T';
+			}
+			else
+			{
+				line += '.';
+			}
+		}
+		m_mapLayout.push_back(line);
 	}
+	GenerateTorchPos();
 }
 
 void Scene::Load(ifstream& _file)
@@ -567,57 +467,35 @@ void Scene::Init()
 	}
 
 	//if no MAIN camera just use the first one
-	if (!m_useCamera)
+	if (!m_useCamera && !m_Cameras.empty())
 	{
-		m_useCamera = (*m_Cameras.begin());
-		m_useCameraIndex = 0;
+		m_useCamera = *m_Cameras.begin(); m_useCameraIndex = 0;
 	}
 
-	//set up links between everything and GameObjects
-	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	for (auto go : m_GameObjects)
 	{
-		(*it)->Init(this);
+		go->Init(this);
 	}
 
 	// Create cube
 	m_cube = new Cube();
 
-	// Map layout 2d
-	std::vector<std::string> g_mapLayout = {
-		"WWWWWWWWWW",
-		"W..T....PW",
-		"W.WWWWW..W",
-		"W.W....W.W",
-		"W.W.WW.W.W",
-		"W.W.WW.W.W",
-		"W.W....W.W",
-		"W.WWWWW..W",
-		"W..D.....W",
-		"WWWWWWWWWW"
-	};
-
+	BuildMap();
 	GenerateTorchPos();
-
-	m_torchPos.clear();
-
-	for (int row = 0; row < g_mapLayout.size(); ++row)
-	{
-		for (int col = 0; col < g_mapLayout[row].length(); ++col)
-		{
-			if (g_mapLayout[row][col] == 'T')
-			{
-				float x = col * 2.2f;
-				float y = 2.5f;
-				float z = row * 2.2f;
-				m_torchPos.push_back(glm::vec3(x, y, z));
-			}
-		}
-	}
 
 	m_creatureMesh = new AIMesh("Assets\\beast\\beast.obj");
 	if (m_creatureMesh)
 	{
 		m_creatureMesh->addTexture("Assets\\beast\\beast_texture.bmp", FIF_BMP);
+	}
+}
+
+void Scene::SetShaderUniforms(GLuint _shaderprog)
+{
+	//everything needs to know about all the lights
+	for (auto l : m_Lights)
+	{
+		l->SetRenderValues(_shaderprog);
 	}
 }
 
@@ -641,9 +519,7 @@ void Scene::GenerateTorchPos()
 		{
 			if (m_mapLayout[row][col] == 'T')
 			{
-				float x = col * 2.2f;
-				float y = 2.5f;
-				float z = row * 2.2f;
+				float x = col * 2.2f, y = 2.5f, z = row * 2.2f;
 				m_torchPos.push_back(glm::vec3(x, y, z));
 			}
 		}

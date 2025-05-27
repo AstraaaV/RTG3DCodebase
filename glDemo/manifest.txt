@@ -19,7 +19,7 @@ FAR: 100.0
 }
 {
 TYPE: Isometric
-NAME: CAM3
+NAME: ISO
 POS:  0.0 5.0 5.0
 LOOKAT: 0.0 0.0 0.0
 FOV: 45.0

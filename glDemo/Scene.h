@@ -48,9 +48,9 @@ public:
 	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix,
 		const glm::vec3& lightPos, const glm::vec3& lightCol, const glm::vec3& ambientCol);
 
-	void RenderFloorCeiling(GLuint shader, const glm::mat4& view, const glm::mat4& proj, GLuint texture);
-
 	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& prokection);
+
+	void BuildMap();
 
 	//set up all shader uniform values for all of our lights
 	void SetShaderUniforms(GLuint _shaderprog);
