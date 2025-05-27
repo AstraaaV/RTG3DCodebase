@@ -116,14 +116,12 @@ void Scene::Update(float _dt, GLFWwindow* window)
 
 void Scene::CycleCams()
 {
-	if (m_Cameras.empty()) return; //Stop cycle if cams dont exist
-	
-	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
-	auto it = m_Cameras.begin(); // Update active cam
-	advance(it, m_useCameraIndex);
-	m_useCamera = *it;
+	if (m_Cameras.size() == 0) return;
 
-	cout << "Switched to Cam: " << m_useCamera->GetName() << endl;
+	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
+	m_activeCamera = m_Cameras[m_useCameraIndex];
+
+	cout << "Switched to Cam: " << m_activeCamera->GetName() << endl;
 }
 
 //Render Everything

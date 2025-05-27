@@ -64,7 +64,7 @@ public:
 	void Load(ifstream& _file);
 
 protected:
-	std::list<Camera*>    m_Cameras;
+	std::vector<Camera*>    m_Cameras;
 	std::list<Light*>    m_Lights;
 	std::list<Model*>		m_Models;
 	std::list<Texture*>		m_Textures;
@@ -79,6 +79,7 @@ protected:
 	AIMesh* m_creatureMesh = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
+	Camera* m_activeCamera = nullptr;
 	int m_useCameraIndex = 0;
 	bool m_camSwitchPressed = false;
 
