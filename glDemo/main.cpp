@@ -152,7 +152,7 @@ int main()
 	//
 
 	GLuint dirShader = setupShaders("Assets\\Shaders\\texture-directional.vert", "Assets\\Shaders\\texture-directional.frag");
-	GLuint pointShader = setupShaders("Assets\\Shaders\\texture-point.vert", "Assets\\Shaders\\texture-point.frag");
+	GLuint pointShader = setupShaders("Assets\\Shaders\\texture-pointlight.vert", "Assets\\Shaders\\texture-pointlight.frag");
 
 
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
@@ -213,7 +213,9 @@ int main()
 			{
 				float x = col * 2.2f;
 				float z = row * 2.2f;
-				g_fpCamera->setPosition(glm::vec3(x, 1.5f, z));
+				g_fpCamera->setPosition(glm::vec3(5.0f, 10.0f, 15.0f));
+				g_fpCamera->setYaw(-90.0f);
+				g_fpCamera->setPitch(-30.0f);
 				camSpawnSet = true;
 				break;
 			}
@@ -230,6 +232,9 @@ int main()
 	g_isoCamera->setAspect((float)g_initWidth / g_initHeight);
 
 	g_principleAxes = new CGPrincipleAxes();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 
 	//
 	// Main loop

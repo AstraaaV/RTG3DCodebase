@@ -114,7 +114,7 @@ protected:
 
 	glm::vec3 m_dirLightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f));
 	glm::vec3 m_dirLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec3 m_dirLightAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+	glm::vec3 m_dirLightAmbient = glm::vec3(0.7f, 0.7f, 0.7f);
 	GLuint m_texDirLightShader = 0;
 
 	glm::vec3 m_pointLightPosition = glm::vec3(1.0f, 1.0f, 1.0f);
