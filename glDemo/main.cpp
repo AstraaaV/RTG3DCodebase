@@ -38,31 +38,19 @@ ArcballCamera* g_mainCamera = nullptr;
 FirstPersonCamera* g_fpCamera = nullptr;
 IsometricCamera* g_isoCamera = nullptr;
 CGPrincipleAxes* g_principleAxes = nullptr;
-Cube* g_cube = nullptr;
 
 GLuint g_flatColourShader;
 
 GLuint g_texDirLightShader;
-vec3 g_DLdirection = glm::normalize(vec3(-1.0f, -1.0f, -1.0f));
-vec3 g_DLcolour = vec3(1.0f, 1.0f, 1.0f);
-vec3 g_DLambient = vec3(0.4f, 0.4f, 0.4f);
 
 GLuint g_texPointLightShader;
-vec3 g_PLposition = vec3(1.0f, 1.0f, 1.0f);
-vec3 g_PLcolour = vec3(1.0f, 1.0f, 0.0f);
-vec3 g_PLambient = vec3(0.2f, 0.2f, 0.2f);
 
 AIMesh* g_creatureMesh = nullptr;
 vec3 g_beastPos = vec3(2.0f, 0.0f, 0.0f);
 float g_beastRotation = 0.0f;
-AIMesh* g_planetMesh = nullptr;
-
-vec3 g_duckPos = vec3(2.0f, 0.0f, 0.0f);
-float g_duckRotation = 0.0f;
-AIMesh* g_duckMesh = nullptr;
 
 // Torch positions
-std::vector<glm::vec3> g_torchPos =
+std::vector<glm::vec3> torches =
 {
 	vec3(2.2f, 2.5f, 0.2f), // Back, middle-left
 	vec3(6.6f, 2.5f, 0.2f), // Back, middle-right
@@ -70,20 +58,6 @@ std::vector<glm::vec3> g_torchPos =
 	vec3(8.6f, 2.5f, 4.4f), // Right, center
 	vec3(2.2f, 2.5f, 8.6f), // Front, left
 	vec3(6.6f, 2.5f, 8.6f) // Front, right
-};
-
-// Map layout 2d
-std::vector<std::string> g_mapLayout = {
-	"WWWWWWWWWW",
-	"W..T....PW",
-	"W.WWWWW..W",
-	"W.W....W.W",
-	"W.W.WW.W.W",
-	"W.W.WW.W.W",
-	"W.W....W.W",
-	"W.WWWWW..W",
-	"W..D.....W",
-	"WWWWWWWWWW"
 };
 
 int g_showing = 1;
@@ -227,33 +201,19 @@ int main()
 
 	bool camSpawnSet = false;
 
-	for (int row = 0; row < g_mapLayout.size(); ++row)
+	const std::vector<std::string>& map = g_Scene->GetMapLayout();
+
+	for (int row = 0; row < map.size(); ++row)
 	{
-		for (int col = 0; col < g_mapLayout[row].length(); ++col)
+		for (int col = 0; col < map[row].length(); ++col)
 		{
-			if (g_mapLayout[row][col] == 'P')
+			if (map[row][col] == 'P')
 			{
 				float x = col * 2.2f;
 				float z = row * 2.2f;
 				g_fpCamera->setPosition(glm::vec3(x, 1.5f, z));
 				camSpawnSet = true;
 				break;
-			}
-		}
-	}
-
-	g_torchPos.clear();
-
-	for (int row = 0; row < g_mapLayout.size(); ++row)
-	{
-		for (int col = 0; col < g_mapLayout[row].length(); ++col)
-		{
-			if (g_mapLayout[row][col] == 'T')
-			{
-				float x = col * 2.2f;
-				float y = 2.5f;
-				float z = row * 2.2f;
-				g_torchPos.push_back(glm::vec3(x, y, z));
 			}
 		}
 	}
@@ -269,18 +229,10 @@ int main()
 
 	g_principleAxes = new CGPrincipleAxes();
 
-	g_cube = new Cube();
-
 	g_creatureMesh = new AIMesh(string("Assets\\beast\\beast.obj"));
 	if (g_creatureMesh) {
 		g_creatureMesh->addTexture(string("Assets\\beast\\beast_texture.bmp"), FIF_BMP);
 	}
-
-	g_planetMesh = new AIMesh(string("Assets\\gsphere.obj"));
-	if (g_planetMesh) {
-		g_planetMesh->addTexture(string("Assets\\Textures\\Hodges_G_MountainRock1.jpg"), FIF_JPEG);
-	}
-
 
 	//
 	// Main loop
@@ -365,44 +317,13 @@ void renderScene()
 		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
 		glUniform1i(pLocation, 0); // set to point to texture unit 0 for AIMeshes
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLdirection);
+		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightDirection()));
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
+		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightColour()));
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
+		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightAmbient()));
 
-		if (g_creatureMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), g_beastPos) * eulerAngleY<float>(glm::radians<float>(g_beastRotation));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_creatureMesh->setupTextures();
-			g_creatureMesh->render();
-		}
-
-		if (g_planetMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(4.0, 4.0, 4.0));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_planetMesh->setupTextures();
-			g_planetMesh->render();
-		}
-
-		if (g_duckMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(4.0, 4.0, 4.0));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_duckMesh->setupTextures();
-			g_duckMesh->render();
-		}
+		g_Scene->RenderCreature(g_texDirLightShader);
 	}
 	break;
 
@@ -424,11 +345,11 @@ void renderScene()
 
 		// Directional
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLdirection);
+		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightDirection()));
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
+		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightColour()));
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
+		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightAmbient()));
 
 		// Matrices
 		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
@@ -438,68 +359,11 @@ void renderScene()
 
 		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
 		
-		// Floor
-		for (int x = 0; x < 5; x++)
-		{
-			for (int z = 0; z < 5; z++)
-			{
-				mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, -1.1f, z * 2.2f)) *
-									  glm::scale(identity<mat4>(), vec3(2.0f, 0.2f, 2.0f));
+		g_Scene->RenderFloorCeiling(g_texDirLightShader, cameraView, cameraProjection, g_wallTex);
 
-				glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-				g_cube->render();
-			}
-		}
+		const std::vector<std::string>& map = g_Scene->GetMapLayout();
 
-		// Ceiling
-		for (int x = 0; x < 5; x++)
-		{
-			for (int z = 0; z < 5; z++)
-			{
-				mat4 modelTransform = glm::translate(identity<mat4>(), vec3(x * 2.2f, 3.1f, z * 2.2f)) *
-									  glm::scale(identity<mat4>(), vec3(2.0f, 0.2f, 2.0f));
-
-				glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-				g_cube->render();
-			}
-		}
-
-		// Render walls using map layout
-		for (int row = 0; row < g_mapLayout.size(); row++)
-		{
-			for (int col = 0; col < g_mapLayout[row].length(); col++)
-			{
-
-				char tile = g_mapLayout[row][col];
-				float x = col * 2.2f;
-				float z = row * 2.2f;
-
-				mat4 modelTransform;
-
-				switch(tile)
-				{
-				case 'W': // Wall
-					modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
-						glm::scale(identity<mat4>(), vec3(2.0f, 4.0f, 2.0f));
-					break;
-
-				case 'T': // Torch
-					modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.5f, z)) *
-						glm::scale(identity<mat4>(), vec3(0.3f, 2.0f, 0.3f));
-					break;
-
-				case 'D': // Door
-					modelTransform = glm::translate(identity<mat4>(), vec3(x, 1.0f, z)) *
-						glm::scale(identity<mat4>(), vec3(1.0f, 2.0f, 0.3f));
-					break;
-
-				default:
-					continue;
-				}
-				glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-				g_cube->render();
-			}
-		}
+		g_Scene->RenderMapLayout(g_texDirLightShader, cameraView, cameraProjection);
 
 		// Front wall (with door)
 		/*for (int x = 0; x < 5; x++)
@@ -542,34 +406,7 @@ void renderScene()
 			g_cube->render();
 		}*/
 
-		glUseProgram(g_texPointLightShader);
-
-		for (int i = 0; i < g_torchPos.size(); i++)
-		{
-			GLint pLocation;
-
-			//set cam matrices
-			Helper::SetUniformLocation(g_texPointLightShader, "viewMatrix", &pLocation);
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-			Helper::SetUniformLocation(g_texPointLightShader, "projMatrix", &pLocation);
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-
-			Helper::SetUniformLocation(g_texPointLightShader, "pointPos", &pLocation);
-			glUniform3fv(pLocation, 1, (GLfloat*)&g_PLposition);
-			Helper::SetUniformLocation(g_texPointLightShader, "pointCol", &pLocation);
-			glUniform3fv(pLocation, 1, (GLfloat*)&g_PLcolour);
-			Helper::SetUniformLocation(g_texPointLightShader, "ambientCol", &pLocation);
-			glUniform3fv(pLocation, 1, (GLfloat*)&g_PLambient);
-
-			// Torch cube
-			mat4 modelTransform = glm::translate(identity<mat4>(), g_torchPos[i]) *
-				glm::scale(identity<mat4>(), vec3(0.3f, 0.3f, 0.3f));
-		
-			Helper::SetUniformLocation(g_texPointLightShader, "modelMatrix", &pLocation);
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-		
-			g_cube->render();
-		}
+		g_Scene->RenderTorches(g_texPointLightShader, cameraView, cameraProjection, g_Scene->GetPointLightPosition(), g_Scene->GetPointLightColour(), g_Scene->GetPointLightAmbient());
 
 		//debug
 		glUseProgram(g_texDirLightShader);
@@ -584,7 +421,7 @@ void renderScene()
 		mat4 modelTransform = glm::translate(identity<mat4>(), camPos) *
 							  glm::scale(identity<mat4>(), vec3(0.2f, 0.2f, 0.2f));
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-		g_cube->render();
+		g_Scene->GetCube()->render();
 
 		break;
 	}
@@ -718,9 +555,12 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			}
 
 		case GLFW_KEY_L:
-			g_lightsEnabled = !g_lightsEnabled;
-			cout << "Lights enabled: " << (g_lightsEnabled ? "ON" : "OFF") << endl;
+		{
+			bool current = g_Scene->GetLightsEnabled();
+			g_Scene->SetLightsEnabled(!current);
+			cout << "Lights enabled: " << (!current ? "On" : "Off") << endl;
 			break;
+		}
 
 		default:
 		{

@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <AIMesh.h>
 
 using namespace std;
 
@@ -42,6 +43,15 @@ public:
 	//Render Everything
 	void Render();
 
+	void RenderCreature(GLuint shaderProgram);
+
+	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix,
+		const glm::vec3& lightPos, const glm::vec3& lightCol, const glm::vec3& ambientCol);
+
+	void RenderFloorCeiling(GLuint shader, const glm::mat4& view, const glm::mat4& proj, GLuint texture);
+
+	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& prokection);
+
 	//set up all shader uniform values for all of our lights
 	void SetShaderUniforms(GLuint _shaderprog);
 
@@ -55,7 +65,25 @@ public:
 
 	Camera* GetActiveCamera() { return m_useCamera; }
 
+	Cube* GetCube() const { return m_cube; }
+
+	const std::vector<std::string>& GetMapLayout() const { return m_mapLayout; }
+
 	void AddCamera(Camera* cam);
+
+	void GenerateTorchPos();
+	const std::vector<glm::vec3>& GetTorchPositions() const { return m_torchPos; }
+
+	glm::vec3 GetDirLightDirection() const { return m_dirLightDirection; }
+	glm::vec3 GetDirLightColour() const { return m_dirLightColour; }
+	glm::vec3 GetDirLightAmbient() const { return m_dirLightAmbient; }
+
+	glm::vec3 GetPointLightPosition() const { return m_pointLightPosition; }
+	glm::vec3 GetPointLightColour() const { return m_pointLightColour; }
+	glm::vec3 GetPointLightAmbient() const { return m_pointLightAmbient; }
+
+	void SetLightsEnabled(bool enabled) { m_lightsEnabled = enabled; }
+	bool GetLightsEnabled() const { return m_lightsEnabled; }
 
 protected:
 
@@ -73,11 +101,29 @@ protected:
 	std::list<Shader*>		m_Shaders;
 	std::list<GameObject*> m_GameObjects;
 
+	std::vector<std::string> m_mapLayout;
+	std::vector<glm::vec3> m_torchPos;
+
+	glm::vec3 m_dirLightDirection = glm::normalize(glm::vec3(-1.0f, -1.0f, -1.0f));
+	glm::vec3 m_dirLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 m_dirLightAmbient = glm::vec3(0.4f, 0.4f, 0.4f);
+
+	glm::vec3 m_pointLightPosition = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 m_pointLightColour = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 m_pointLightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
+
 	Cube* m_cube = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
 	int m_activeCameraIndex = 0;
 	bool m_camSwitchPressed = false;
+
+	bool m_lightsEnabled = true;
+
+	// Examples
+	AIMesh* m_creatureMesh = nullptr;
+	glm::vec3 m_beastPos = glm::vec3(2.0f, 0.0f, 0.0f);
+	float m_beastRotation = 0.0f;
 };
 
