@@ -426,13 +426,6 @@ void updateScene(GLFWwindow* window)
 	g_Scene->Update(tDelta, g_window);
 
 	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
-
-	if (fpCam)
-	{
-		vec3 pos = fpCam->getPosition();
-		pos.z += 0.1f;
-		fpCam->setPosition(pos);
-	}
 }
 
 

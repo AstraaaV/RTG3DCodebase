@@ -70,7 +70,7 @@ void FirstPersonCamera::updateCamVectors()
 	glm::vec3 front;
 	front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 	front.y = sin(glm::radians(m_pitch));
-	front.z = cos(glm::radians(m_yaw)) * sin(glm::radians(m_pitch));
+	front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 	m_front = glm::normalize(front);
 
 	// Recalculates the right and up vectors
@@ -120,11 +120,11 @@ glm::mat4 FirstPersonCamera::GetView() const
 	glm::vec3 position = m_position;
 	glm::vec3 target = m_position + m_direction;
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	return glm::lookAt(position, target, up);
+	return glm::lookAt(m_position, m_position + m_front, m_up);
 }
 
 glm::mat4 FirstPersonCamera::GetProj() const
 {
 	float size = 10.0f;
-	return glm::ortho(-size * m_aspect, size * m_aspect, -size, size, m_near, m_far);
+	return glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }
