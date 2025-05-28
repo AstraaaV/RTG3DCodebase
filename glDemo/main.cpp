@@ -290,7 +290,7 @@ void renderScene()
 		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
 		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightAmbient()));
 
-		g_Scene->RenderCreature(g_texDirLightShader);
+		g_Scene->RenderCreature();
 	}
 	break;
 

@@ -29,6 +29,7 @@ public:
 	void BuildMap();
 	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection);
 	void RenderCreature();
+	void RenderPlayerMarker(GLuint shaderProgram);
 	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 
 	void SetShaderUniforms(GLuint _shaderprog);

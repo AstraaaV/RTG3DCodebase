@@ -18,6 +18,7 @@ public:
 	virtual void Tick(float deltaTime, GLFWwindow* window);
 	virtual void Render();
 	virtual void Load(std::ifstream& file);
+	virtual void SetShader(GLuint id) { m_shaderID = id; }
 
 	void SetName(const std::string& name) { m_name = name; }
 	std::string GetName() const { return m_name; }
@@ -32,6 +33,8 @@ protected:
 
 	string m_name;
 	string m_type;
+
+	GLuint m_shaderID = 0;
 
 	glm::vec3 m_pos = glm::vec3(0.0f);
 	int m_renderPass = 0;

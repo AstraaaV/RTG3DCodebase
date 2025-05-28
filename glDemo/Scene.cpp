@@ -14,6 +14,7 @@
 #include <assert.h>
 #include <helper.h>
 #include <RenderPass.h>
+#include <IsometricCamera.h>
 
 Scene::Scene()
 {
@@ -36,6 +37,7 @@ void Scene::Init()
 	BuildMap();
 
 	Beast* beast = new Beast();
+	beast->SetShader(m_texDirLightShader);
 	AddGameObject(beast);
 
 
@@ -159,6 +161,11 @@ void Scene::Render()
 	RenderMapLayout(m_texDirLightShader, view, proj);
 	RenderTorches(m_texPointLightShader, view, proj);
 	RenderCreature();
+
+	if (dynamic_cast<ArcballCamera*>(m_useCamera) || dynamic_cast<IsometricCamera*>(m_useCamera))
+	{
+		RenderPlayerMarker(m_texDirLightShader);
+	}
 }
 
 void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection)
@@ -289,6 +296,24 @@ void Scene::RenderCreature()
 			break;
 		}
 	}
+}
+
+void Scene::RenderPlayerMarker(GLuint shaderProgram)
+{
+	if (!m_cube || !m_useCamera) return;
+
+	glUseProgram(shaderProgram);
+
+	GLint loc;
+	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &loc);
+
+	glm::vec3 camPos = m_useCamera->GetPos();
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), camPos) *
+		glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+
+	glUniformMatrix4fv(loc, 1, GL_FALSE, &model[0][0]);
+
+	m_cube->render();
 }
 
 void Scene::AddGameObject(GameObject* go)
