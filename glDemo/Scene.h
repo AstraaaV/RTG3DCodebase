@@ -28,9 +28,8 @@ public:
 	void Render();
 	void BuildMap();
 	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection);
-	void RenderCreature(GLuint shaderProgram);
-	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix,
-		const glm::vec3& lightPos, const glm::vec3& lightCol, const glm::vec3& ambientCol);
+	void RenderCreature();
+	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 
 	void SetShaderUniforms(GLuint _shaderprog);
 	void GenerateTorchPos();
@@ -73,7 +72,6 @@ protected:
 
 	std::vector<std::string> m_mapLayout;
 	std::vector<glm::vec3> m_torchPos;
-
 
 	Cube* m_cube = nullptr;
 	AIMesh* m_creatureMesh = nullptr;

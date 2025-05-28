@@ -41,6 +41,9 @@ public:
 	void SetType(const std::string& type) { m_type = type; }
 	std::string GetType() const { return m_type; }
 
+	void SetDiffuse(const glm::vec3& diff) { m_diffuse = diff; }
+	void SetSpecular(const glm::vec3& spec) { m_specular = spec; }
+
 protected:
 	string m_name;
 	string m_type;
@@ -49,6 +52,8 @@ protected:
 	vec3 m_dir;
 	vec3 m_col; // colour of the light
 	vec3 m_amb; // ambient colour of the light
+	vec3 m_diffuse;
+	vec3 m_specular;
 	float m_intensity;
 
 };

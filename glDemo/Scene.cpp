@@ -10,6 +10,7 @@
 #include "Shader.h"
 #include "GameObjectFactory.h"
 #include "Cube.h"
+#include "Beast.h"
 #include <assert.h>
 #include <helper.h>
 #include <RenderPass.h>
@@ -34,11 +35,9 @@ void Scene::Init()
 	m_cube = new Cube();
 	BuildMap();
 
-	m_creatureMesh = new AIMesh("Assets\\beast\\beast.obj");
-	if (m_creatureMesh)
-	{
-		m_creatureMesh->addTexture("Assets\\beast\\beast_texture.bmp", FIF_BMP);
-	}
+	Beast* beast = new Beast();
+	AddGameObject(beast);
+
 
 	if (!m_Cameras.empty())
 	{
@@ -89,7 +88,17 @@ void Scene::GenerateTorchPos()
 			if (m_mapLayout[row][col] == 'T')
 			{
 				float x = col * 2.2f, y = 2.5f, z = row * 2.2f;
-				m_torchPos.push_back(glm::vec3(x, y, z));
+				glm::vec3 torchPos(x, y, z);
+				m_torchPos.push_back(torchPos);
+
+				Light* point = LightFactory::makeNewLight("POINT");
+				point->SetPosition(torchPos);
+				point->SetDiffuse(glm::vec3(1.0f, 0.7f, 0.3f));
+				point->SetAmbient(glm::vec3(0.05f, 0.04f, 0.02f));
+				point->SetSpecular(glm::vec3(1.0f));
+				point->SetName("TorchLight_" + std::to_string(m_Lights.size()));
+
+				m_Lights.push_back(point);
 			}
 		}
 	}
@@ -148,8 +157,8 @@ void Scene::Render()
 	mat4 proj = m_useCamera->GetProj();
 
 	RenderMapLayout(m_texDirLightShader, view, proj);
-	RenderTorches(m_texPointLightShader, view, proj, m_pointLightPosition, m_pointLightColour, m_pointLightAmbient);
-	RenderCreature(m_texDirLightShader);
+	RenderTorches(m_texPointLightShader, view, proj);
+	RenderCreature();
 }
 
 void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection)
@@ -205,56 +214,81 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 				model = translate(mat4(1), vec3(x, 1.0f, z)) *
 					scale(mat4(1), vec3(1.0f, 2.0f, 0.3f));
 				break;
-
+			case 'P':
+			case '.':
+				model = translate(mat4(1), vec3(x, -1.0f, z)) *
+					scale(mat4(1), vec3(2.2f, 0.5f, 2.2f));
+				break;
 			default:
 				continue;
 			}
 			glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
 			m_cube->render();
+
+			if (tile == 'P')
+			{
+				glm::mat4 markerCube = translate(mat4(1), vec3(x, 1.0f, z)) *
+					scale(mat4(1), vec3(1.0f, 2.0f, 1.0f));
+				glUniformMatrix4fv(pLocation, 1, GL_FALSE, &markerCube[0][0]);
+				m_cube->render();
+			}
 		}
 	}
 }
 
-void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, const glm::vec3& lightPos, const glm::vec3& lightCol, const glm::vec3& ambientCol)
+void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
 	if (!m_cube) return;
 
-	GLint pLocation;
 	glUseProgram(shaderProgram);
 
+	GLint pLocation;
 	Helper::SetUniformLocation(shaderProgram, "viewMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &viewMatrix[0][0]);
 	Helper::SetUniformLocation(shaderProgram, "projMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &projMatrix[0][0]);
 
-	Helper::SetUniformLocation(shaderProgram, "pointPos", &pLocation);
-	glUniform3fv(pLocation, 1, &lightPos[0]);
-	Helper::SetUniformLocation(shaderProgram, "pointCol", &pLocation);
-	glUniform3fv(pLocation, 1, &lightCol[0]);
-	Helper::SetUniformLocation(shaderProgram, "ambientCol", &pLocation);
-	glUniform3fv(pLocation, 1, &ambientCol[0]);
+	std::vector<glm::vec3> positions, colours, ambients;
 
-	for (const auto& pos : m_torchPos)
+	for (Light* light : m_Lights)
 	{
-		mat4 model = glm::translate(mat4(1), pos) * glm::scale(mat4(1), vec3(0.3f, 0.3f, 0.3f));
-		Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
+		if (light->GetType() == "POINT")
+		{
+			positions.push_back(light->GetPosition());
+			colours.push_back(light->GetColour());
+			ambients.push_back(light->GetAmbient());
+		}
 
-		m_cube->render();
+		int count = static_cast<int>(positions.size());
+		if (count > 16) count = 16;
+
+		glUniform1i(glGetUniformLocation(shaderProgram, "numPointLights"), count);
+		glUniform3fv(glGetUniformLocation(shaderProgram, "pointPos"), count, glm::value_ptr(positions[0]));
+		glUniform3fv(glGetUniformLocation(shaderProgram, "pointCol"), count, glm::value_ptr(colours[0]));
+		glUniform3fv(glGetUniformLocation(shaderProgram, "ambientCol"), count, glm::value_ptr(ambients[0]));
+	
+		Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
+		for (const auto& pos : m_torchPos)
+		{
+			mat4 model = glm::translate(mat4(1), pos) * glm::scale(mat4(1), glm::vec3(0.3f));
+			glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
+		
+			m_cube->render();
+		}
+	
 	}
 }
 
-void Scene::RenderCreature(GLuint shaderProgram)
+void Scene::RenderCreature()
 {
-	if (!m_creatureMesh) return;
-
-	GLint pLocation;
-	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
-	mat4 transform = translate(mat4(1), vec3(11, 0, 11)) * eulerAngleY(radians(180.0f));
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &transform[0][0]);
-
-	m_creatureMesh->setupTextures();
-	m_creatureMesh->render();
+	for (GameObject* go : m_GameObjects)
+	{
+		if (go->GetName() == "Beast")
+		{
+			go->Render();
+			break;
+		}
+	}
 }
 
 void Scene::AddGameObject(GameObject* go)
