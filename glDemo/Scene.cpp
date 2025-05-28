@@ -11,6 +11,7 @@
 #include "GameObjectFactory.h"
 #include "Cube.h"
 #include "Beast.h"
+#include "Player.h"
 #include <assert.h>
 #include <helper.h>
 #include <RenderPass.h>
@@ -29,12 +30,16 @@ Scene::~Scene()
 	for (auto shader : m_Shaders) delete shader;
 	for (auto go : m_GameObjects) delete go;
 	if (m_cube) { delete m_cube; m_cube = nullptr; }
+	if (m_player) { delete m_player; m_player = nullptr; }
 }
 
 void Scene::Init()
 {
 	m_cube = new Cube();
 	BuildMap();
+
+	Player* player = new Player();
+	AddGameObject(player);
 
 	Beast* beast = new Beast();
 	beast->SetShader(m_texDirLightShader);
@@ -126,6 +131,24 @@ void Scene::Update(float _dt, GLFWwindow* window)
 	{
 		m_useCamera->Tick(_dt, window);
 	}
+
+	glm::vec3 playerPos = m_useCamera->GetPos();
+	int row = static_cast<int>(playerPos.z / 2.2f);
+	int col = static_cast<int>(playerPos.x / 2.2f);
+
+	if (row >= 0 && row < m_mapLayout.size() &&
+		col >= 0 && col < m_mapLayout[row].length())
+	{
+		char tile = m_mapLayout[row][col];
+
+		if (tile == 'P')
+		{
+			printf("Player stepped on pressure plate at [%d,%d]!\n", row, col);
+		}
+	}
+
+	if (m_player)
+		InteractionTriggers(m_player->GetPosition());
 
 	for (auto go : m_GameObjects) go->Tick(_dt, window);
 }
@@ -283,6 +306,39 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 			m_cube->render();
 		}
 	
+	}
+}
+
+void Scene::InteractionTriggers(glm::vec3 playerPos)
+{
+	int col = static_cast<int>(playerPos.x / 2.2f);
+	int row = static_cast<int>(playerPos.z / 2.2f);
+
+	if (row >= 0 && row < m_mapLayout.size() && col >= 0 && col < m_mapLayout[row].size())
+	{
+		if (m_mapLayout[row][col] == 'P')
+		{
+			std::vector<std::pair<int, int>> directions =
+			{
+				{-1, 0}, {1, 0}, {0, -1}, {0, 1}
+			};
+
+			for (auto& dir : directions)
+			{
+				int r = row + dir.first;
+				int c = col + dir.second;
+
+				if (r >= 0 && r < m_mapLayout.size() && c >= 0 && c < m_mapLayout[r].size())
+				{
+					if (m_mapLayout[r][c] == 'D')
+					{
+						m_mapLayout[r][c] = '.';
+						cout << "Door opened at: " << r << ", " << c << endl;
+						break;
+					}
+				}
+			}
+		}
 	}
 }
 

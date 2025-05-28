@@ -15,6 +15,7 @@ using namespace std;
 #include "GameObject.h"
 #include "Cube.h"
 #include "AIMesh.h"
+#include "Player.h"
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -31,6 +32,8 @@ public:
 	void RenderCreature();
 	void RenderPlayerMarker(GLuint shaderProgram);
 	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
+
+	void InteractionTriggers(glm::vec3 playerPos);
 
 	void SetShaderUniforms(GLuint _shaderprog);
 	void GenerateTorchPos();
@@ -76,6 +79,7 @@ protected:
 
 	Cube* m_cube = nullptr;
 	AIMesh* m_creatureMesh = nullptr;
+	Player* m_player = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	Camera* m_activeCamera = nullptr;
