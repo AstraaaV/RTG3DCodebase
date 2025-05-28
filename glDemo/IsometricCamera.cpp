@@ -60,10 +60,7 @@ void IsometricCamera::SetZoom(float zoomLevel)
 
 glm::mat4 IsometricCamera::GetView() const
 {
-	glm::vec3 position = m_pos;
-	glm::vec3 target = m_pos + m_direction;
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	return glm::lookAt(position, target, up);
+	return m_viewMatrix;
 }
 
 glm::mat4 IsometricCamera::GetProj() const

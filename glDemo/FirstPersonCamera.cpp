@@ -25,6 +25,8 @@ void FirstPersonCamera::Init(float width, float height, Scene* scene)
 {
 	m_aspect = width / height;
 	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+	
+	Tick(0.0f, nullptr);
 }
 
 void FirstPersonCamera::Tick(float dt, GLFWwindow* window)
@@ -34,7 +36,6 @@ void FirstPersonCamera::Tick(float dt, GLFWwindow* window)
 	int w = 1, h = 1;
 	glfwGetFramebufferSize(window, &w, &h);
 	m_aspect = static_cast<float>(w) / static_cast<float>(h);
-	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }
 
 void FirstPersonCamera::processKeys(CameraMovement direction, float deltaTime)
@@ -118,8 +119,6 @@ float FirstPersonCamera::getSensitivity() const
 glm::mat4 FirstPersonCamera::GetView() const
 {
 	glm::vec3 position = m_position;
-	glm::vec3 target = m_position + m_direction;
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	return glm::lookAt(m_position, m_position + m_front, m_up);
 }
 

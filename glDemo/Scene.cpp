@@ -110,18 +110,33 @@ void Scene::Update(float _dt, GLFWwindow* window)
 
 	//update lights, cams, and game objects
 	for (auto light : m_Lights) light->Tick(_dt, window);
-	for (auto cam : m_Cameras) cam->Tick(_dt, window);
+	
+	if (m_useCamera)
+	{
+		m_useCamera->Tick(_dt, window);
+	}
+
 	for (auto go : m_GameObjects) go->Tick(_dt, window);
 }
 
 void Scene::CycleCams()
 {
-	if (m_Cameras.size() == 0) return;
+	if (m_Cameras.empty()) return;
 
 	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
-	m_activeCamera = m_Cameras[m_useCameraIndex];
-
-	cout << "Switched to Cam: " << m_activeCamera->GetName() << endl;
+	auto it = m_Cameras.begin();
+	std::advance(it, m_useCameraIndex);
+	
+	if (it != m_Cameras.end() && *it != nullptr)
+	{
+		m_useCamera = *it;
+		m_activeCamera = m_useCamera;
+		cout << "Switched to cam: " << m_useCamera->GetName() << endl;
+	}
+	else
+	{
+		cout << "Camera switch failed." << endl;
+	}
 }
 
 //Render Everything
@@ -155,6 +170,9 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 	glUniform3fv(pLocation, 1, value_ptr(m_dirLightColour));
 	Helper::SetUniformLocation(shaderProgram, "DIRAmb", &pLocation);
 	glUniform3fv(pLocation, 1, value_ptr(m_dirLightAmbient));
+
+	Helper::SetUniformLocation(shaderProgram, "lightsEnabled", &pLocation);
+	glUniform1i(pLocation, m_lightsEnabled ? 1 : 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_wallTex);

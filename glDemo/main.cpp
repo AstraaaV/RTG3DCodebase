@@ -137,11 +137,17 @@ int main()
 	GLuint pointShader = setupShaders("Assets\\Shaders\\texture-pointlight.vert", "Assets\\Shaders\\texture-pointlight.frag");
 
 	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
-	g_wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
+	GLuint wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
 
-	if (g_wallTex == 0)
+	if (wallTex == 0)
 	{
 		cout << "Texture failed to load." << endl;
+	}
+	else
+	{
+		g_wallTex = wallTex;
+		g_Scene = new Scene();;
+		g_Scene->SetWallTexture(wallTex);
 	}
 
 	g_mainCamera = new ArcballCamera();
@@ -149,8 +155,6 @@ int main()
 	//
 	//Set up Scene class
 	//
-	g_Scene = new Scene();
-	g_Scene->SetWallTexture(g_wallTex);
 	g_Scene->SetTexDirLightShader(dirShader);
 	g_Scene->SetTexPointLightShader(pointShader);
 
@@ -298,10 +302,10 @@ void renderScene()
 		// Render cube 
 		glUseProgram(g_texDirLightShader);
 
-		GLint pLocation;
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, g_Scene->GetWallTexture());
 
+		GLint pLocation;
 		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
 		glUniform1i(pLocation, 0);
 
@@ -323,7 +327,7 @@ void renderScene()
 		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
 		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-		
+
 		// Floor
 		mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 5.0f)) *
 			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 0.1f, 10.0f));
