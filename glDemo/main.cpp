@@ -158,17 +158,13 @@ int main()
 	g_Scene->SetTexDirLightShader(dirShader);
 	g_Scene->SetTexPointLightShader(pointShader);
 
-	// First person camera
-	g_fpCamera = new FirstPersonCamera();
-	g_fpCamera->SetName("MAIN");
-	g_fpCamera->SetAspect((float)g_initWidth / g_initHeight);
-	g_Scene->AddCamera(g_fpCamera);
-
-	// Isometric camera
+	// Isometric Camera
 	g_isoCamera = new IsometricCamera();
-	g_isoCamera->SetName("ISO");
-	g_isoCamera->SetAspect((float)g_initWidth / g_initHeight);
 	g_Scene->AddCamera(g_isoCamera);
+
+	// Arcball camera
+	g_mainCamera = new ArcballCamera();
+	g_Scene->AddCamera(g_mainCamera);
 
 	g_Scene->SetActiveCamera(g_fpCamera);
 
@@ -191,10 +187,11 @@ int main()
 		cout << "Active camera is: " << g_Scene->GetActiveCamera()->GetName() << endl;
 	}
 
-
+	g_fpCamera = new FirstPersonCamera();
 	g_fpCamera->setPosition(glm::vec3(2.2f * 5, 1.5f, 2.2f * 5));
 	g_fpCamera->setYaw(-90.0f);
 	g_fpCamera->setPitch(-30.0f);
+	g_Scene->AddCamera(g_fpCamera);
 
 	bool camSpawnSet = false;
 
