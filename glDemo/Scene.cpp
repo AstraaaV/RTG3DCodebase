@@ -38,8 +38,9 @@ void Scene::Init()
 	m_cube = new Cube();
 	BuildMap();
 
-	Player* player = new Player();
-	AddGameObject(player);
+	m_player = new Player();
+	m_player->SetShader(m_texDirLightShader);
+	AddGameObject(m_player);
 
 	Beast* beast = new Beast();
 	beast->SetShader(m_texDirLightShader);
@@ -311,13 +312,22 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 
 void Scene::InteractionTriggers(glm::vec3 playerPos)
 {
+	static float lastTriggerTime = 0.0f;
+	float currentTime = glfwGetTime();
+
+	if (currentTime - lastTriggerTime < 0.5f) return;
+
 	int col = static_cast<int>(playerPos.x / 2.2f);
 	int row = static_cast<int>(playerPos.z / 2.2f);
 
 	if (row >= 0 && row < m_mapLayout.size() && col >= 0 && col < m_mapLayout[row].size())
 	{
-		if (m_mapLayout[row][col] == 'P')
+		char tile = m_mapLayout[row][col];
+
+		if (tile == 'P')
 		{
+			cout << "Pressure Plate Activated at (" << row << "," << col << ")" << endl;
+
 			std::vector<std::pair<int, int>> directions =
 			{
 				{-1, 0}, {1, 0}, {0, -1}, {0, 1}
@@ -336,8 +346,21 @@ void Scene::InteractionTriggers(glm::vec3 playerPos)
 						cout << "Door opened at: " << r << ", " << c << endl;
 						break;
 					}
+					else if (m_mapLayout[r][c] == 'T')
+					{
+						cout << "Torch enabled near the plate." << endl;
+					}
 				}
 			}
+			lastTriggerTime = currentTime;
+		}
+		else if (tile == 'T')
+		{
+			cout << "You feel warmth... A torch ignites near you." << endl;
+		}
+		else if (tile == 'W')
+		{
+			cout << "You bumped into a wall." << endl;
 		}
 	}
 }
