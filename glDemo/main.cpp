@@ -1,4 +1,4 @@
-
+#include "Scene.h"
 #include "core.h"
 #include "TextureLoader.h"
 #include "ArcballCamera.h"
@@ -10,12 +10,9 @@
 #include "helper.h"
 #include "AIMesh.h"
 #include "Cube.h"
-#include "Scene.h"
-
 
 using namespace std;
 using namespace glm;
-
 
 #pragma region Global variables
 
@@ -26,27 +23,6 @@ bool				g_mouseDown = false;
 double				g_prevMouseX, g_prevMouseY;
 bool				g_camSwitchPressed = false;
 bool g_lightsEnabled = true;
-
-// Texture handling
-GLuint g_wallTex = 0;
-ArcballCamera* g_mainCamera = nullptr;
-FirstPersonCamera* g_fpCamera = nullptr;
-IsometricCamera* g_isoCamera = nullptr;
-CGPrincipleAxes* g_principleAxes = nullptr;
-GLuint g_flatColourShader;
-GLuint g_texDirLightShader;
-GLuint g_texPointLightShader;
-
-// Torch positions
-std::vector<glm::vec3> torches =
-{
-	vec3(2.2f, 2.5f, 0.2f), // Back, middle-left
-	vec3(6.6f, 2.5f, 0.2f), // Back, middle-right
-	vec3(0.2f, 2.5f, 4.4f), // Left, center
-	vec3(8.6f, 2.5f, 4.4f), // Right, center
-	vec3(2.2f, 2.5f, 8.6f), // Front, left
-	vec3(6.6f, 2.5f, 8.6f) // Front, right
-};
 
 int g_showing = 1;
 int g_NumExamples = 3;
@@ -63,7 +39,6 @@ const unsigned int g_initHeight = 512;
 GLFWwindow* g_window = nullptr;
 
 // Function prototypes
-void renderScene();
 void processKeys(GLFWwindow* window, float deltaTime);
 void updateScene(GLFWwindow* window);
 void resizeWindow(GLFWwindow* _window, int _width, int _height);
@@ -129,54 +104,14 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	//
-	// Setup the Example Objects
-	//
-
-	GLuint dirShader = setupShaders("Assets\\Shaders\\texture-directional.vert", "Assets\\Shaders\\texture-directional.frag");
-	GLuint pointShader = setupShaders("Assets\\Shaders\\texture-pointlight.vert", "Assets\\Shaders\\texture-pointlight.frag");
-
-	g_flatColourShader = setupShaders(string("Assets\\Shaders\\flatColour.vert"), string("Assets\\Shaders\\flatColour.frag"));
-	GLuint wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
-
-	if (wallTex == 0)
-	{
-		cout << "Texture failed to load." << endl;
-	}
-	else
-	{
-		g_wallTex = wallTex;
-		g_Scene = new Scene();;
-		g_Scene->SetWallTexture(wallTex);
-	}
-
-	g_mainCamera = new ArcballCamera();
+	g_Scene = new Scene();
+	g_Scene->Init();
 
 	//
 	//Set up Scene class
 	//
-	g_Scene->SetTexDirLightShader(dirShader);
-	g_Scene->SetTexPointLightShader(pointShader);
-
-	// Isometric Camera
-	g_isoCamera = new IsometricCamera();
-	g_Scene->AddCamera(g_isoCamera);
-
-	// Arcball camera
-	g_mainCamera = new ArcballCamera();
-	g_Scene->AddCamera(g_mainCamera);
-
-	g_Scene->SetActiveCamera(g_fpCamera);
-
-	ifstream manifest;
-	manifest.open("manifest.txt");
-
-	//g_Scene->Load(manifest);
-	g_Scene->Init();
 
 	g_showing = 2;
-
-	manifest.close();
 
 	if (!g_Scene->GetActiveCamera())
 	{
@@ -187,15 +122,7 @@ int main()
 		cout << "Active camera is: " << g_Scene->GetActiveCamera()->GetName() << endl;
 	}
 
-	g_fpCamera = new FirstPersonCamera();
-	g_fpCamera->setPosition(glm::vec3(2.2f * 5, 1.5f, 2.2f * 5));
-	g_fpCamera->setYaw(-90.0f);
-	g_fpCamera->setPitch(-30.0f);
-	g_Scene->AddCamera(g_fpCamera);
-
 	bool camSpawnSet = false;
-
-	g_principleAxes = new CGPrincipleAxes();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -217,14 +144,16 @@ int main()
 
 		processKeys(window, (float)g_gameClock->gameTimeDelta());
 
-		renderScene();						// Render into the current buffer
+		g_Scene->Render();
 		glfwSwapBuffers(window);			// Displays what was just rendered (using double buffering).
 
 		glfwPollEvents();					// Use this version when animating as fast as possible
 
 		// update window title
 		char timingString[256];
-		sprintf_s(timingString, 256, "CIS5013: Average fps: %.0f; Average spf: %f", g_gameClock->averageFPS(), g_gameClock->averageSPF() / 1000.0f);
+		float fps = g_gameClock->averageFPS();
+		float spf = g_gameClock->averageSPF();
+		sprintf_s(timingString, 256, "Dungeon Keeper 2 Clone | GDV5001 | FPS: %.1f | SPF: %.4f", fps, spf);
 		glfwSetWindowTitle(window, timingString);
 	}
 
@@ -234,136 +163,6 @@ int main()
 	{
 		g_gameClock->stop();
 		g_gameClock->reportTimingData();
-	}
-}
-
-// renderScene - function to render the current scene
-void renderScene()
-{
-	// Clear the rendering window
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	Camera* activeCam = g_Scene->GetActiveCamera();
-	if (!activeCam) return;
-
-	mat4 cameraProjection = activeCam->GetProj();
-	mat4 cameraView = activeCam->GetView();
-	mat4 cameraTransform = cameraProjection * cameraView;
-
-	cameraTransform = cameraProjection * cameraView;
-
-#// Render principle axes - no modelling transforms so just use cameraTransform
-	if (true)
-	{
-		// Render axes 
-		glUseProgram(g_flatColourShader);
-		GLint pLocation;
-		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
-		mat4 modelTransform = identity<mat4>();
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-		g_principleAxes->render();
-	}
-
-	switch (g_showing)
-	{
-	case 0:
-	{
-		GLuint dirShader = g_Scene->GetTexDirLightShader();
-		glUseProgram(dirShader);
-
-		GLint pLocation;
-		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
-		glUniform1i(pLocation, 0); // set to point to texture unit 0 for AIMeshes
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
-		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightDirection()));
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
-		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightColour()));
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
-		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightAmbient()));
-
-		g_Scene->RenderCreature();
-	}
-	break;
-
-	case 1:
-	{
-		// Render cube 
-		glUseProgram(g_texDirLightShader);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, g_Scene->GetWallTexture());
-
-		GLint pLocation;
-		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
-		glUniform1i(pLocation, 0);
-
-		// Lighting
-		Helper::SetUniformLocation(g_texDirLightShader, "lightsEnabled", &pLocation);
-		glUniform1i(pLocation, g_lightsEnabled ? 1 : 0);
-
-		// Directional
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
-		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightDirection()));
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
-		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightColour()));
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
-		glUniform3fv(pLocation, 1, glm::value_ptr(g_Scene->GetDirLightAmbient()));
-
-		// Matrices
-		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-
-		// Floor
-		mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 0.0f, 5.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 0.1f, 10.0f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
-		g_Scene->GetCube()->render();
-
-		// Ceiling
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 4.0f, 5.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 0.1f, 10.0f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
-		g_Scene->GetCube()->render();
-
-		// Back Wall
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 5.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 4.0f, 0.1f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
-		g_Scene->GetCube()->render();
-
-		// Front Wall
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 2.0f, 10.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 4.0f, 0.1f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
-		g_Scene->GetCube()->render();
-
-		// Left Wall
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.0f, 5.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 4.0f, 10.0f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
-		g_Scene->GetCube()->render();
-
-		// Right Wall
-		model = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 2.0f, 5.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 4.0f, 10.0f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, glm::value_ptr(model));
-		g_Scene->GetCube()->render();
-		break;
-	}
-	case 2:
-		g_Scene->Render();
 	}
 }
 
@@ -441,9 +240,9 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 
 	float aspectRatio = static_cast<float>(_width) / static_cast<float>(_height);
 	
-	if (g_mainCamera) {
-
-		g_mainCamera->SetAspect((float)_width / (float)_height);
+	if (g_Scene && g_Scene->GetActiveCamera())
+	{
+		g_Scene->GetActiveCamera()->SetAspect((float)_width / (float)_height);
 	}
 
 	if (g_Scene)
@@ -475,7 +274,7 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			if (!g_camSwitchPressed)
 			{
 				g_Scene->CycleCams();
-				cout << "Cam switched.\n";
+				cout << "Cam switched.\n" << g_Scene->GetActiveCamera()->GetName() << endl;
 				g_camSwitchPressed = true;
 			}
 			break;
@@ -551,12 +350,17 @@ void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods
 
 void mouseScrollHandler(GLFWwindow* _window, double _xoffset, double _yoffset) {
 
-	if (g_mainCamera) 
+	if (!g_Scene) return;
+
+	Camera* activeCam = g_Scene->GetActiveCamera();
+	ArcballCamera* arcCam = dynamic_cast<ArcballCamera*>(activeCam);
+
+	if (arcCam)
 	{
 		if (_yoffset < 0.0)
-			g_mainCamera->scaleRadius(1.1f);
+			arcCam->scaleRadius(1.1f);
 		else if (_yoffset > 0.0)
-			g_mainCamera->scaleRadius(0.9f);
+			arcCam->scaleRadius(0.9f);
 	}
 }
 

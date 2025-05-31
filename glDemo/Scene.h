@@ -16,6 +16,9 @@ using namespace std;
 #include "Cube.h"
 #include "AIMesh.h"
 #include "Player.h"
+#include "ArcballCamera.h"
+#include "FirstPersonCamera.h"
+#include "IsometricCamera.h"
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -36,7 +39,7 @@ public:
 	void InteractionTriggers(glm::vec3 playerPos);
 
 	void SetShaderUniforms(GLuint _shaderprog);
-	void GenerateTorchPos();
+	void InitTorches();
 
 	void AddGameObject(GameObject* _new);
 	void AddCamera(Camera* cam);
@@ -63,6 +66,8 @@ public:
 	glm::vec3 GetPointLightColour() const { return m_pointLightColour; }
 	glm::vec3 GetPointLightAmbient() const { return m_pointLightAmbient; }
 
+	GLuint GetFlatColourShader() const;
+
 	void SetLightsEnabled(bool enabled) { m_lightsEnabled = enabled; }
 	void Load(ifstream& _file);
 
@@ -80,6 +85,10 @@ protected:
 	Cube* m_cube = nullptr;
 	AIMesh* m_creatureMesh = nullptr;
 	Player* m_player = nullptr;
+	Shader* m_flatColourShader = nullptr;
+	FirstPersonCamera* m_fpCamera = nullptr;
+	ArcballCamera* m_arcCamera = nullptr;
+	IsometricCamera* m_isoCamera = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	Camera* m_activeCamera = nullptr;

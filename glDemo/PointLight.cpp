@@ -33,12 +33,12 @@ void PointLight::SetRenderValues(unsigned int _prog)
 	string linString = m_name + "Linear";
 	string quadString = m_name + "Quadratic";
 
-	if(Helper::SetUniformLocation(_prog, constString.c_str(), &loc));
+	if(Helper::SetUniformLocation(_prog, constString.c_str(), &loc))
 	glUniform1f(loc, m_constant);
 
-	if (Helper::SetUniformLocation(_prog, linString.c_str(), &loc));
+	if (Helper::SetUniformLocation(_prog, linString.c_str(), &loc))
 	glUniform1f(loc, m_linear);
 
-	if (Helper::SetUniformLocation(_prog, quadString.c_str(), &loc));
+	if (Helper::SetUniformLocation(_prog, quadString.c_str(), &loc))
 	glUniform1f(loc, m_quadratic);
 }

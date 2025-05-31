@@ -15,7 +15,8 @@
 #include <assert.h>
 #include <helper.h>
 #include <RenderPass.h>
-#include <IsometricCamera.h>
+#include "IsometricCamera.h"
+#include "TextureLoader.h"
 
 Scene::Scene()
 {
@@ -35,6 +36,17 @@ Scene::~Scene()
 
 void Scene::Init()
 {
+	GLuint wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
+
+	if (wallTex == 0)
+	{
+		cout << "Failed to load the wall texture." << endl;
+	}
+	else
+	{
+		SetWallTexture(wallTex);
+	}
+
 	m_cube = new Cube();
 	BuildMap();
 
@@ -46,6 +58,32 @@ void Scene::Init()
 	beast->SetShader(m_texDirLightShader);
 	AddGameObject(beast);
 
+	ifstream manifest("manifest.txt");
+
+	if (manifest.is_open())
+	{
+		Load(manifest);
+		manifest.close();
+	}
+	else
+	{
+		cout << "Failed to open manifest.txt\n" << endl;
+	}
+
+	m_fpCamera = new FirstPersonCamera();
+	m_fpCamera->setPosition(glm::vec3(2.2f * 5, 1.5f, 2.2f * 5));
+	m_fpCamera->setYaw(-90.0f);
+	m_fpCamera->setPitch(-30.0f);
+	AddCamera(m_fpCamera);
+	SetActiveCamera(m_fpCamera);
+
+	// Arcball camera
+	m_arcCamera = new ArcballCamera();
+	AddCamera(m_arcCamera);
+
+	// Isometric Camera
+	m_isoCamera = new IsometricCamera();
+	AddCamera(m_isoCamera);
 
 	if (!m_Cameras.empty())
 	{
@@ -83,10 +121,10 @@ void Scene::BuildMap()
 		}
 		m_mapLayout.push_back(line);
 	}
-	GenerateTorchPos();
+	InitTorches();
 }
 
-void Scene::GenerateTorchPos()
+void Scene::InitTorches()
 {
 	m_torchPos.clear();
 	for (int row = 0; row < m_mapLayout.size(); ++row)
@@ -289,14 +327,17 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 			colours.push_back(light->GetColour());
 			ambients.push_back(light->GetAmbient());
 		}
-
+	}
 		int count = static_cast<int>(positions.size());
 		if (count > 16) count = 16;
 
-		glUniform1i(glGetUniformLocation(shaderProgram, "numPointLights"), count);
-		glUniform3fv(glGetUniformLocation(shaderProgram, "pointPos"), count, glm::value_ptr(positions[0]));
-		glUniform3fv(glGetUniformLocation(shaderProgram, "pointCol"), count, glm::value_ptr(colours[0]));
-		glUniform3fv(glGetUniformLocation(shaderProgram, "ambientCol"), count, glm::value_ptr(ambients[0]));
+		if (count > 0)
+		{
+			glUniform1i(glGetUniformLocation(shaderProgram, "numPointLights"), count);
+			glUniform3fv(glGetUniformLocation(shaderProgram, "pointPos"), count, glm::value_ptr(positions[0]));
+			glUniform3fv(glGetUniformLocation(shaderProgram, "pointCol"), count, glm::value_ptr(colours[0]));
+			glUniform3fv(glGetUniformLocation(shaderProgram, "ambientCol"), count, glm::value_ptr(ambients[0]));
+		}
 	
 		Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
 		for (const auto& pos : m_torchPos)
@@ -306,8 +347,6 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 		
 			m_cube->render();
 		}
-	
-	}
 }
 
 void Scene::InteractionTriggers(glm::vec3 playerPos)
@@ -419,6 +458,11 @@ void Scene::SetShaderUniforms(GLuint _shaderprog)
 	}
 }
 
+GLuint Scene::GetFlatColourShader() const
+{
+	return m_flatColourShader ? m_flatColourShader->GetProg() : 0;
+}
+
 void Scene::Load(ifstream& _file)
 {
 	string dummy;
@@ -457,6 +501,15 @@ void Scene::Load(ifstream& _file)
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
+
+		/*if (type.empty())
+		{
+			cout << "ERROR: Light type missing or blank. Skipping.\n";
+			continue;
+		}
+		
+		cout << "Loaded light type: [" << type << "]" << endl;
+		*/
 		Light* newLight = LightFactory::makeNewLight(type);
 		newLight->Load(_file);
 
