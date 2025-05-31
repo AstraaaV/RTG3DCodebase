@@ -11,7 +11,7 @@ Light* LightFactory::makeNewLight(std::string _type)
 	{
 		return new Light();
 	}
-	else if (_type == "DIRECTION")
+	else if (_type == "DIRECTIONAL")
 	{
 		return new DirectionLight();
 	}
@@ -21,7 +21,7 @@ Light* LightFactory::makeNewLight(std::string _type)
 	}
 	else
 	{
-		printf("UNKNOWN LIGHT TYPE!");
+		printf("UNKNOWN LIGHT TYPE: %s\n", _type.c_str());
 		assert(0);
 		return nullptr;
 	}

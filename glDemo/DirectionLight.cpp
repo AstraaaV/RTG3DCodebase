@@ -5,7 +5,7 @@
 
 DirectionLight::DirectionLight()
 {
-	m_type = "DIRECTION";
+	m_type = "DIRECTIONAL";
 	m_pos = vec3(0.0, 0.0, 0.0);
 	m_direction = vec3(0.0, 1.0, 0.0);
 }
@@ -17,7 +17,7 @@ DirectionLight::~DirectionLight()
 void DirectionLight::Load(ifstream& _file)
 {
 	Light::Load(_file);
-	StringHelp::Float3(_file, "DIRECTION", m_direction.x, m_direction.y, m_direction.z);
+	StringHelp::Float3(_file, "DIRECTIONAL", m_direction.x, m_direction.y, m_direction.z);
 }
 
 void DirectionLight::SetRenderValues(unsigned int _prog)

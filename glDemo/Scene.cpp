@@ -232,9 +232,20 @@ void Scene::Render()
 
 void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection)
 {
-	if (!m_cube) return;
+	if (!m_cube)
+	{
+		cout << "ERROR: m_cube is null!" << endl;
+		return;
+	}
 
 	GLint pLocation;
+
+	if (shaderProgram == 0)
+	{
+		cout << "ERROR: Shader program is 0!" << endl;
+		return;
+	}
+
 	glUseProgram(shaderProgram);
 
 	Helper::SetUniformLocation(shaderProgram, "viewMatrix", &pLocation);
@@ -308,6 +319,12 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
 	if (!m_cube) return;
+
+	if (shaderProgram == 0)
+	{
+		cout << "ERROR: Shader program is 0!" << endl;
+		return;
+	}
 
 	glUseProgram(shaderProgram);
 
@@ -463,6 +480,15 @@ GLuint Scene::GetFlatColourShader() const
 	return m_flatColourShader ? m_flatColourShader->GetProg() : 0;
 }
 
+static std::string Trim(const std::string& str)
+{
+	size_t first = str.find_first_not_of(" \t\n\r");
+	if (first == string::npos) return "";
+
+	size_t last = str.find_last_not_of(" \t\n\r");
+	return str.substr(first, (last - first + 1));
+}
+
 void Scene::Load(ifstream& _file)
 {
 	string dummy;
@@ -497,20 +523,31 @@ void Scene::Load(ifstream& _file)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
 
-		string type;
-		_file >> dummy >> type; _file.ignore(256, '\n');
+		string type, line;
 
-		/*if (type.empty())
+		getline(_file, line);
+		size_t colon = line.find(':');
+		if (colon != string::npos)
+			type = Trim(line.substr(colon + 1));
+
+		if (type.empty())
 		{
-			cout << "ERROR: Light type missing or blank. Skipping.\n";
+			cout << "ERROR: Light type missing or blank." << i << "Skipping." << endl;
+			_file.ignore(256, '}');
 			continue;
 		}
 		
 		cout << "Loaded light type: [" << type << "]" << endl;
-		*/
+		
 		Light* newLight = LightFactory::makeNewLight(type);
+		if (!newLight)
+		{
+			cout << "ERROR: Failed to create light of type " << type << endl;
+			_file.ignore(256, '}');
+			continue;
+		}
+		
 		newLight->Load(_file);
 
 		m_Lights.push_back(newLight);
