@@ -11,7 +11,16 @@ Shader::Shader(ifstream& _file)
 
 	m_shaderProg = setupShaders(fileNameV, fileNameF);
 
-	printf("SHADER LOADED: %s\n", m_name.c_str());
+	if (m_shaderProg == 0)
+	{
+		cout << "Shader failed: " << m_name << "\n"
+			<< " -> VERT: " << fileNameV << "\n"
+			<< " -> FRAG: " << fileNameF << endl;
+	}
+	else
+	{
+		cout << "Shader loaded: " << m_name << endl;
+	}
 }
 
 Shader::~Shader()

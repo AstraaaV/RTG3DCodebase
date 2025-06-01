@@ -16,7 +16,7 @@ in SimplePacket {
 } inputFragment;
 
 // Texture
-uniform sampler2D texture;
+layout(binding = 0) uniform sampler2D texture;
 
 // Output colour
 layout (location=0) out vec4 fragColour;
@@ -45,7 +45,7 @@ void main(void) {
 		vec3 diffuseColour = surfaceColour.rgb * pointCol[i] * diff;
 		vec3 ambient = ambientCol[i] * surfaceColour.rgb;
 
-		finalColour += (ambient + diffuse) * att;
+		finalColour += (ambient + diffuseColour) * att;
 	}
 
 

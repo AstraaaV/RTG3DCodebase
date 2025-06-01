@@ -47,17 +47,6 @@ void Scene::Init()
 		SetWallTexture(wallTex);
 	}
 
-	m_cube = new Cube();
-	BuildMap();
-
-	m_player = new Player();
-	m_player->SetShader(m_texDirLightShader);
-	AddGameObject(m_player);
-
-	Beast* beast = new Beast();
-	beast->SetShader(m_texDirLightShader);
-	AddGameObject(beast);
-
 	ifstream manifest("manifest.txt");
 
 	if (manifest.is_open())
@@ -69,6 +58,20 @@ void Scene::Init()
 	{
 		cout << "Failed to open manifest.txt\n" << endl;
 	}
+
+	m_cube = new Cube();
+	BuildMap();
+
+	m_player = new Player();
+	m_player->SetShader(m_texDirLightShader);
+	AddGameObject(m_player);
+
+	Beast* beast = new Beast();
+	beast->SetShader(m_texDirLightShader);
+	AddGameObject(beast);
+
+	cout << "Assigned TEXDIR = " << m_texDirLightShader << "\n";
+	cout << "Assigned TEXPOINT = " << m_texPointLightShader << "\n";
 
 	m_fpCamera = new FirstPersonCamera();
 	m_fpCamera->setPosition(glm::vec3(2.2f * 5, 1.5f, 2.2f * 5));
@@ -215,6 +218,8 @@ void Scene::CycleCams()
 //Render Everything
 void Scene::Render()
 {
+	cout << "TEXDIR: " << m_texDirLightShader << " | TEXPOINT: " << m_texPointLightShader << endl;
+	
 	if (!m_useCamera) return;
 
 	mat4 view = m_useCamera->GetView();
@@ -646,5 +651,14 @@ void Scene::Load(ifstream& _file)
 		//skip }
 		_file.ignore(256, '\n');
 		cout << "}\n";
+	}
+
+	for (Shader* shader : m_Shaders)
+	{
+		string name = shader->GetName();
+		if (name == "TEXDIR")
+			m_texDirLightShader = shader->GetProg();
+		else if (name == "TEXPOINT")
+			m_texPointLightShader = shader->GetProg();
 	}
 }

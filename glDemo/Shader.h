@@ -12,11 +12,11 @@ public:
 	Shader(ifstream& _file);
 	~Shader();
 
-	GLuint GetProg() { return m_shaderProg; }
-	string GetName() { return m_name; }
+	GLuint GetProg() const { return m_shaderProg; }
+	const string& GetName() const { return m_name; }
 
 protected:
 	string m_name;
-	GLuint m_shaderProg;
+	GLuint m_shaderProg = 0;
 
 };
