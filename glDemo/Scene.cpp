@@ -66,9 +66,9 @@ void Scene::Init()
 	m_player->SetShader(m_texDirLightShader);
 	AddGameObject(m_player);
 
-	Beast* beast = new Beast();
-	beast->SetShader(m_texDirLightShader);
-	AddGameObject(beast);
+	m_beast = new Beast();
+	m_beast->SetShader(m_texDirLightShader);
+	AddGameObject(m_beast);
 
 	cout << "Assigned TEXDIR = " << m_texDirLightShader << "\n";
 	cout << "Assigned TEXPOINT = " << m_texPointLightShader << "\n";
@@ -142,8 +142,8 @@ void Scene::InitTorches()
 
 				Light* point = LightFactory::makeNewLight("POINT");
 				point->SetPosition(torchPos);
-				point->SetDiffuse(glm::vec3(1.0f, 0.7f, 0.3f));
-				point->SetAmbient(glm::vec3(0.05f, 0.04f, 0.02f));
+				point->SetDiffuse(glm::vec3(1.0f, 0.8f, 0.5f));
+				point->SetAmbient(glm::vec3(0.1f, 0.1f, 0.1f));
 				point->SetSpecular(glm::vec3(1.0f));
 				point->SetName("TorchLight_" + std::to_string(m_Lights.size()));
 
@@ -192,7 +192,13 @@ void Scene::Update(float _dt, GLFWwindow* window)
 	if (m_player)
 		InteractionTriggers(m_player->GetPosition());
 
-	for (auto go : m_GameObjects) go->Tick(_dt, window);
+	for (auto go : m_GameObjects)
+	{
+		if (go->GetName() == "Beast" && !dynamic_cast<FirstPersonCamera*>(m_useCamera))
+			continue;
+
+		go->Tick(_dt, window);
+	}
 }
 
 void Scene::CycleCams()
@@ -227,11 +233,10 @@ void Scene::Render()
 
 	RenderMapLayout(m_texDirLightShader, view, proj);
 	RenderTorches(m_texPointLightShader, view, proj);
-	RenderCreature();
 
-	if (dynamic_cast<ArcballCamera*>(m_useCamera) || dynamic_cast<IsometricCamera*>(m_useCamera))
+	if (dynamic_cast<FirstPersonCamera*>(m_useCamera))
 	{
-		RenderPlayerMarker(m_texDirLightShader);
+		RenderCreature();
 	}
 }
 
@@ -257,13 +262,8 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &view[0][0]);
 	Helper::SetUniformLocation(shaderProgram, "projMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &projection[0][0]);
-	
-	Helper::SetUniformLocation(shaderProgram, "DIRDir", &pLocation);
-	glUniform3fv(pLocation, 1, value_ptr(m_dirLightDirection));
-	Helper::SetUniformLocation(shaderProgram, "DIRCol", &pLocation);
-	glUniform3fv(pLocation, 1, value_ptr(m_dirLightColour));
-	Helper::SetUniformLocation(shaderProgram, "DIRAmb", &pLocation);
-	glUniform3fv(pLocation, 1, value_ptr(m_dirLightAmbient));
+
+	SetShaderUniforms(shaderProgram);
 
 	Helper::SetUniformLocation(shaderProgram, "lightsEnabled", &pLocation);
 	glUniform1i(pLocation, m_lightsEnabled ? 1 : 0);
@@ -350,6 +350,7 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 			ambients.push_back(light->GetAmbient());
 		}
 	}
+
 		int count = static_cast<int>(positions.size());
 		if (count > 16) count = 16;
 
@@ -428,14 +429,8 @@ void Scene::InteractionTriggers(glm::vec3 playerPos)
 
 void Scene::RenderCreature()
 {
-	for (GameObject* go : m_GameObjects)
-	{
-		if (go->GetName() == "Beast")
-		{
-			go->Render();
-			break;
-		}
-	}
+	if (m_beast && dynamic_cast<FirstPersonCamera*>(m_useCamera))
+		m_beast->Render();
 }
 
 void Scene::RenderPlayerMarker(GLuint shaderProgram)
@@ -656,7 +651,7 @@ void Scene::Load(ifstream& _file)
 	for (Shader* shader : m_Shaders)
 	{
 		string name = shader->GetName();
-		if (name == "TEXDIR")
+		if (name == "SUNLIGHT")
 			m_texDirLightShader = shader->GetProg();
 		else if (name == "TEXPOINT")
 			m_texPointLightShader = shader->GetProg();

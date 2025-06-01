@@ -30,7 +30,7 @@ FAR: 100.0
 LIGHTS 2
 {
 TYPE: DIRECTIONAL
-NAME: DIR
+NAME: SUN
 POS: 0.0 5.0 0.0
 DIR: 0.0 -1.0 0.0
 COL: 1.0 1.0 1.0
@@ -149,7 +149,7 @@ VERTFILE: Assets\\Shaders\\flatTexture.vert
 FRAGFILE: Assets\\Shaders\\flatTexture.frag
 }
 {
-NAME: TEXDIR
+NAME: SUNLIGHT
 VERTFILE: Assets\\Shaders\\texture-directional.vert
 FRAGFILE: Assets\\Shaders\\texture-directional.frag
 }
@@ -159,7 +159,7 @@ VERTFILE: Assets\\Shaders\\texture-pointlight.vert
 FRAGFILE: Assets\\Shaders\\texture-pointlight.frag
 }
 
-GAMEOBJECTS 12
+GAMEOBJECTS 11
 {
 TYPE: EXAMPLE
 NAME: BEAST
@@ -169,7 +169,7 @@ SCALE: 1.0 1.0 1.0
 ROTINC: 0.0 0.1 0.001
 MODEL: BEAST
 TEXTURE: BEAST
-SHADER: TEXDIR
+SHADER: SUNLIGHT
 }
 {
 TYPE: EXAMPLE
@@ -180,18 +180,7 @@ SCALE: 1.0 1.0 1.0
 ROTINC: 0.0 0.2 0.0
 MODEL: SPHERE
 TEXTURE: ROCK
-SHADER: TEXDIR
-}
-{
-TYPE: EXAMPLE
-NAME: DUCK
-POS: -2.0 0.0 2.0
-ROT: 0.0 0.0 0.0 
-SCALE: 1.0 1.0 1.0
-ROTINC: 0.0 0.3 0.0
-MODEL: DUCK
-TEXTURE: DUCK
-SHADER: TEXDIR
+SHADER: SUNLIGHT
 }
 {
 TYPE: EXAMPLE
@@ -202,7 +191,7 @@ SCALE: 2.0 2.0 1.0
 ROTINC: 0.0 0.3 0.0
 MODEL: CUBE
 TEXTURE: WALL
-SHADER: TEXDIR
+SHADER: SUNLIGHT
 }
 {
 TYPE: EXAMPLE

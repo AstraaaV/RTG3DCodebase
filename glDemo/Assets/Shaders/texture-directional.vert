@@ -12,22 +12,22 @@ out SimplePacket {
 
   vec3 surfaceWorldPos;
   vec3 surfaceNormal;
-	vec2 texCoord;
+  vec2 texCoord;
 
-} outputVertex;
+} vertexOut;
 
 
 void main(void) {
 
-	outputVertex.texCoord = vertexTexCoord.st;
+  vertexOut.texCoord = vertexTexCoord;
 
   // transform normal vector by inverse-transpose of the model matrix
-  outputVertex.surfaceNormal = (transpose(inverse(modelMatrix)) * vec4(vertexNormal, 0.0)).xyz;
+  vertexOut.surfaceNormal = (transpose(inverse(modelMatrix)) * vec4(vertexNormal, 0.0)).xyz;
 
   // take vertexPos into world coords and pass onto fragment shader
-  vec4 worldCoord = modelMatrix * vec4(vertexPos, 1.0);
-  outputVertex.surfaceWorldPos = worldCoord.xyz; // don't need w element
+  vec4 worldPos = modelMatrix * vec4(vertexPos, 1.0);
+  vertexOut.surfaceWorldPos = worldPos.xyz; // don't need w element
 
   // take worldCoord rest of the way into clip coords and set in gl_Position
-	gl_Position = projMatrix * viewMatrix * worldCoord;
+	gl_Position = projMatrix * viewMatrix * worldPos;
 }

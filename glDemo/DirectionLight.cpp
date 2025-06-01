@@ -26,7 +26,7 @@ void DirectionLight::SetRenderValues(unsigned int _prog)
 	Light::SetRenderValues(_prog);
 
 	GLint loc;
-	string dirString = m_name + "Dir";//only thing I add is a direction
+	string dirString = m_name + "SUN";//only thing I add is a direction
 
 	if (Helper::SetUniformLocation(_prog, dirString.c_str(), &loc))
 		glUniform3fv(loc, 1, glm::value_ptr(m_direction));

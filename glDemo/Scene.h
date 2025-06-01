@@ -19,6 +19,7 @@ using namespace std;
 #include "ArcballCamera.h"
 #include "FirstPersonCamera.h"
 #include "IsometricCamera.h"
+#include "Beast.h"
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -89,6 +90,7 @@ protected:
 	FirstPersonCamera* m_fpCamera = nullptr;
 	ArcballCamera* m_arcCamera = nullptr;
 	IsometricCamera* m_isoCamera = nullptr;
+	Beast* m_beast = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	Camera* m_activeCamera = nullptr;
