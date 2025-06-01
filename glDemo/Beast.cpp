@@ -8,10 +8,10 @@
 Beast::Beast()
 {
 	m_shaderID = 0;
-	m_position = glm::vec3(11.0f, 0.0f, 11.0f);
-	m_patrolStart = m_position;
-	m_patrolEnd = m_position + glm::vec3(5.0f, 0.0f, 0.0f);
 	m_rotation = 0.0f;
+	m_idleTime = 0.0f;
+	m_moveToEnd = true;
+	SetName("Beast");
 
 	m_mesh = new AIMesh("Assets\\beast\\beast.obj");
 	if (m_mesh)
@@ -23,7 +23,9 @@ Beast::Beast()
 		cout << "Failed to load Beast mesh." << endl;
 	}
 
-	SetName("Beast");
+	m_patrolStart = glm::vec3(11.0f, 0.0f, 11.0f);
+	m_patrolEnd = m_patrolStart + glm::vec3(5.0f, 0.0f, 0.0f);
+	m_position = m_patrolStart;
 }
 
 Beast::~Beast()
@@ -59,7 +61,7 @@ void Beast::Tick(float dt, GLFWwindow* window)
 
 void Beast::Render()
 {
-	if (!m_mesh) return;
+	if (!m_mesh || m_shaderID == 0) return;
 
 	glUseProgram(m_shaderID);
 
@@ -76,4 +78,14 @@ void Beast::Render()
 
 	m_mesh->setupTextures();
 	m_mesh->render();
+}
+
+void Beast::Init(AIMesh* mesh, glm::vec3 start, glm::vec3 end)
+{
+	if(mesh)
+		m_mesh = mesh;
+
+	m_patrolStart = start;
+	m_patrolEnd = end;
+	m_position = start;
 }

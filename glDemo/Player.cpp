@@ -3,16 +3,23 @@
 #include <helper.h>
 #include <GLFW/glfw3.h>
 #include <Cube.h>
+#include <iostream>
 
 Player::Player()
 {
 	SetName("Player");
 	m_position = glm::vec3(5.0f, 0.0f, 5.0f);
 	m_cube = new Cube();
+	m_speed = 5.0f;
 }
 
 Player::~Player() 
 {
+	if (m_cube)
+	{
+		delete m_cube;
+		m_cube = nullptr;
+	}
 }
 
 void Player::Tick(float dt, GLFWwindow* window)
@@ -30,10 +37,17 @@ void Player::Tick(float dt, GLFWwindow* window)
 
 void Player::Render()
 {
-	GLint loc;
-	glm::mat4 model = glm::translate(glm::mat4(1), m_position) *
-		glm::scale(glm::mat4(1), glm::vec3(1.0f, 2.0f, 1.0f));
+	if (!m_shaderID)
+	{
+		cout << "[PLAYER] Shader not set.\n";
+		return;
+	}
 
+	// Model Matrix
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), m_position) *
+		glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 2.0f, 1.0f));
+	
+	GLint loc;
 	Helper::SetUniformLocation(m_shaderID, "modelMatrix", &loc);
 	glUniformMatrix4fv(loc, 1, GL_FALSE, &model[0][0]);
 

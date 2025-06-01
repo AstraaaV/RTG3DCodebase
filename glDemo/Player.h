@@ -18,6 +18,6 @@ public:
 private:
 	glm::vec3 m_position;
 	float m_speed = 5.0f;
-	GLuint m_shaderID;
-	Cube* m_cube;
+
+	Cube* m_cube = nullptr;
 };

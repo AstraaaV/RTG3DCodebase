@@ -14,5 +14,10 @@ layout (location=0) out vec4 fragColour;
 
 void main(void) {
 
-	fragColour = texture(texture, inputFragment.texCoord);
+	vec4 texColor = texture(texture, inputFragment.texCoord);
+
+	if(texColor.a < 0.1)
+		discard;
+
+	fragColour = texColor;
 }

@@ -30,18 +30,24 @@ void Background::Tick(float _dt, GLFWwindow* window)
 
 void Background::PreRender()
 {
+	if (m_texture != 0)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+	}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
-
-	GLint timeLoc;
-	Helper::SetUniformLocation(m_shader, "u_time", &timeLoc);
-	glUniform1f(timeLoc, glfwGetTime());
+	if (m_shader != 0)
+	{
+		GLint timeLoc;
+		Helper::SetUniformLocation(m_shader, "u_time", &timeLoc);
+		glUniform1f(timeLoc, glfwGetTime());
+	}
 }
 
 void Background::Render()
 {
-	m_model->Render();
+	if(m_model)
+		m_model->Render();
 }
 
 void Background::Init(GLuint shader, GLuint texture, Model* model)
@@ -53,4 +59,10 @@ void Background::Init(GLuint shader, GLuint texture, Model* model)
 	SetRenderPass(RP_BACKGROUND); // Makes sure its in bg render pass
 
 	std::cout << "Texture ID: " << m_texture << std::endl;
+
+	if (!m_texture || !m_shader || !m_model)
+		cout << "[BACKGROUND] Init Warning: Missing Asset(s): "
+		<< "Shader = " << m_shader
+		<< ", Texture = " << m_texture
+		<< ", Model = " << (m_model ? "OK" : "NULL") << endl;
 }

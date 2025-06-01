@@ -224,6 +224,8 @@ void Scene::CycleCams()
 //Render Everything
 void Scene::Render()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	cout << "TEXDIR: " << m_texDirLightShader << " | TEXPOINT: " << m_texPointLightShader << endl;
 	
 	if (!m_useCamera) return;
@@ -429,7 +431,7 @@ void Scene::InteractionTriggers(glm::vec3 playerPos)
 
 void Scene::RenderCreature()
 {
-	if (m_beast && dynamic_cast<FirstPersonCamera*>(m_useCamera))
+	if (m_beast && m_showBeast)
 		m_beast->Render();
 }
 
@@ -609,13 +611,27 @@ void Scene::Load(ifstream& _file)
 		_file.ignore(256, '\n');
 		cout << "{\n";
 
-		m_Shaders.push_back(new Shader(_file));
+		Shader* shader = new Shader(_file);
+		m_Shaders.push_back(shader);
 
 		//skip }
 		_file.ignore(256, '\n');
 		cout << "}\n";
 	}
 
+	for (Shader* shader : m_Shaders)
+	{
+		string name = shader->GetName();
+		cout << "[SCENE] Shader in list: " << name << " -> " << shader->GetProg() << endl;
+
+		if (name == "SUNLIGHT")
+			m_texDirLightShader = shader->GetProg();
+		else if (name == "TEXPOINT")
+			m_texPointLightShader = shader->GetProg();
+	}
+
+	cout << "m_texDirLightShader: " << m_texDirLightShader << endl;
+	cout << "m_texPointLightShader: " << m_texPointLightShader << endl;
 	cout << endl << endl;
 
 	//load GameObjects
@@ -648,12 +664,15 @@ void Scene::Load(ifstream& _file)
 		cout << "}\n";
 	}
 
-	for (Shader* shader : m_Shaders)
-	{
-		string name = shader->GetName();
-		if (name == "SUNLIGHT")
-			m_texDirLightShader = shader->GetProg();
-		else if (name == "TEXPOINT")
-			m_texPointLightShader = shader->GetProg();
-	}
+	if (m_texDirLightShader == 0)
+		cout << "[SCENE] SUNLIGHT shader not loaded.\n" << endl;
+
+	if (m_texPointLightShader == 0)
+		cout << "[SCENE] TEXPOINT shader not loaded.\n" << endl;
+}
+
+void Scene::ToggleBeast()
+{
+	m_showBeast = !m_showBeast;
+	cout << "[SCENE] Beast Visibility: " << (m_showBeast ? "ON" : "OFF") << endl;
 }

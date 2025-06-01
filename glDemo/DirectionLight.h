@@ -11,13 +11,13 @@ public:
 	~DirectionLight();
 
 	//load from manifest
-	virtual void Load(ifstream& _file);
+	void Load(ifstream& _file) override;
 
 	//set render values
-	virtual void SetRenderValues(unsigned int _prog);
+	void SetRenderValues(unsigned int _prog) override;
 
 	// Tick this light
-	virtual void Tick(float _dt, GLFWwindow* window);
+	void Tick(float _dt, GLFWwindow* window) override;
 protected:
 	vec3 m_direction;
 

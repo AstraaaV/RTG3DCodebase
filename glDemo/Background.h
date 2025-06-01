@@ -6,7 +6,7 @@ class Background : public GameObject
 {
 public:
 	Background();
-	~Background();
+	~Background() override;
 
 	//load me from the file
 	virtual void Load(ifstream& _file);
@@ -24,10 +24,10 @@ protected:
 
 	string m_ShaderName, m_TexName, m_ModelName;
 
-	GLuint m_texture;
-	GLuint m_shader;
-	GLuint m_normalMap;
+	GLuint m_texture = 0;
+	GLuint m_shader = 0;
+	GLuint m_normalMap = 0;
 	
-	Model* m_model;
+	Model* m_model = nullptr;
 };
 

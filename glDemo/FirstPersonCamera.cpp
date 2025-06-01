@@ -34,7 +34,10 @@ void FirstPersonCamera::Tick(float dt, GLFWwindow* window)
 	m_viewMatrix = glm::lookAt(m_position, m_position + m_front, m_up);
 
 	int w = 1, h = 1;
-	glfwGetFramebufferSize(window, &w, &h);
+
+	if(window)
+		glfwGetFramebufferSize(window, &w, &h);
+	
 	m_aspect = static_cast<float>(w) / static_cast<float>(h);
 }
 
@@ -75,7 +78,8 @@ void FirstPersonCamera::updateCamVectors()
 	m_front = glm::normalize(front);
 
 	// Recalculates the right and up vectors
-	m_right = glm::normalize(glm::cross(m_front, m_up));
+	glm::vec3 worldUp(0.0f, 1.0f, 0.0f);
+	m_right = glm::normalize(glm::cross(m_front, worldUp));
 	m_up = glm::normalize(glm::cross(m_right, m_front));
 }
 
@@ -124,6 +128,5 @@ glm::mat4 FirstPersonCamera::GetView() const
 
 glm::mat4 FirstPersonCamera::GetProj() const
 {
-	float size = 10.0f;
 	return glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }

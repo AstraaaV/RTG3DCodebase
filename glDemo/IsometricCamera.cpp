@@ -65,6 +65,5 @@ glm::mat4 IsometricCamera::GetView() const
 
 glm::mat4 IsometricCamera::GetProj() const
 {
-	float size = 10.0f;
-	return glm::ortho(-size * m_aspect, size * m_aspect, -size, size, m_near, m_far);
+	return glm::ortho(-m_viewSize * m_aspect, m_viewSize * m_aspect, -m_viewSize, m_viewSize, m_near, m_far);
 }

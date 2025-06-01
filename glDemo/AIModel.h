@@ -11,8 +11,8 @@ public:
 	AIModel();
 	virtual ~AIModel();
 
-	void Load(ifstream& _file);
-	virtual void Render();
+	void Load(ifstream& _file) override;
+	void Render() override;
 
 protected:
 	AIMesh* m_AImesh;

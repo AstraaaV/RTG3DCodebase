@@ -45,6 +45,10 @@ void Camera::SetRenderValues(unsigned int shaderProgram)
 	//matrix for the projection transform
 	if (Helper::SetUniformLocation(shaderProgram, "projMatrix", &loc))
 		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(projMatrix));
+
+	// Camera Position
+	if (Helper::SetUniformLocation(shaderProgram, "cameraPosition", &loc))
+		glUniform3fv(loc, 1, glm::value_ptr(m_pos));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -76,8 +80,13 @@ void Camera::Tick(float _dt, GLFWwindow* window)
 	if (width <= 0) width = 1;
 	if (height <= 0) height = 1;
 
-	float asp = static_cast<float>(width) / static_cast<float>(height);
-	SetAspect(asp);
+	float newAsp = static_cast<float>(width) / static_cast<float>(height);
+	
+	if (fabs(newAsp - m_aspect) > 0.001f)
+	{
+		SetAspect(newAsp);
+		m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+	}
 }
 
 void Camera::Load(ifstream& _file)

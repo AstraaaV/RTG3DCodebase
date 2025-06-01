@@ -72,6 +72,8 @@ public:
 	void SetLightsEnabled(bool enabled) { m_lightsEnabled = enabled; }
 	void Load(ifstream& _file);
 
+	void ToggleBeast();
+
 protected:
 	std::vector<Camera*>    m_Cameras;
 	std::list<Light*>    m_Lights;
@@ -98,6 +100,7 @@ protected:
 	bool m_camSwitchPressed = false;
 
 	bool m_lightsEnabled = false;
+	bool m_showBeast = false;
 
 	GLuint m_wallTex = 0;
 	GLuint m_texDirLightShader = 0;

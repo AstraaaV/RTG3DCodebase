@@ -103,6 +103,8 @@ int main()
 	glFrontFace(GL_CCW);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
 
 	g_Scene = new Scene();
@@ -278,6 +280,10 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 				cout << "Cam switched.\n" << g_Scene->GetActiveCamera()->GetName() << endl;
 				g_camSwitchPressed = true;
 			}
+			break;
+
+		case GLFW_KEY_B:
+			g_Scene->ToggleBeast();
 			break;
 
 		case GLFW_KEY_L:

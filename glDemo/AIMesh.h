@@ -1,8 +1,23 @@
 #pragma once
 
 #include "core.h"
+#include <string>
 
 class AIMesh {
+public:
+	AIMesh(std::string _filename, GLuint _meshIndex = 0);
+	~AIMesh();
+
+	void addTexture(GLuint _textureID);
+	void addTexture(std::string _filename, FREE_IMAGE_FORMAT _format);
+
+	void addNormalMap(GLuint _normalMapID);
+	void addNormalMap(std::string _filename, FREE_IMAGE_FORMAT _format);
+
+	void setupTextures();
+	void render();
+
+private:
 
 	GLuint				m_numFaces = 0;
 
@@ -19,17 +34,4 @@ class AIMesh {
 
 	GLuint				m_textureID = 0;
 	GLuint				m_normalMapID = 0;
-
-public:
-
-	AIMesh(std::string _filename, GLuint _meshIndex = 0);
-
-	void addTexture(GLuint _textureID);
-	void addTexture(std::string _filename, FREE_IMAGE_FORMAT _format);
-
-	void addNormalMap(GLuint _normalMapID);
-	void addNormalMap(std::string _filename, FREE_IMAGE_FORMAT _format);
-
-	void setupTextures();
-	void render();
 };

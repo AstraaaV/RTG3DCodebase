@@ -8,10 +8,12 @@ class Beast : public GameObject
 {
 public:
 	Beast();
-	~Beast();
+	~Beast() override;
 
 	void Tick(float dt, GLFWwindow* window) override;
 	void Render() override;
+
+	void Init(AIMesh* mesh, glm::vec3 start, glm::vec3 end);
 private:
 	AIMesh* m_mesh = nullptr;
 	glm::vec3 m_position;

@@ -37,13 +37,22 @@ void DirectionLight::Tick(float _dt, GLFWwindow* window)
 	m_timeOfDay += _dt * m_speed;
 
 	// Loop time
-	if (m_timeOfDay > 360.0f) m_timeOfDay -= 360.0f;
+	if (m_timeOfDay > 360.0f)
+		m_timeOfDay -= 360.0f;
 
 	// Rotate light on XZ plane
 	float radians = glm::radians(m_timeOfDay);
 	m_direction = glm::normalize(vec3(cos(radians), sin(radians), 0.0f));
 
 	// Dim light when its below "horizon"
-	m_col = (m_direction.y > 0.0f) ? vec3(1.0f, 1.0f, 0.9f) : vec3(0.1f, 0.1f, 0.2f);
-	m_amb = (m_direction.y > 0.0f) ? vec3(0.3f) : vec3(0.05f); // add moonlight at night?
+	if (m_direction.y > 0.0f)
+	{
+		m_col = glm::vec3(1.0f, 1.0f, 0.9f);
+		m_amb = glm::vec3(0.3f);
+	}
+	else
+	{
+		m_col = glm::vec3(0.1f, 0.1f, 0.2f);
+		m_amb = glm::vec3(0.05f);
+	}
 }
