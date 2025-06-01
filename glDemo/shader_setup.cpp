@@ -258,6 +258,7 @@ GLuint setupShaders(const string& vsPath, const string& fsPath, ShaderError* err
 	if (buildInfo.fragmentShader != 0)
 		glAttachShader(program, buildInfo.fragmentShader);
 
+	printf("LINKING SHADER PROGRAM FROM: %s and %s\n", vsPath.c_str(), fsPath.c_str());
 
 	// Link and validate the shader program
 	glLinkProgram(program);

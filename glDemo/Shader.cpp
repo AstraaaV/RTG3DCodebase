@@ -10,6 +10,8 @@ Shader::Shader(ifstream& _file)
 	StringHelp::String(_file, "FRAGFILE", fileNameF);
 
 	m_shaderProg = setupShaders(fileNameV, fileNameF);
+
+	printf("SHADER LOADED: %s\n", m_name.c_str());
 }
 
 Shader::~Shader()

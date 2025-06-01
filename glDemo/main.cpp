@@ -95,7 +95,8 @@ int main()
 #pragma endregion
 
 	// Initialise scene - geometry and shaders etc
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // setup background colour to be black
+	glClearColor(0.2f, 0.2f, 0.8f, 1.0f); // setup background colour to be black
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearDepth(1.0f);
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glPolygonMode(GL_BACK, GL_LINE);
