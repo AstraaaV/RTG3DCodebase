@@ -502,6 +502,8 @@ ShaderError createShaderFromFile(GLenum shaderType, const string& shaderFilePath
 		}
 		else if (err == ShaderError::GLSL_SHADER_COMPILE_ERROR) {
 
+			cout << "\n[SHADER COMPILE ERROR]: " << shaderFilePath << endl;
+
 			set<char> pathDelimiters{ '\\' };
 			vector<string> pathComponents = StringUtility::splitPath(shaderFilePath, pathDelimiters);
 

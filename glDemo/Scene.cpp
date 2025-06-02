@@ -325,6 +325,29 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 
 void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
+	constexpr int MAX_LIGHTS = 4;
+
+	glm::vec3 lightPos[MAX_LIGHTS] =
+	{
+		glm::vec3(2.0f, 1.5f, 2.0f),
+		glm::vec3(-2.0f, 1.5f, 2.0f),
+		glm::vec3(2.0f, 1.5f, -2.0f),
+		glm::vec3(-2.0f, 1.5f, -2.0f)
+	};
+
+	glm::vec3 lightCol[MAX_LIGHTS] =
+	{
+		glm::vec3(1.0f, 0.5f, 0.5f),
+		glm::vec3(0.5f, 1.0f, 0.5f),
+		glm::vec3(0.5f, 0.5f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f)
+	};
+
+	glm::vec3 ambientCol[MAX_LIGHTS] =
+	{
+		glm::vec3(0.1f), glm::vec3(0.1f), glm::vec3(0.1f), glm::vec3(0.1f)
+	};
+	
 	if (!m_cube) return;
 
 	if (shaderProgram == 0)

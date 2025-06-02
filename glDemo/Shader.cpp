@@ -24,9 +24,11 @@ Shader::Shader(ifstream& _file)
 
 	if (m_shaderProg == 0)
 	{
-		cout << "Shader failed: " << m_name << "\n"
+		cout << "\n[CRITICAL ERROR] Shader failed: " << m_name << "\n"
 			<< " -> VERT: " << fileNameV << "\n"
 			<< " -> FRAG: " << fileNameF << endl;
+
+		assert(false && "shader compile/llink failed. see error log above.");
 	}
 	else
 	{
