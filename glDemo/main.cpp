@@ -118,11 +118,11 @@ int main()
 
 	if (!g_Scene->GetActiveCamera())
 	{
-		cout << "No active camera set after Init." << endl;
+		std::cout << "No active camera set after Init." << endl;
 	}
 	else
 	{
-		cout << "Active camera is: " << g_Scene->GetActiveCamera()->GetName() << endl;
+		std::cout << "Active camera is: " << g_Scene->GetActiveCamera()->GetName() << endl;
 	}
 
 	bool camSpawnSet = false;
@@ -180,14 +180,14 @@ void processKeys(GLFWwindow* window, float deltaTime)
 	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(activeCam);
 	if (!fpCam)
 	{
-		cout << "Active cam is NOT FPC\n";
+		std::cout << "Active cam is NOT FPC\n";
 		return;
 	}
 
 	static bool printed = false;
 	if (!printed)
 	{
-		cout << "Using FPC for movement\n";
+		std::cout << "Using FPC for movement\n";
 		printed = true;
 	}
 	
@@ -209,7 +209,7 @@ void processKeys(GLFWwindow* window, float deltaTime)
 	glm::vec3 currentPos = fpCam->getPosition();
 	if (currentPos != lastPos)
 	{
-		cout << "Cam moved to: " << currentPos.x << ", " << currentPos.y << ", " << currentPos.z << endl;
+		std::cout << "Cam moved to: " << currentPos.x << ", " << currentPos.y << ", " << currentPos.z << endl;
 		lastPos = currentPos;
 	}
 
@@ -277,7 +277,7 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			if (!g_camSwitchPressed)
 			{
 				g_Scene->CycleCams();
-				cout << "Cam switched.\n" << g_Scene->GetActiveCamera()->GetName() << endl;
+				std::cout << "Cam switched.\n" << g_Scene->GetActiveCamera()->GetName() << endl;
 				g_camSwitchPressed = true;
 			}
 			break;
@@ -289,7 +289,7 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		case GLFW_KEY_L:
 			g_lightsEnabled = !g_lightsEnabled;
 			g_Scene->SetLightsEnabled(g_lightsEnabled);
-			cout << "Lights enabled: " << (g_lightsEnabled ? "On" : "Off") << endl;
+			std::cout << "Lights enabled: " << (g_lightsEnabled ? "On" : "Off") << endl;
 			break;
 		}
 	}

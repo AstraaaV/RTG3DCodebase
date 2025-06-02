@@ -17,13 +17,13 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 
 	if (!scene)
 	{
-		cout << "AIMesh failed to load : " << _filename << endl;
+		std::cout << "AIMesh failed to load : " << _filename << endl;
 		return;
 	}
 
 	if (_meshIndex >= scene->mNumMeshes)
 	{
-		cout << "Invalid Mesh Index: " << _meshIndex << " for " << _filename << endl;
+		std::cout << "Invalid Mesh Index: " << _meshIndex << " for " << _filename << endl;
 		aiReleaseImport(scene);
 		return;
 	}
@@ -80,7 +80,7 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 
 	if (!faceIndexArray)
 	{
-		cout << "[AIMESH] Failed to allocate memory for faceIndexArray: " << _filename << endl;
+		std::cout << "[AIMESH] Failed to allocate memory for faceIndexArray: " << _filename << endl;
 		aiReleaseImport(scene);
 		return;
 	}

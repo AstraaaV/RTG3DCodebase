@@ -24,7 +24,7 @@ Shader::Shader(ifstream& _file)
 
 	if (m_shaderProg == 0)
 	{
-		cout << "\n[CRITICAL ERROR] Shader failed: " << m_name << "\n"
+		std::cout << "\n[CRITICAL ERROR] Shader failed: " << m_name << "\n"
 			<< " -> VERT: " << fileNameV << "\n"
 			<< " -> FRAG: " << fileNameF << endl;
 
@@ -32,7 +32,7 @@ Shader::Shader(ifstream& _file)
 	}
 	else
 	{
-		cout << "Shader loaded: " << m_name << endl;
+		std::cout << "Shader loaded: " << m_name << endl;
 	}
 }
 

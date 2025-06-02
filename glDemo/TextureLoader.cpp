@@ -12,7 +12,7 @@ GLuint loadTexture(string _filename, FREE_IMAGE_FORMAT _srcImageType) {
 
 	if (!loadedBitmap) 
 	{
-		cout << "FreeImage: Could not load image " << _filename << endl;
+		std::cout << "FreeImage: Could not load image " << _filename << endl;
 		return 0;
 	}
 
@@ -22,7 +22,7 @@ GLuint loadTexture(string _filename, FREE_IMAGE_FORMAT _srcImageType) {
 
 	if (!bitmap32bpp) 
 	{
-		cout << "FreeImage: Conversion to 32 bits unsuccessful for image " << _filename << endl;
+		std::cout << "FreeImage: Conversion to 32 bits unsuccessful for image " << _filename << endl;
 		return 0;
 	}
 

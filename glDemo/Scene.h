@@ -1,6 +1,7 @@
 #pragma once
 #include "core.h"
 #include <list>
+#include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -15,7 +16,6 @@ using namespace std;
 #include "GameObject.h"
 #include "Cube.h"
 #include "AIMesh.h"
-#include "Player.h"
 #include "ArcballCamera.h"
 #include "FirstPersonCamera.h"
 #include "IsometricCamera.h"
@@ -37,10 +37,7 @@ public:
 	void RenderPlayerMarker(GLuint shaderProgram);
 	void RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix);
 
-	void InteractionTriggers(glm::vec3 playerPos);
-
 	void SetShaderUniforms(GLuint _shaderprog);
-	void InitTorches();
 
 	void AddGameObject(GameObject* _new);
 	void AddCamera(Camera* cam);
@@ -76,7 +73,7 @@ public:
 
 protected:
 	std::vector<Camera*>    m_Cameras;
-	std::list<Light*>    m_Lights;
+	std::vector<Light*>    m_Lights;
 	std::list<Model*>		m_Models;
 	std::list<Texture*>		m_Textures;
 	std::list<Shader*>		m_Shaders;
@@ -87,7 +84,6 @@ protected:
 
 	Cube* m_cube = nullptr;
 	AIMesh* m_creatureMesh = nullptr;
-	Player* m_player = nullptr;
 	Shader* m_flatColourShader = nullptr;
 	FirstPersonCamera* m_fpCamera = nullptr;
 	ArcballCamera* m_arcCamera = nullptr;

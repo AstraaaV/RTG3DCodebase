@@ -233,7 +233,7 @@ GLuint setupShaders(const string& vsPath, const string& fsPath, ShaderError* err
 
 	if (program == 0) {
 
-		cout << "The shader program object could not be created." << endl;
+		std::cout << "The shader program object could not be created." << endl;
 
 		if (error_result)
 			*error_result = ShaderError::GLSL_PROGRAM_OBJECT_CREATION_ERROR;
@@ -270,11 +270,11 @@ GLuint setupShaders(const string& vsPath, const string& fsPath, ShaderError* err
 
 		// Failed to link - report linker error log and dispose of local resources
 
-		cout << "The shader program object could not be linked successfully..." << endl;
+		std::cout << "The shader program object could not be linked successfully..." << endl;
 
-		cout << "\n<GLSL shader program object linker errors--------------------->\n\n";
+		std::cout << "\n<GLSL shader program object linker errors--------------------->\n\n";
 		reportProgramInfoLog(program);
-		cout << "<-----------------end shader program object linker errors>\n\n";
+		std::cout << "<-----------------end shader program object linker errors>\n\n";
 
 		glDeleteProgram(program);
 
@@ -484,7 +484,7 @@ ShaderError createShaderFromFile(GLenum shaderType, const string& shaderFilePath
 
 		if (err == StringUtility::StringResult::S_FILE_NOT_FOUND) {
 
-			cout << (pathComponents[pathComponents.size() - 1]) << " source not found. Check the file path in your code.\n";
+			std::cout << (pathComponents[pathComponents.size() - 1]) << " source not found. Check the file path in your code.\n";
 		}
 
 		return ShaderError::GLSL_SHADER_SOURCE_NOT_FOUND;
@@ -496,25 +496,25 @@ ShaderError createShaderFromFile(GLenum shaderType, const string& shaderFilePath
 
 		if (err == ShaderError::GLSL_SHADER_OBJECT_CREATION_ERROR) {
 
-			cout << (pathComponents[pathComponents.size() - 1]) << " shader object could not be created.  Try freeing up resources before attempting to create the shader.\n";
+			std::cout << (pathComponents[pathComponents.size() - 1]) << " shader object could not be created.  Try freeing up resources before attempting to create the shader.\n";
 
 			return err;
 		}
 		else if (err == ShaderError::GLSL_SHADER_COMPILE_ERROR) {
 
-			cout << "\n[SHADER COMPILE ERROR]: " << shaderFilePath << endl;
+			std::cout << "\n[SHADER COMPILE ERROR]: " << shaderFilePath << endl;
 
 			set<char> pathDelimiters{ '\\' };
 			vector<string> pathComponents = StringUtility::splitPath(shaderFilePath, pathDelimiters);
 
-			cout << pathComponents[pathComponents.size() - 1] << " could not be compiled successfully...\n\n";
+			std::cout << pathComponents[pathComponents.size() - 1] << " could not be compiled successfully...\n\n";
 			printSourceListing(sourceString);
 
 			// report compilation error log
 
-			cout << "\n<" << pathComponents[pathComponents.size() - 1] << " shader compiler errors--------------------->\n\n";
+			std::cout << "\n<" << pathComponents[pathComponents.size() - 1] << " shader compiler errors--------------------->\n\n";
 			reportShaderInfoLog(shader);
-			cout << "<-----------------end " << pathComponents[pathComponents.size() - 1] << " shader compiler errors>\n\n\n";
+			std::cout << "<-----------------end " << pathComponents[pathComponents.size() - 1] << " shader compiler errors>\n\n\n";
 
 			glDeleteShader(shader);
 			shader = 0;
@@ -573,14 +573,14 @@ void printSourceListing(const string& sourceString, bool showLineNumbers) {
 
 		if (showLineNumbers) {
 
-			cout.fill(' ');
-			cout.width(4);
-			cout << dec << ++lineIndex << " > ";
+			std::cout.fill(' ');
+			std::cout.width(4);
+			std::cout << dec << ++lineIndex << " > ";
 		}
 
 		size_t substrLength = strcspn(srcPtr, "\n");
 
-		cout << string(srcPtr, 0, substrLength) << endl;
+		std::cout << string(srcPtr, 0, substrLength) << endl;
 
 		srcPtr += substrLength + 1;
 	}
@@ -599,7 +599,7 @@ void reportProgramInfoLog(GLuint program)
 
 		glGetProgramInfoLog(program, noofBytes, 0, str);
 
-		cout << str << endl;
+		std::cout << str << endl;
 		//printf("%s\n", str);
 
 		free(str);
@@ -619,7 +619,7 @@ void reportShaderInfoLog(GLuint shader)
 
 		glGetShaderInfoLog(shader, noofBytes, 0, str);
 
-		cout << str << endl;
+		std::cout << str << endl;
 		//printf("%s\n", str);
 
 		free(str);

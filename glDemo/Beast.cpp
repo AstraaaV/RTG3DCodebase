@@ -20,7 +20,7 @@ Beast::Beast()
 	}
 	else
 	{
-		cout << "Failed to load Beast mesh." << endl;
+		std::cout << "Failed to load Beast mesh." << endl;
 	}
 
 	m_patrolStart = glm::vec3(11.0f, 0.0f, 11.0f);

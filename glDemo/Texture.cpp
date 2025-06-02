@@ -165,7 +165,7 @@ Texture::Texture(ifstream& _file)
 	}
 	else
 	{
-		cout << "Unknown Texture type : " << type << endl;
+		std::cout << "Unknown Texture type : " << type << endl;
 		assert(0);
 	}
 

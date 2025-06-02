@@ -266,7 +266,7 @@ GUClock::GUClock(void) {
 	}
 	else {
 
-		cout << "clock initialisation error" << endl;
+		std::cout << "clock initialisation error" << endl;
 
 		timeRecip = 0.0; // high-performance counter not present - timeRecip = 0 means clock cannot be started
 
@@ -364,23 +364,23 @@ bool GUClock::clockStopped() const {
 
 void GUClock::reportTimingData() const {
 
-	cout << "max FPS = " << maximumFPS() << endl;
-	cout << "min FPS = " << minimumFPS() << endl;
-	cout << "average FPS = " << averageFPS() << endl;
+	std::cout << "max FPS = " << maximumFPS() << endl;
+	std::cout << "min FPS = " << minimumFPS() << endl;
+	std::cout << "average FPS = " << averageFPS() << endl;
 
-	cout << "max SPF = " << (maximumSPF() / 1000.0) << endl;
-	cout << "min SPF = " << (minimumSPF() / 1000.0) << endl;
-	cout << "average SPF = " << (averageSPF() / 1000.0) << endl;
+	std::cout << "max SPF = " << (maximumSPF() / 1000.0) << endl;
+	std::cout << "min SPF = " << (minimumSPF() / 1000.0) << endl;
+	std::cout << "average SPF = " << (averageSPF() / 1000.0) << endl;
 
 	if (frameCounter) {
 
-		cout << "ALT max FPS = " << frameCounter->altMaximumFPS() << endl;
-		cout << "ALT min FPS = " << frameCounter->altMinimumFPS() << endl;
-		cout << "ALT average FPS = " << frameCounter->altAverageFPS() << endl;
+		std::cout << "ALT max FPS = " << frameCounter->altMaximumFPS() << endl;
+		std::cout << "ALT min FPS = " << frameCounter->altMinimumFPS() << endl;
+		std::cout << "ALT average FPS = " << frameCounter->altAverageFPS() << endl;
 
-		cout << "ALT max SPF = " << (frameCounter->altMaximumSPF() /*/ 1000.0*/) << endl;
-		cout << "ALT min SPF = " << (frameCounter->altMinimumSPF() /*/ 1000.0*/) << endl;
-		cout << "ALT average SPF = " << (frameCounter->altAverageSPF() /*/ 1000.0*/) << endl;
+		std::cout << "ALT max SPF = " << (frameCounter->altMaximumSPF() /*/ 1000.0*/) << endl;
+		std::cout << "ALT min SPF = " << (frameCounter->altMinimumSPF() /*/ 1000.0*/) << endl;
+		std::cout << "ALT average SPF = " << (frameCounter->altAverageSPF() /*/ 1000.0*/) << endl;
 	}
 }
 

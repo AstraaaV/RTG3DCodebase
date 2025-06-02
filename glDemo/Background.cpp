@@ -61,7 +61,7 @@ void Background::Init(GLuint shader, GLuint texture, Model* model)
 	std::cout << "Texture ID: " << m_texture << std::endl;
 
 	if (!m_texture || !m_shader || !m_model)
-		cout << "[BACKGROUND] Init Warning: Missing Asset(s): "
+		std::cout << "[BACKGROUND] Init Warning: Missing Asset(s): "
 		<< "Shader = " << m_shader
 		<< ", Texture = " << m_texture
 		<< ", Model = " << (m_model ? "OK" : "NULL") << endl;
