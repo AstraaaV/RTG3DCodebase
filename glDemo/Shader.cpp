@@ -9,6 +9,17 @@ Shader::Shader(ifstream& _file)
 	StringHelp::String(_file, "VERTFILE", fileNameV);
 	StringHelp::String(_file, "FRAGFILE", fileNameF);
 
+	if (m_name == "TEXPOINT")
+	{
+		fileNameV = "Assets\\Shaders\\texture-pointlight.vert";
+		fileNameF = "Assets\\Shaders\\texture-pointlight.frag";
+	}
+	else if (m_name == "SUNLIGHT")
+	{
+		fileNameV = "Assets\\Shaders\\texture-directional.vert";
+		fileNameF = "Assets\\Shaders\\texture-directional.frag";
+	}
+
 	m_shaderProg = setupShaders(fileNameV, fileNameF);
 
 	if (m_shaderProg == 0)

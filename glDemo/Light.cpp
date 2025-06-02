@@ -15,8 +15,9 @@ Light::Light()
 	m_dir = glm::vec3(0.0f, -1.0f, 0.0f);
 	m_col = glm::vec3(1.0f);
 	m_amb = glm::vec3(0.2f);
+	m_specular = glm::vec3(1.0f);
+	m_diffuse = glm::vec3(1.0f);
 	m_intensity = 1.0f;
-
 }
 
 Light::~Light()

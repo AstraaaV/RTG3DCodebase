@@ -527,11 +527,25 @@ void Scene::Load(ifstream& _file)
 		_file.ignore(256, '\n');
 
 		string type, line;
-
-		getline(_file, line);
-		size_t colon = line.find(':');
-		if (colon != string::npos)
-			type = Trim(line.substr(colon + 1));
+		std::streampos blockStart = _file.tellg();
+		while (getline(_file, line))
+		{
+			if (line.find("TYPE:") != string::npos)
+			{
+				size_t colon = line.find(':');
+				if (colon != string::npos)
+				{
+					type = Trim(line.substr(colon + 1));
+					break;
+				}
+			}
+			else if (line.find('}') != string::npos)
+			{
+				break;
+			}
+		}
+		_file.clear();
+		_file.seekg(blockStart);
 
 		if (type.empty())
 		{
