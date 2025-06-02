@@ -27,26 +27,14 @@ NEAR: 0.5
 FAR: 100.0
 }
 
-LIGHTS 2
+LIGHTS 1
 {
 TYPE: DIRECTIONAL
 NAME: SUN
 POS: 0.0 5.0 0.0
-DIRECTIONAL: 0.0 -1.0 0.0
+DIR: 0.0 -1.0 0.0
 COL: 1.0 1.0 1.0
 AMB: 0.4 0.4 0.4
-}
-{
-TYPE: POINT
-NAME: TORCH
-POS: 2.0 1.5 0.0
-DIR: 0.0 -1.0 0.0
-COL: 1.0 0.7 0.3
-AMB: 0.2 0.1 0.05
-INTENSITY: 1
-CONST: 1
-LIN: 0.09
-QUAD: 0.032
 }
 
 MODELS 4
@@ -140,23 +128,23 @@ FILE: Assets\\Textures\\rock_wall.JPG
 SHADERS 4
 {
 NAME: FLAT
-VERTFILE: Assets\\Shaders\\flatColour.vert
-FRAGFILE: Assets\\Shaders\\flatColour.frag
+VERT: Assets\\Shaders\\flatColour.vert
+FRAG: Assets\\Shaders\\flatColour.frag
 }
 {
 NAME: FLAT_TEX
-VERTFILE: Assets\\Shaders\\flatTexture.vert
-FRAGFILE: Assets\\Shaders\\flatTexture.frag
+VERT: Assets\\Shaders\\flatTexture.vert
+FRAG: Assets\\Shaders\\flatTexture.frag
 }
 {
 NAME: SUNLIGHT
-VERTFILE: Assets\\Shaders\\texture-directional.vert
-FRAGFILE: Assets\\Shaders\\texture-directional.frag
+VERT: Assets\\Shaders\\texture-directional.vert
+FRAG: Assets\\Shaders\\texture-directional.frag
 }
 {
 NAME: TEXPOINT
-VERTFILE: Assets\\Shaders\\texture-pointlight.vert
-FRAGFILE: Assets\\Shaders\\texture-pointlight.frag
+VERT: Assets\\Shaders\\texture-pointlight.vert
+FRAG: Assets\\Shaders\\texture-pointlight.frag
 }
 
 GAMEOBJECTS 11

@@ -260,6 +260,16 @@ GLuint setupShaders(const string& vsPath, const string& fsPath, ShaderError* err
 
 	printf("LINKING SHADER PROGRAM FROM: %s and %s\n", vsPath.c_str(), fsPath.c_str());
 
+	glValidateProgram(program);
+	GLint validateStatus;
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &validateStatus);
+
+	if (validateStatus == GL_FALSE)
+	{
+		std::cout << "[ERROR] Shader program validation failed!" << endl;
+		reportProgramInfoLog(program);
+	}
+
 	// Link and validate the shader program
 	glLinkProgram(program);
 
@@ -471,7 +481,11 @@ ShaderError createShaderFromFile(GLenum shaderType, const string& shaderFilePath
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
 
 		if (compileStatus == 0)
+		{
+			std::cout << "[ERROR] Failed to compile shader: " << shaderFilePath << std::endl;
+			reportShaderInfoLog(shader);
 			throw ShaderError::GLSL_SHADER_COMPILE_ERROR;
+		}
 
 		*shaderObject = shader;
 
@@ -479,12 +493,11 @@ ShaderError createShaderFromFile(GLenum shaderType, const string& shaderFilePath
 	}
 	catch (StringUtility::StringResult err) {
 
-		set<char> pathDelimiters{ '\\' };
-		vector<string> pathComponents = StringUtility::splitPath(shaderFilePath, pathDelimiters);
+		const string fileName = shaderFilePath.substr(shaderFilePath.find_last_of("/\\") + 1);
 
 		if (err == StringUtility::StringResult::S_FILE_NOT_FOUND) {
 
-			std::cout << (pathComponents[pathComponents.size() - 1]) << " source not found. Check the file path in your code.\n";
+			std::cout << "[ERROR] Shader file not found: " << fileName << " - Check your file path.\n";
 		}
 
 		return ShaderError::GLSL_SHADER_SOURCE_NOT_FOUND;

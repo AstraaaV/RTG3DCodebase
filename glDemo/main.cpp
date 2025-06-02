@@ -173,7 +173,11 @@ void processKeys(GLFWwindow* window, float deltaTime)
 	FirstPersonCamera* fpCam = dynamic_cast<FirstPersonCamera*>(activeCam);
 	if (!fpCam)
 	{
-		std::cout << "Active cam is NOT FPC\n";
+		static int frameCounter = 0;
+		if (frameCounter++ % 300 == 0)
+		{
+			std::cout << "Active cam is NOT FPC\n";
+		}
 		return;
 	}
 	

@@ -177,7 +177,12 @@ void Scene::Render()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	std::cout << "TEXDIR: " << m_texDirLightShader << " | TEXPOINT: " << m_texPointLightShader << endl;
+	static int frameCounter = 0;
+	if (frameCounter++ % 300 == 0)
+	{
+		std::cout << "TEXDIR: " << m_texDirLightShader << " | TEXPOINT: " << m_texPointLightShader << endl;
+		return;
+	}
 	
 	if (!m_useCamera) return;
 
@@ -205,7 +210,11 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 
 	if (shaderProgram == 0)
 	{
-		std::cout << "ERROR: Shader program is 0!" << std::endl;
+		static int frameCounter = 0;
+		if (frameCounter++ % 600 == 0)
+		{
+			std::cout << "ERROR: Shader program is 0!" << std::endl;
+		}
 		return;
 	}
 
@@ -396,6 +405,16 @@ inline std::string Trim(const std::string& str)
 	return str.substr(start, end - start + 1);
 }
 
+inline void SkipMalformedBlock(std::ifstream& file)
+{
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line.find('}') != std::string::npos)
+			break;
+	}
+}
+
 void Scene::Load(ifstream& _file)
 {
 	string dummy;
@@ -456,7 +475,7 @@ void Scene::Load(ifstream& _file)
 		if (type.empty())
 		{
 			std::cout << "ERROR: Light type missing or blank." << i << "Skipping." << endl;
-			_file.ignore(256, '}');
+			SkipMalformedBlock(_file);
 			continue;
 		}
 		
