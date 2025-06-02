@@ -11,7 +11,6 @@ AIModel::AIModel()
 AIModel::~AIModel()
 {
 	delete m_AImesh;
-	m_AImesh = nullptr;
 }
 
 void AIModel::Load(ifstream& _file)
@@ -25,6 +24,5 @@ void AIModel::Load(ifstream& _file)
 
 void AIModel::Render()
 {
-	if(m_AImesh)
-		m_AImesh->render();
+	m_AImesh->render();
 }

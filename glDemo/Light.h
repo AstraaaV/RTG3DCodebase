@@ -3,8 +3,6 @@
 #include "glm/gtc/matrix_transform.hpp" 
 #include "glm/gtc/type_ptr.hpp"
 
-struct GLFWwindow;
-
 using namespace glm;
 
 #include <string>
@@ -18,42 +16,36 @@ class Light
 {
 public:
 	Light();
-	virtual ~Light();
+	virtual ~Light() = default;
 
-	virtual void Tick(float _dt, GLFWwindow* window);
-	
 	//load from mainfest
 	virtual void Load(ifstream& _file);
+
+	//tick this light
+	virtual void Tick(float _dt);
+
+	//Getters and Setters
+	void SetName(string _name) { m_name = _name; }
+	string GetName() { return m_name; }
+	void SetType(string _type) { m_type = _type; }
+	string GetType() { return m_type; }
+
+	vec3 GetCol() { return m_col; }
+	vec3 GetAmb() { return m_amb; }
+	vec3 GetPos() { return m_pos; }
+
+	//set my shader values
+	//base version: if name of light is LG
+	//sets up shader values for LGpos LGcol & LGamb
+	//position, main colour and ambient colour for this light
 	virtual void SetRenderValues(unsigned int _prog);
-
-	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
-	glm::vec3 GetPosition() const { return m_pos; }
-
-	void SetColour(const glm::vec3& col) { m_col = col; }
-	glm::vec3 GetColour() const { return m_col; }
-
-	void SetAmbient(const glm::vec3& amb) { m_amb = amb; }
-	glm::vec3 GetAmbient() const { return m_amb; }
-
-	void SetName(const std::string& name) { m_name = name; }
-	std::string GetName() const { return m_name; }
-
-	void SetType(const std::string& type) { m_type = type; }
-	std::string GetType() const { return m_type; }
-
-	void SetDiffuse(const glm::vec3& diff) { m_diffuse = diff; }
-	void SetSpecular(const glm::vec3& spec) { m_specular = spec; }
 
 protected:
 	string m_name;
 	string m_type;
 
 	vec3 m_pos; // position of the light
-	vec3 m_dir;
 	vec3 m_col; // colour of the light
 	vec3 m_amb; // ambient colour of the light
-	vec3 m_diffuse;
-	vec3 m_specular;
-	float m_intensity;
 
 };

@@ -17,14 +17,7 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 
 	if (!scene)
 	{
-		std::cout << "AIMesh failed to load : " << _filename << endl;
-		return;
-	}
-
-	if (_meshIndex >= scene->mNumMeshes)
-	{
-		std::cout << "Invalid Mesh Index: " << _meshIndex << " for " << _filename << endl;
-		aiReleaseImport(scene);
+		cout << "AIMesh failed to load : " << _filename << endl;
 		return;
 	}
 
@@ -44,8 +37,8 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 	glGenBuffers(1, &m_meshNormalBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_meshNormalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, mesh->mNumVertices * sizeof(aiVector3D), mesh->mNormals, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(3);
 
 	// *** normal mapping *** Setup VBO for tangent and bi-tangent data
 	glGenBuffers(1, &m_meshTangentBuffer);
@@ -72,33 +65,21 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 
 	// Setup VBO for mesh index buffer (face index array)
 
-	m_numFaces = mesh->mNumFaces;
+	m_numFaces = scene->mMeshes[_meshIndex]->mNumFaces;
 
 	// Setup contiguous array
-	const GLuint numBytes = m_numFaces * 3 * sizeof(GLuint);
+	const GLuint numBytes = scene->mMeshes[_meshIndex]->mNumFaces * 3 * sizeof(GLuint);
 	GLuint* faceIndexArray = (GLuint*)malloc(numBytes);
 
-	if (!faceIndexArray)
+	GLuint* dstPtr = faceIndexArray;
+	for (unsigned int f = 0; f < scene->mMeshes[_meshIndex]->mNumFaces; ++f, dstPtr += 3)
 	{
-		std::cout << "[AIMESH] Failed to allocate memory for faceIndexArray: " << _filename << endl;
-		aiReleaseImport(scene);
-		return;
-	}
-
-	for (unsigned int f = 0; f < m_numFaces; ++f)
-	{
-		aiFace& face = mesh->mFaces[f];
-
-		faceIndexArray[f * 3 + 0] = face.mIndices[0];
-		faceIndexArray[f * 3 + 1] = face.mIndices[1];
-		faceIndexArray[f * 3 + 2] = face.mIndices[2];
+		memcpy_s(dstPtr, 3 * sizeof(GLuint), scene->mMeshes[_meshIndex]->mFaces[f].mIndices, 3 * sizeof(GLuint));
 	}
 
 	glGenBuffers(1, &m_meshFaceIndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_meshFaceIndexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, faceIndexArray, GL_STATIC_DRAW);
-
-	free(faceIndexArray);
 
 	glBindVertexArray(0);
 
@@ -108,13 +89,7 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 
 AIMesh::~AIMesh()
 {
-	if (m_meshVertexPosBuffer) glDeleteBuffers(1, &m_meshVertexPosBuffer);
-	if (m_meshNormalBuffer) glDeleteBuffers(1, &m_meshNormalBuffer);
-	if (m_meshTangentBuffer) glDeleteBuffers(1, &m_meshTangentBuffer);
-	if (m_meshBiTangentBuffer) glDeleteBuffers(1, &m_meshBiTangentBuffer);
-	if (m_meshTexCoordBuffer) glDeleteBuffers(1, &m_meshTexCoordBuffer);
-	if (m_meshFaceIndexBuffer) glDeleteBuffers(1, &m_meshFaceIndexBuffer);
-	if (m_vao) glDeleteVertexArrays(1, &m_vao);
+
 }
 
 // Texture setup methods
@@ -149,6 +124,8 @@ void AIMesh::setupTextures()
 
 		if (m_textureID != 0) {
 
+			glEnable(GL_TEXTURE_2D);
+
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_textureID);
 
@@ -172,4 +149,3 @@ void AIMesh::render()
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, m_numFaces * 3, GL_UNSIGNED_INT, (const GLvoid*)0);
 }
-

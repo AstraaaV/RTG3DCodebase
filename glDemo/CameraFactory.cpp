@@ -1,35 +1,31 @@
 #include "CameraFactory.h"
 #include "Camera.h"
+#include "FirstPersonCamera.h"
 #include "ArcballCamera.h"
 #include "IsometricCamera.h"
-#include "FirstPersonCamera.h"
-#include <iostream>
 #include <assert.h>
 
 using std::string;
-using std::cout;
-using std::endl;
 
-Camera* CameraFactory::makeNewCam(const string& type)
+Camera* CameraFactory::makeNewCam(string _type)
 {
-	cout << "[CAMERAFACTORY] Requested Cam Type: " << type << endl;
-
-	if (type == "Arcball")
+	printf("CAM TYPE: %s \n", _type.c_str());
+	if (_type == "Arcball")
 	{
 		return new ArcballCamera();
 	}
-	else if (type == "Isometric")
+	else if (_type == "Isometric")
 	{
 		return new IsometricCamera();
 	}
-	else if (type == "FirstPerson")
+	else if (_type == "FirstPerson")
 	{
 		return new FirstPersonCamera();
 	}
 	else
 	{
-		cout << "[CAMERAFACTORY] Error. Unknown cam type: " << type << endl;
-		assert(false && "Unknown camera type passed to CameraFactory.");
+		printf("UNKNOWN CAMERA TYPE!");
+		assert(0);
 		return nullptr;
 	}
 }

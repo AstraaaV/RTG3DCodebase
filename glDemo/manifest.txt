@@ -29,15 +29,15 @@ FAR: 100.0
 
 LIGHTS 1
 {
-TYPE: DIRECTIONAL
-NAME: SUN
+TYPE: DIRECTION
+NAME: DIR
 POS: 0.0 5.0 0.0
-DIR: 0.0 -1.0 0.0
 COL: 1.0 1.0 1.0
 AMB: 0.4 0.4 0.4
+DIR: 0.0 -1.0 0.0
 }
 
-MODELS 4
+MODELS 3
 {
 TYPE: AI
 NAME: BEAST
@@ -49,16 +49,11 @@ NAME: SPHERE
 FILE: Assets\\gsphere.obj
 }
 {
-TYPE: AI
-NAME: DUCK
-FILE: Assets\\rubber_duck_toy_4k.obj
-}
-{
 TYPE: CUBE
 NAME: CUBE
 }
 
-TEXTURES 13
+TEXTURES 12
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -83,11 +78,6 @@ FILE: Assets\\Textures\\stars.jpg
 TYPE: FIF_JPEG
 NAME: STARS2
 FILE: Assets\\Textures\\stars2.jpg
-}
-{
-TYPE: FIF_JPEG
-NAME: DUCK
-FILE: Assets\\Textures\\rubber_duck_toy_diff_4k.jpg
 }
 {
 TYPE: FIF_JPEG
@@ -128,23 +118,23 @@ FILE: Assets\\Textures\\rock_wall.JPG
 SHADERS 4
 {
 NAME: FLAT
-VERT: Assets\\Shaders\\flatColour.vert
-FRAG: Assets\\Shaders\\flatColour.frag
+VERTFILE: Assets\\Shaders\\flatColour.vert
+FRAGFILE: Assets\\Shaders\\flatColour.frag
 }
 {
 NAME: FLAT_TEX
-VERT: Assets\\Shaders\\flatTexture.vert
-FRAG: Assets\\Shaders\\flatTexture.frag
+VERTFILE: Assets\\Shaders\\flatTexture.vert
+FRAGFILE: Assets\\Shaders\\flatTexture.frag
 }
 {
-NAME: SUNLIGHT
-VERT: Assets\\Shaders\\texture-directional.vert
-FRAG: Assets\\Shaders\\texture-directional.frag
+NAME: TEXDIR
+VERTFILE: Assets\\Shaders\\texture-directional.vert
+FRAGFILE: Assets\\Shaders\\texture-directional.frag
 }
 {
 NAME: TEXPOINT
-VERT: Assets\\Shaders\\texture-pointlight.vert
-FRAG: Assets\\Shaders\\texture-pointlight.frag
+VERTFILE: Assets\\Shaders\\texpoint.vert
+FRAGFILE: Assets\\Shaders\\texpoint.frag
 }
 
 GAMEOBJECTS 11
@@ -157,7 +147,7 @@ SCALE: 1.0 1.0 1.0
 ROTINC: 0.0 0.1 0.001
 MODEL: BEAST
 TEXTURE: BEAST
-SHADER: SUNLIGHT
+SHADER: TEXDIR
 }
 {
 TYPE: EXAMPLE
@@ -168,7 +158,7 @@ SCALE: 1.0 1.0 1.0
 ROTINC: 0.0 0.2 0.0
 MODEL: SPHERE
 TEXTURE: ROCK
-SHADER: SUNLIGHT
+SHADER: TEXDIR
 }
 {
 TYPE: EXAMPLE
@@ -179,7 +169,7 @@ SCALE: 2.0 2.0 1.0
 ROTINC: 0.0 0.3 0.0
 MODEL: CUBE
 TEXTURE: WALL
-SHADER: SUNLIGHT
+SHADER: TEXDIR
 }
 {
 TYPE: EXAMPLE

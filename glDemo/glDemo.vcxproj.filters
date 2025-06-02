@@ -225,28 +225,22 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\texture-directional.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\texture-directional.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Assets\Shaders\flatColour.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\flatColour.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\texture-pointlight.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\texture-pointlight.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Assets\Shaders\flatTexture.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\flatTexture.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\texture-directional.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\texture-directional.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

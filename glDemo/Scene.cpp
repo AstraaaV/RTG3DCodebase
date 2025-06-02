@@ -136,7 +136,7 @@ void Scene::Update(float _dt, GLFWwindow* window)
 	}
 
 	//update lights, cams, and game objects
-	for (auto light : m_Lights) light->Tick(_dt, window);
+	for (auto light : m_Lights) light->Tick(_dt);
 	
 	if (m_useCamera)
 	{
@@ -563,7 +563,7 @@ void Scene::Load(ifstream& _file)
 		string name = shader->GetName();
 		std::cout << "[SCENE] Shader in list: " << name << " -> " << shader->GetProg() << endl;
 
-		if (name == "SUNLIGHT")
+		if (name == "TEXDIR")
 			m_texDirLightShader = shader->GetProg();
 		else if (name == "TEXPOINT")
 			m_texPointLightShader = shader->GetProg();
@@ -600,7 +600,7 @@ void Scene::Load(ifstream& _file)
 	}
 
 	if (m_texDirLightShader == 0)
-		std::cout << "[SCENE] SUNLIGHT shader not loaded.\n" << endl;
+		std::cout << "[SCENE] TEXDIR shader not loaded.\n" << endl;
 
 	if (m_texPointLightShader == 0)
 		std::cout << "[SCENE] TEXPOINT shader not loaded.\n" << endl;

@@ -8,118 +8,194 @@ using namespace glm;
 // Private API
 //
 
+// update position, orientation and view matrices when camera rotation and radius is modified
+void ArcballCamera::calculateDerivedValues() {
+
+	const float theta_ = glm::radians<float>(m_theta);
+	const float phi_ = glm::radians<float>(m_phi);
+
+	// calculate position vector
+	//cameraPos = glm::vec4(sinf(phi_) * cosf(-theta_) * radius, sinf(-theta_) * radius, cosf(phi_) * cosf(-theta_) * radius, 1.0f);
+
+	// calculate orientation basis R
+	//R = glm::eulerAngleY(phi_) * glm::eulerAngleX(theta_);
+
+	// calculate view and projection transform matrices
+	m_viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -m_radius)) * glm::eulerAngleX(-theta_) * glm::eulerAngleY(-phi_);
+	m_projectionMatrix = glm::perspective(glm::radians<float>(m_fovY), m_aspect, m_nearPlane, m_farPlane);
+}
+
+
+//
+// Public method implementation
+//
+
+// ArcballCamera constructors
+
 // initialise camera parameters so it is placed at the origin looking down the -z axis (for a right-handed camera) or +z axis (for a left-handed camera)
-ArcballCamera::ArcballCamera()
-{
-	m_target = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_distance = 10.0f;
-	m_yaw = -90.0f;
-	m_pitch = 20.0f;
-	m_rotateSpeed = 0.1f;
+ArcballCamera::ArcballCamera() {
 
-	m_fov = 45.0f;
-	m_near = 0.1f;
-	m_far = 100.0f;
-	m_type = "Arcball";
-	m_name = "ArcballCam";
+	m_theta = 0.0f;
+	m_phi = 0.0f;
+	m_radius = 15.0f;
+
+	m_fovY = 55.0f;
+	m_aspect = 1.0f;
+	m_nearPlane = 0.1f;
+	m_farPlane = 500.0f;
+
+	//F = ViewFrustum(55.0f, 1.0f, 0.1f, 500.0f);
+
+	// calculate derived values
+	calculateDerivedValues();
+	//F.calculateWorldCoordPlanes(C, R);
 }
 
-void ArcballCamera::Init(float screenW, float screenH, Scene* scene)
-{
-	Camera::Init(screenW, screenH, scene);
-	UpdateCameraVectors();
+
+// create a camera with orientation <theta, phi> representing Euler angles specified in degrees and Euclidean distance 'init_radius' from the origin.  The frustum / viewplane projection coefficients are defined in init_fovy, specified in degrees spanning the entire vertical field of view angle, init_aspect (w/h ratio), init_nearPlane and init_farPlane.  If init_farPlane = 0.0 (as determined by equalf) then the resulting frustum represents an infinite perspective projection.  This is the default
+ArcballCamera::ArcballCamera(float _theta, float _phi, float _radius, float _fovY, float _aspect, float _nearPlane, float _farPlane) {
+
+	this->m_theta = _theta;
+	this->m_phi = _phi;
+	this->m_radius = std::max<float>(0.0f, _radius);
+
+	this->m_fovY = _fovY;
+	this->m_aspect = _aspect;
+	this->m_nearPlane = _nearPlane;
+	this->m_farPlane = _farPlane;
+
+	//F = ViewFrustum(init_fovy, init_aspect, init_nearPlane, init_farPlane);
+
+	// calculate derived values
+	calculateDerivedValues();
+	//F.calculateWorldCoordPlanes(C, R);
 }
 
-void ArcballCamera::Tick(float dt, GLFWwindow* window)
-{
-	if (!window) return;
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	{
-		double xpos, ypos;
-		static double lastX = 0.0, lastY = 0.0;
-		glfwGetCursorPos(window, &xpos, &ypos);
+#pragma region Accessor methods for stored values
 
-		double dx = xpos - lastX;
-		double dy = ypos - lastY;
+// return the pivot rotation around the x axis (theta) in degrees
+float ArcballCamera::getTheta() {
 
-		m_yaw += static_cast<float>(dx) * m_rotateSpeed;
-		m_pitch -= static_cast<float>(dy) * m_rotateSpeed;
-
-		m_pitch = glm::clamp(m_pitch, -89.0f, 89.0f);
-
-		UpdateCameraVectors();
-
-		lastX = xpos;
-		lastY = ypos;
-	}
-	Camera::Tick(dt, window);
+	return m_theta;
 }
 
-void ArcballCamera::SetTarget(glm::vec3 target)
-{
-	m_target = target;
-	UpdateCameraVectors();
+// return the pivot rotation around the y axis (phi) in degrees
+float ArcballCamera::getPhi() {
+
+	return m_phi;
 }
 
-void ArcballCamera::SetDistance(float distance)
-{
-	m_distance = distance;
-	UpdateCameraVectors();
+void ArcballCamera::rotateCamera(float _dTheta, float _dPhi) {
+
+	m_theta += _dTheta;
+	m_phi += _dPhi;
+
+	calculateDerivedValues();
 }
 
-void ArcballCamera::SetRotateSpeed(float speed)
-{
-	m_rotateSpeed = speed;
+float ArcballCamera::getRadius() {
+
+	return m_radius;
+}
+
+void ArcballCamera::scaleRadius(float _s) {
+
+	m_radius *= _s;
+	calculateDerivedValues();
+}
+
+void ArcballCamera::incrementRadius(float _i) {
+
+	m_radius = std::max<float>(m_radius + _i, 0.0f);
+	calculateDerivedValues();
+}
+
+float ArcballCamera::getFovY() {
+
+	return m_fovY;
+}
+
+void ArcballCamera::setFovY(float _fovY) {
+
+	this->m_fovY = _fovY;
+	calculateDerivedValues();
+}
+
+float ArcballCamera::getAspect() {
+
+	return m_aspect;
+}
+
+void ArcballCamera::setAspect(float _aspect) {
+
+	this->m_aspect = _aspect;
+	calculateDerivedValues();
+}
+
+float ArcballCamera::getNearPlaneDistance() {
+
+	return m_nearPlane;
+}
+
+void ArcballCamera::setNearPlaneDistance(float _nearPlaneDistance) {
+
+	this->m_nearPlane = _nearPlaneDistance;
+	calculateDerivedValues();
+}
+
+float ArcballCamera::getFarPlaneDistance() {
+
+	return m_farPlane;
+}
+
+void ArcballCamera::setFarPlaneDistance(float _farPlaneDistance) {
+
+	this->m_farPlane = _farPlaneDistance;
+	calculateDerivedValues();
+}
+
+#pragma endregion
+
+
+#pragma region Accessor methods for derived values
+
+// return the camera location in world coordinate space
+//glm::vec4 ArcballCamera::getPosition() {
+//
+//	return cameraPos;
+//}
+
+// return a const reference to the camera's orientation matrix in world coordinate space
+//glm::mat4 ArcballCamera::getOrientationBasis() {
+//
+//	return R;
+//}
+
+// return a const reference to the view transform matrix for the camera
+glm::mat4 ArcballCamera::viewTransform() {
+
+	return m_viewMatrix;
+}
+
+// return a const reference the projection transform for the camera
+glm::mat4 ArcballCamera::projectionTransform() {
+
+	return m_projectionMatrix;
 }
 
 glm::mat4 ArcballCamera::GetView() const
 {
-	glm::vec3 position = m_pos;
-	glm::vec3 target = m_pos + m_direction;
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	return glm::lookAt(position, target, up);
+	return m_viewMatrix;
 }
 
 glm::mat4 ArcballCamera::GetProj() const
 {
-	float size = 10.0f;
-	return glm::ortho(-size * m_aspect, size * m_aspect, -size, size, m_near, m_far);
+	return m_projectionMatrix;
 }
 
-void ArcballCamera::Zoom(float offset)
+void ArcballCamera::Tick(float dt, GLFWwindow* window)
 {
-	if (offset < 0.0f)
-		scaleRadius(1.1f);
-	else
-		scaleRadius(0.9f);
 }
 
-void ArcballCamera::scaleRadius(float factor)
-{
-	m_distance *= factor;
-
-	if (m_distance < 1.0f)
-		m_distance = 1.0f;
-	if (m_distance > 100.0f)
-		m_distance = 100.0f;
-
-	UpdateCameraVectors();
-}
-
-void ArcballCamera::UpdateCameraVectors()
-{
-	float yawRad = glm::radians(m_yaw);
-	float pitchRad = glm::radians(m_pitch);
-
-	glm::vec3 direction;
-	direction.x = cos(pitchRad) * cos(yawRad);
-	direction.y = sin(pitchRad);
-	direction.z = cos(pitchRad) * sin(yawRad);
-
-	m_pos = m_target - glm::normalize(direction) * m_distance;
-	m_lookAt = m_target;
-
-	m_viewMatrix = glm::lookAt(m_pos, m_target, glm::vec3(0, 1, 0));
-}
 #pragma endregion

@@ -212,8 +212,6 @@
     <None Include="Assets\Shaders\flatTexture.vert" />
     <None Include="Assets\Shaders\texture-directional.frag" />
     <None Include="Assets\Shaders\texture-directional.vert" />
-    <None Include="Assets\Shaders\texture-pointlight.frag" />
-    <None Include="Assets\Shaders\texture-pointlight.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
