@@ -34,6 +34,9 @@ public:
 	vec3 GetAmb() { return m_amb; }
 	vec3 GetPos() { return m_pos; }
 
+	void SetEnabled(bool enabled) { m_enabled = enabled; }
+	bool isEnabled() const { return m_enabled; }
+
 	//set my shader values
 	//base version: if name of light is LG
 	//sets up shader values for LGpos LGcol & LGamb
@@ -43,6 +46,8 @@ public:
 protected:
 	string m_name;
 	string m_type;
+
+	bool m_enabled = true;
 
 	vec3 m_pos; // position of the light
 	vec3 m_col; // colour of the light

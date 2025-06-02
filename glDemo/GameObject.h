@@ -17,6 +17,7 @@ public:
 	virtual void Init(Scene* scene);
 	virtual void Tick(float deltaTime, GLFWwindow* window);
 	virtual void Render();
+	virtual void PreRender() {}
 	virtual void Load(std::ifstream& file);
 	virtual void SetShader(GLuint id) { m_shaderID = id; }
 
@@ -29,12 +30,16 @@ public:
 	void SetRenderPass(int pass) { m_renderPass = pass; }
 	int GetRenderPass() const { return m_renderPass; }
 
+	GLuint GetShaderProg() const { return m_shaderProg; }
+	unsigned int GetRP() const { return m_renderPass; }
+
 protected:
 
 	string m_name;
 	string m_type;
 
 	GLuint m_shaderID = 0;
+	GLuint m_shaderProg;
 
 	glm::vec3 m_pos = glm::vec3(0.0f);
 	int m_renderPass = 0;

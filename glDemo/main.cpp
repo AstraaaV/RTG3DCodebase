@@ -104,6 +104,15 @@ int main()
 
 	// Initialise scene, loads models/lights/cams/shaders,etc
 	g_Scene = new Scene();
+
+	ifstream manifest("manifest.txt");
+	if (!manifest.is_open())
+	{
+		std::cout << "Failed to open manifest file!\n";
+		return -1;
+	}
+	g_Scene->Load(manifest);
+	manifest.close();
 	g_Scene->Init();
 
 	//
@@ -213,8 +222,6 @@ void updateScene(GLFWwindow* window)
 	// Ticks clock to see how much time has passed since last frame
 	if (g_gameClock)
 	{
-		if (g_gameClock) return;
-
 		g_gameClock->tick();
 		float tDelta = (float)g_gameClock->gameTimeDelta();
 		g_Scene->Update(tDelta, g_window);
@@ -241,7 +248,7 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 	// Forces update after resizing
 	if (g_Scene)
 	{
-		g_Scene->Update(0.0f, g_window);
+		g_Scene->Update(0.0f, _window);
 	}
 
 	glViewport(0, 0, _width, _height);		// Draw into entire window
@@ -264,14 +271,19 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			{
 				// Switch camera
 				g_Scene->CycleCams();
-				std::cout << "Cam switched.\n" << g_Scene->GetActiveCamera()->GetName() << endl;
+
+				Camera* cam = g_Scene->GetActiveCamera();
+				if (cam)
+				{
+					std::string name = cam->GetName();
+					std::cout << "Cam switched.\n" << g_Scene->GetActiveCamera()->GetName() << endl;
+				}
+				else
+				{
+					std::cout << "Error. Active camera is null!" << endl;
+				}
 				g_camSwitchPressed = true;
 			}
-			break;
-
-		case GLFW_KEY_B:
-			// Toggle beast visibility
-			g_Scene->ToggleBeast();
 			break;
 
 		case GLFW_KEY_L:

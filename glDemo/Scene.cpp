@@ -9,14 +9,8 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObjectFactory.h"
-#include "Cube.h"
-#include "Beast.h"
+#include "RenderPass.h"
 #include <assert.h>
-#include <helper.h>
-#include <RenderPass.h>
-#include "IsometricCamera.h"
-#include "TextureLoader.h"
-#include <iostream>
 
 Scene::Scene()
 {
@@ -24,395 +18,183 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	for (auto cam : m_Cameras) delete cam;
-	for (auto light : m_Lights) delete light;
-	for (auto model : m_Models) delete model;
-	for (auto texture : m_Textures) delete texture;
-	for (auto shader : m_Shaders) delete shader;
-	for (auto go : m_GameObjects) delete go;
-	if (m_cube) { delete m_cube; m_cube = nullptr; }
+	//TODO: We are being really naught and not deleting everything as we finish
+	//what shoudl really go here and in similar places throughout the code base?
 }
 
-void Scene::Init()
+inline std::string Scene::Trim(const std::string& str)
 {
-	GLuint wallTex = loadTexture("Assets\\Textures\\rock_wall.JPG", FIF_JPEG);
-
-	if (wallTex == 0)
-	{
-		std::cout << "Failed to load the wall texture." << std::endl;
-	}
-	else
-	{
-		SetWallTexture(wallTex);
-	}
-
-	ifstream manifest("manifest.txt");
-
-	if (manifest.is_open())
-	{
-		Load(manifest);
-		manifest.close();
-	}
-	else
-	{
-		std::cout << "Failed to open manifest.txt\n" << std::endl;
-	}
-
-	m_cube = new Cube();
-	BuildMap();
-
-	m_torchPos.clear();
-
-	for (int row = 0; row < m_mapLayout.size(); ++row)
-	{
-		for (int col = 0; col < m_mapLayout[row].size(); ++col)
-		{
-			if (m_mapLayout[row][col] == 'T')
-			{
-				float x = col * 2.2f;
-				float z = row * 2.2f;
-				m_torchPos.push_back(glm::vec3(x, 1.5f, z));
-			}
-		}
-	}
-
-	Beast* beast = new Beast();
-	beast->SetShader(m_texDirLightShader);
-	AddGameObject(beast);
-
-	// Isometric Camera
-	m_isoCamera = new IsometricCamera();
-	AddCamera(m_isoCamera);
-
-	if (!m_Cameras.empty())
-	{
-		m_useCamera = *m_Cameras.begin();
-		m_useCameraIndex = 0;
-	}
-}
-
-void Scene::BuildMap()
-{
-	m_mapLayout.clear();
-	int width = 10, height = 10;
-
-	for (int row = 0; row < height; ++row)
-	{
-		std::string line;
-		for (int col = 0; col < width; ++col)
-		{
-			if (row == 0 || col == 0 || row == height - 1 || col == width - 1)
-			{
-				line += 'W';
-			}
-			else if (row == height / 2 && col == width - 1)
-			{
-				line += 'P';
-			}
-			else if ((row + col) % 7 == 0)
-			{
-				line += 'T';
-			}
-			else
-			{
-				line += '.';
-			}
-		}
-		m_mapLayout.push_back(line);
-	}
+	size_t first = str.find_first_not_of(" \t\r\n");
+	if (first == std::string::npos) return "";
+	size_t last = str.find_last_not_of(" \t\r\n");
+	return str.substr(first, last - first + 1);
 }
 
 //tick all my Game Objects, lights and cameras
 void Scene::Update(float _dt, GLFWwindow* window)
 {
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS && !m_camSwitchPressed)
+	//update all lights
+	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
 	{
-		CycleCams();
-		m_camSwitchPressed = true;
-	}
-	else if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE)
-	{
-		m_camSwitchPressed = false;
+		(*it)->Tick(_dt);
 	}
 
-	//update lights, cams, and game objects
-	for (auto light : m_Lights) light->Tick(_dt);
-	
-	if (m_useCamera)
+	//update all cameras
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
-		m_useCamera->Tick(_dt, window);
+		(*it)->Tick(_dt, m_window);
 	}
 
-	for (auto go : m_GameObjects) go->Tick(_dt, window);
+	//update all GameObjects
+	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	{
+		(*it)->Tick(_dt, m_window);
+	}
 }
 
-void Scene::CycleCams()
+void Scene::AddGameObject(GameObject* _new)
 {
-	if (m_Cameras.empty()) return;
-
-	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
-	auto it = m_Cameras.begin();
-	std::advance(it, m_useCameraIndex);
-	
-	if (it != m_Cameras.end() && *it != nullptr)
-	{
-		m_useCamera = *it;
-		m_activeCamera = m_useCamera;
-		std::cout << "Switched to cam: " << m_useCamera->GetName() << endl;
-	}
-	else
-	{
-		std::cout << "Camera switch failed." << endl;
-	}
+	m_GameObjects.push_back(_new);
 }
+
+//I want THAT Game Object by name
+GameObject* Scene::GetGameObject(string _GOName)
+{
+	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	{
+		if ((*it)->GetName() == _GOName)
+		{
+			return (*it);
+		}
+	}
+	printf("Unknown Game Object NAME : %s \n", _GOName.c_str());
+	assert(0);
+	return nullptr;
+}
+
+Camera* Scene::GetCamera(string _camName)
+{
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
+	{
+		if ((*it)->GetName() == _camName)
+		{
+			return (*it);
+		}
+	}
+	printf("Unknown Camera NAME : %s \n", _camName.c_str());
+	assert(0);
+	return nullptr;
+}
+
+Camera* Scene::GetActiveCamera() const
+{
+	return m_useCamera;
+}
+
+Light* Scene::GetLight(string _lightName)
+{
+	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
+	{
+		if ((*it)->GetName() == _lightName)
+		{
+			return (*it);
+		}
+	}
+	printf("Unknown Light NAME : %s \n", _lightName.c_str());
+	assert(0);
+	return nullptr;
+}
+
+Texture* Scene::GetTexture(string _texName)
+{
+	for (list<Texture*>::iterator it = m_Textures.begin(); it != m_Textures.end(); it++)
+	{
+		if ((*it)->GetName() == _texName)
+		{
+			return (*it);
+		}
+	}
+	printf("Unknown Texture NAME : %s \n", _texName.c_str());
+	assert(0);
+	return nullptr;
+}
+
+Model* Scene::GetModel(string _modelName)
+{
+	for (list<Model*>::iterator it = m_Models.begin(); it != m_Models.end(); it++)
+	{
+		if ((*it)->GetName() == _modelName)
+		{
+			return (*it);
+		}
+	}
+	printf("Unknown Model NAME : %s \n", _modelName.c_str());
+	assert(0);
+	return nullptr;
+}
+
+Shader* Scene::GetShader(string _shaderName)
+{
+	for (list<Shader*>::iterator it = m_Shaders.begin(); it != m_Shaders.end(); it++)
+	{
+		if ((*it)->GetName() == _shaderName)
+		{
+			return (*it);
+		}
+	}
+	printf("Unknown Shader NAME : %s \n", _shaderName.c_str());
+	assert(0);
+	return nullptr;
+}
+
 
 //Render Everything
 void Scene::Render()
 {
-	for (GameObject* go : m_GameObjects)
+	if (!m_useCamera)
 	{
-		if (go->GetRenderPass() == RP_BACKGROUND)
-			go->Render();
-	}
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	static int frameCounter = 0;
-	if (frameCounter++ % 300 == 0)
-	{
-		std::cout << "TEXDIR: " << m_texDirLightShader << " | TEXPOINT: " << m_texPointLightShader << endl;
-		return;
-	}
-	
-	if (!m_useCamera) return;
-
-	mat4 view = m_useCamera->GetView();
-	mat4 proj = m_useCamera->GetProj();
-
-	RenderMapLayout(m_texDirLightShader, view, proj);
-	RenderTorches(m_texPointLightShader, view, proj);
-
-	if (dynamic_cast<FirstPersonCamera*>(m_useCamera))
-	{
-		RenderCreature();
-	}
-}
-
-void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection)
-{
-	if (!m_cube)
-	{
-		std::cout << "ERROR: m_cube is null!" << endl;
+		std::cout << "[Scene::Render] Error. No active camera!\n";
 		return;
 	}
 
-	GLint pLocation;
-
-	if (shaderProgram == 0)
+	//TODO: Set up for the Opaque Render Pass will go here
+	//check out the example stuff back in main.cpp to see what needs setting up here
+	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		static int frameCounter = 0;
-		if (frameCounter++ % 600 == 0)
+		GameObject* obj = *it;
+		if (!obj) continue;
+
+		if (obj->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
 		{
-			std::cout << "ERROR: Shader program is 0!" << std::endl;
-		}
-		return;
-	}
+			//set shader program using
+			GLuint SP = obj->GetShaderProg();
+			glUseProgram(SP);
 
-	glUseProgram(shaderProgram);
+			//set up for uniform shader values for current camera
+			m_useCamera->SetRenderValues(SP);
 
-	Helper::SetUniformLocation(shaderProgram, "viewMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &view[0][0]);
-	Helper::SetUniformLocation(shaderProgram, "projMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &projection[0][0]);
+			//loop through setting up uniform shader values for anything else
+			SetShaderUniforms(SP);
 
-	SetShaderUniforms(shaderProgram);
+			//set any uniform shader values for the actual model
+			obj->PreRender();
 
-	Helper::SetUniformLocation(shaderProgram, "lightsEnabled", &pLocation);
-	glUniform1i(pLocation, m_lightsEnabled ? 1 : 0);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_wallTex);
-	Helper::SetUniformLocation(shaderProgram, "texture", &pLocation);
-	glUniform1i(pLocation, 0);
-
-	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
-
-	for (int row = 0; row < m_mapLayout.size(); ++row)
-	{
-		for (int col = 0; col < m_mapLayout[row].length(); ++col)
-		{
-			char tile = m_mapLayout[row][col];
-			float x = col * 2.2f, z = row * 2.2f;
-			mat4 model;
-
-			switch (tile)
-			{
-			case 'W': // Wall
-				model = translate(mat4(1), vec3(x, 1.0f, z)) *
-					scale(mat4(1), vec3(2.0f, 4.0f, 2.0f));
-				break;
-
-			case 'T': // Torch
-				model = translate(mat4(1), vec3(x, 1.5f, z)) *
-					scale(mat4(1), vec3(0.3f, 2.0f, 0.3f));
-				break;
-
-			case 'D': // Door
-				model = translate(mat4(1), vec3(x, 1.0f, z)) *
-					scale(mat4(1), vec3(1.0f, 2.0f, 0.3f));
-				break;
-			case 'P':
-			case '.':
-				model = translate(mat4(1), vec3(x, -1.0f, z)) *
-					scale(mat4(1), vec3(2.2f, 0.5f, 2.2f));
-				break;
-			default:
-				continue;
-			}
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
-			m_cube->render();
-
-			if (tile == 'P')
-			{
-				glm::mat4 markerCube = translate(mat4(1), vec3(x, 1.0f, z)) *
-					scale(mat4(1), vec3(1.0f, 2.0f, 1.0f));
-				glUniformMatrix4fv(pLocation, 1, GL_FALSE, &markerCube[0][0]);
-				m_cube->render();
-			}
+			//actually render the GameObject
+			obj->Render();
 		}
 	}
-}
 
-void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
-{
-	GLint loc;
-
-	int lightCount = static_cast<int>(m_torchPos.size());
-	if (lightCount > 16) lightCount = 16;
-	
-	if (!m_cube) return;
-
-	if (shaderProgram == 0)
-	{
-		std::cout << "ERROR: Shader program is 0!" << endl;
-		return;
-	}
-
-	glUseProgram(shaderProgram);
-
-	GLint pLocation;
-	Helper::SetUniformLocation(shaderProgram, "viewMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-	Helper::SetUniformLocation(shaderProgram, "projMatrix", &pLocation);
-	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &projMatrix[0][0]);
-	
-	for (int i = 0; i < lightCount; ++i)
-	{
-		std::string idx = std::to_string(i);
-		glm::vec3 pos = m_torchPos[i];
-
-		glUniform3fv(glGetUniformLocation(shaderProgram, ("lightPos[" + idx + "]").c_str()), 1, &pos[0]);
-	
-		glm::vec3 lightColour(1.0f, 0.7f, 0.3f);
-		glUniform3fv(glGetUniformLocation(shaderProgram, ("lightColour[" + idx + "]").c_str()), 1, &lightColour[0]);
-	
-		glm::vec3 ambientColour(0.2f, 0.1f, 0.05f);
-		glUniform3fv(glGetUniformLocation(shaderProgram, ("ambientColour[" + idx + "]").c_str()), 1, &ambientColour[0]);
-
-		glUniform1f(glGetUniformLocation(shaderProgram, ("intensity[" + idx + "]").c_str()), 1.0f);
-		glUniform1f(glGetUniformLocation(shaderProgram, ("constant[" + idx + "]").c_str()), 1.0f);
-		glUniform1f(glGetUniformLocation(shaderProgram, ("linear[" + idx + "]").c_str()), 0.09f);
-		glUniform1f(glGetUniformLocation(shaderProgram, ("quadratic[" + idx + "]").c_str()), 0.032f);
-	}
-
-	glUniform1i(glGetUniformLocation(shaderProgram, "lightCount"), lightCount);
-
-	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
-
-	for (const auto& pos : m_torchPos)
-	{
-		mat4 model = glm::translate(mat4(1), pos) * glm::scale(mat4(1), glm::vec3(0.3f));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
-
-		m_cube->render();
-	}
-}
-
-void Scene::RenderCreature()
-{
-	if (m_beast && m_showBeast)
-	{
-		m_beast->Render();
-	}
-}
-
-void Scene::RenderPlayerMarker(GLuint shaderProgram)
-{
-	if (!m_cube || !m_useCamera) return;
-
-	glUseProgram(shaderProgram);
-
-	GLint loc;
-	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &loc);
-
-	glm::vec3 camPos = m_useCamera->GetPos();
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), camPos) *
-	glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-
-	glUniformMatrix4fv(loc, 1, GL_FALSE, &model[0][0]);
-
-	m_cube->render();
-}
-
-void Scene::AddGameObject(GameObject* go)
-{
-	m_GameObjects.push_back(go);
-}
-
-void Scene::AddCamera(Camera* cam)
-{
-	m_Cameras.push_back(cam);
-}
-
-void Scene::SetActiveCamera(Camera* cam)
-{
-	m_useCamera = cam;
+	//TODO: now do the same for RP_TRANSPARENT here
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)
 {
 	//everything needs to know about all the lights
-	for (auto l : m_Lights)
+	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
 	{
-		l->SetRenderValues(_shaderprog);
+		(*it)->SetRenderValues(_shaderprog);
 	}
-}
 
-GLuint Scene::GetFlatColourShader() const
-{
-	return m_flatColourShader ? m_flatColourShader->GetProg() : 0;
-}
-
-inline std::string Trim(const std::string& str)
-{
-	const std::string whitespace = " \t\n\r\f\v";
-
-	size_t start = str.find_first_not_of(whitespace);
-	if (start == std::string::npos)
-		return "";
-
-	size_t end = str.find_last_not_of(whitespace);
-	return str.substr(start, end - start + 1);
-}
-
-inline void SkipMalformedBlock(std::ifstream& file)
-{
-	std::string line;
-	while (std::getline(file, line))
-	{
-		if (line.find('}') != std::string::npos)
-			break;
-	}
 }
 
 void Scene::Load(ifstream& _file)
@@ -421,12 +203,12 @@ void Scene::Load(ifstream& _file)
 
 	//load Cameras
 	_file >> dummy >> m_numCameras; _file.ignore(256, '\n');
-	std::cout << "CAMERAS : " << m_numCameras << endl;
+	cout << "CAMERAS : " << m_numCameras << endl;
 	for (int i = 0; i < m_numCameras; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -437,77 +219,42 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Lights
 	_file >> dummy >> m_numLights; _file.ignore(256, '\n');
-	std::cout << "LIGHTS : " << m_numLights << endl;
+	cout << "LIGHTS : " << m_numLights << endl;
 	for (int i = 0; i < m_numLights; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
+		cout << "{\n";
 
-		string type, line;
-		std::streampos blockStart = _file.tellg();
-		while (getline(_file, line))
-		{
-			if (line.find("TYPE:") != string::npos)
-			{
-				size_t colon = line.find(':');
-				if (colon != string::npos)
-				{
-					type = line.substr(colon + 1);
-					type = Trim(type);
-					break;
-				}
-			}
-			else if (line.find('}') != string::npos)
-			{
-				break;
-			}
-		}
-		_file.clear();
-		_file.seekg(blockStart);
-
-		if (type.empty())
-		{
-			std::cout << "ERROR: Light type missing or blank." << i << "Skipping." << endl;
-			SkipMalformedBlock(_file);
-			continue;
-		}
-		
-		std::cout << "Loaded light type: [" << type << "]" << endl;
-		
+		string type;
+		_file >> dummy >> type; _file.ignore(256, '\n');
 		Light* newLight = LightFactory::makeNewLight(type);
-		if (!newLight)
-		{
-			std::cout << "ERROR: Failed to create light of type " << type << endl;
-			_file.ignore(256, '}');
-			continue;
-		}
-		
 		newLight->Load(_file);
 
 		m_Lights.push_back(newLight);
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Models
 	_file >> dummy >> m_numModels; _file.ignore(256, '\n');
-	std::cout << "MODELS : " << m_numModels << endl;
+	cout << "MODELS : " << m_numModels << endl;
 	for (int i = 0; i < m_numModels; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -518,96 +265,124 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Textures
 	_file >> dummy >> m_numTextures; _file.ignore(256, '\n');
-	std::cout << "TEXTURES : " << m_numTextures << endl;
+	cout << "TEXTURES : " << m_numTextures << endl;
 	for (int i = 0; i < m_numTextures; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		m_Textures.push_back(new Texture(_file));
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Shaders
 	_file >> dummy >> m_numShaders; _file.ignore(256, '\n');
-	std::cout << "SHADERS : " << m_numShaders << endl;
+	cout << "SHADERS : " << m_numShaders << endl;
 	for (int i = 0; i < m_numShaders; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
-		Shader* shader = new Shader(_file);
-		m_Shaders.push_back(shader);
+		m_Shaders.push_back(new Shader(_file));
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	for (Shader* shader : m_Shaders)
-	{
-		string name = shader->GetName();
-		std::cout << "[SCENE] Shader in list: " << name << " -> " << shader->GetProg() << endl;
-
-		if (name == "TEXDIR")
-			m_texDirLightShader = shader->GetProg();
-		else if (name == "TEXPOINT")
-			m_texPointLightShader = shader->GetProg();
-	}
+	cout << endl << endl;
 
 	//load GameObjects
 	_file >> dummy >> m_numGameObjects; _file.ignore(256, '\n');
-	std::cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
+	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
-		string type;
-		_file >> dummy >> type; _file.ignore(256, '\n');
+		std::getline(_file, dummy);
+		string type = Trim(dummy.substr(dummy.find(":") + 1));
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
-
-		if (type == "BACKGROUND" || newGO->GetName().find("SKY_") != std::string::npos)
-		{
-			newGO->SetRenderPass(RP_BACKGROUND);
-		}
-		else
-		{
-			newGO->SetRenderPass(RP_OPAQUE);
-		}
-
 		m_GameObjects.push_back(newGO);
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	if (m_texDirLightShader == 0)
-		std::cout << "[SCENE] TEXDIR shader not loaded.\n" << endl;
 
-	if (m_texPointLightShader == 0)
-		std::cout << "[SCENE] TEXPOINT shader not loaded.\n" << endl;
 }
 
-void Scene::ToggleBeast()
+void Scene::Init()
 {
-	m_showBeast = !m_showBeast;
-	std::cout << "[SCENE] Beast Visibility: " << (m_showBeast ? "ON" : "OFF") << endl;
+	//initialise all cameras
+	//scene is passed down here to allow for linking of cameras to game objects
+	int count = 0;
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); ++it)
+	{
+		(*it)->Init(100, 100, this);// TODO: set correct screen sizes here
+
+		//if a camera is called MAIN
+		//this will be the starting camera used
+		if ((*it)->GetName() == "MAIN")
+		{
+			m_useCamera = (*it);
+			m_useCameraIndex = count;
+		}
+		count++;
+	}
+
+	//if no MAIN camera just use the first one
+	if (!m_useCamera && !m_Cameras.empty())
+	{
+		m_useCamera = (*m_Cameras.begin());
+		m_useCameraIndex = 0;
+	}
+	else if (!m_useCamera)
+	{
+		std::cout << "[Scene::Init] Error. No cameras found in scene.\n";
+	}
+	//set up links between everything and GameObjects
+	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	{
+		(*it)->Init(this);
+	}
+}
+
+void Scene::CycleCams()
+{
+	if (m_Cameras.empty()) return;
+
+	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
+
+	auto it = m_Cameras.begin();
+	std::advance(it, m_useCameraIndex);
+	m_useCamera = *it;
+
+	cout << "Camera switched to: " << m_useCamera->GetName() << std::endl;
+} 
+
+void Scene::SetLightsEnabled(bool _enabled)
+{
+	for (Light* light : m_Lights)
+	{
+		if(light)
+			light->SetEnabled(_enabled);
+	}
 }

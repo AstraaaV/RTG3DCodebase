@@ -12,7 +12,7 @@ using std::endl;
 
 GameObject* GameObjectFactory::makeNewGO(const string& type)
 {
-	cout << "[GAMEOBJECTFACTORY} Requested GameObject Type: " << type << endl;
+	cout << "[GAMEOBJECTFACTORY] Requested GameObject Type: " << type << endl;
 
 	if (type == "GAME_OBJECT")
 	{
