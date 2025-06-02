@@ -10,6 +10,6 @@ class LightFactory
 {
 public:
 
-	static Light* makeNewLight(std::string _type);
+	static Light* makeNewLight(const string& type);
 };
 

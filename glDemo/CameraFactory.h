@@ -9,5 +9,5 @@ class CameraFactory
 {
 public:
 
-	static Camera* makeNewCam(std::string type);
+	static Camera* makeNewCam(const string& type);
 };

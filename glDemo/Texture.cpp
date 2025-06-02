@@ -2,7 +2,7 @@
 #include "TextureLoader.h"
 #include "stringHelp.h"
 
-Texture::Texture(ifstream& _file)
+Texture::Texture(std::ifstream& _file)
 {
 	string type;
 	string fileName;

@@ -61,6 +61,21 @@ void Scene::Init()
 	m_cube = new Cube();
 	BuildMap();
 
+	m_torchPos.clear();
+
+	for (int row = 0; row < m_mapLayout.size(); ++row)
+	{
+		for (int col = 0; col < m_mapLayout[row].size(); ++col)
+		{
+			if (m_mapLayout[row][col] == 'T')
+			{
+				float x = col * 2.2f;
+				float z = row * 2.2f;
+				m_torchPos.push_back(glm::vec3(x, 1.5f, z));
+			}
+		}
+	}
+
 	Beast* beast = new Beast();
 	beast->SetShader(m_texDirLightShader);
 	AddGameObject(beast);
@@ -154,6 +169,12 @@ void Scene::CycleCams()
 //Render Everything
 void Scene::Render()
 {
+	for (GameObject* go : m_GameObjects)
+	{
+		if (go->GetRenderPass() == RP_BACKGROUND)
+			go->Render();
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	std::cout << "TEXDIR: " << m_texDirLightShader << " | TEXPOINT: " << m_texPointLightShader << endl;
@@ -255,28 +276,10 @@ void Scene::RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const g
 
 void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, const glm::mat4& projMatrix)
 {
-	constexpr int MAX_LIGHTS = 4;
+	GLint loc;
 
-	glm::vec3 lightPos[MAX_LIGHTS] =
-	{
-		glm::vec3(2.0f, 1.5f, 2.0f),
-		glm::vec3(-2.0f, 1.5f, 2.0f),
-		glm::vec3(2.0f, 1.5f, -2.0f),
-		glm::vec3(-2.0f, 1.5f, -2.0f)
-	};
-
-	glm::vec3 lightCol[MAX_LIGHTS] =
-	{
-		glm::vec3(1.0f, 0.5f, 0.5f),
-		glm::vec3(0.5f, 1.0f, 0.5f),
-		glm::vec3(0.5f, 0.5f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f)
-	};
-
-	glm::vec3 ambientCol[MAX_LIGHTS] =
-	{
-		glm::vec3(0.1f), glm::vec3(0.1f), glm::vec3(0.1f), glm::vec3(0.1f)
-	};
+	int lightCount = static_cast<int>(m_torchPos.size());
+	if (lightCount > 16) lightCount = 16;
 	
 	if (!m_cube) return;
 
@@ -293,15 +296,35 @@ void Scene::RenderTorches(GLuint shaderProgram, const glm::mat4& viewMatrix, con
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &viewMatrix[0][0]);
 	Helper::SetUniformLocation(shaderProgram, "projMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, &projMatrix[0][0]);
-
-	std::vector<glm::vec3> positions, colours, ambients;
 	
+	for (int i = 0; i < lightCount; ++i)
+	{
+		std::string idx = std::to_string(i);
+		glm::vec3 pos = m_torchPos[i];
+
+		glUniform3fv(glGetUniformLocation(shaderProgram, ("lightPos[" + idx + "]").c_str()), 1, &pos[0]);
+	
+		glm::vec3 lightColour(1.0f, 0.7f, 0.3f);
+		glUniform3fv(glGetUniformLocation(shaderProgram, ("lightColour[" + idx + "]").c_str()), 1, &lightColour[0]);
+	
+		glm::vec3 ambientColour(0.2f, 0.1f, 0.05f);
+		glUniform3fv(glGetUniformLocation(shaderProgram, ("ambientColour[" + idx + "]").c_str()), 1, &ambientColour[0]);
+
+		glUniform1f(glGetUniformLocation(shaderProgram, ("intensity[" + idx + "]").c_str()), 1.0f);
+		glUniform1f(glGetUniformLocation(shaderProgram, ("constant[" + idx + "]").c_str()), 1.0f);
+		glUniform1f(glGetUniformLocation(shaderProgram, ("linear[" + idx + "]").c_str()), 0.09f);
+		glUniform1f(glGetUniformLocation(shaderProgram, ("quadratic[" + idx + "]").c_str()), 0.032f);
+	}
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "lightCount"), lightCount);
+
 	Helper::SetUniformLocation(shaderProgram, "modelMatrix", &pLocation);
+
 	for (const auto& pos : m_torchPos)
 	{
 		mat4 model = glm::translate(mat4(1), pos) * glm::scale(mat4(1), glm::vec3(0.3f));
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, &model[0][0]);
-		
+
 		m_cube->render();
 	}
 }
@@ -361,6 +384,18 @@ GLuint Scene::GetFlatColourShader() const
 	return m_flatColourShader ? m_flatColourShader->GetProg() : 0;
 }
 
+inline std::string Trim(const std::string& str)
+{
+	const std::string whitespace = " \t\n\r\f\v";
+
+	size_t start = str.find_first_not_of(whitespace);
+	if (start == std::string::npos)
+		return "";
+
+	size_t end = str.find_last_not_of(whitespace);
+	return str.substr(start, end - start + 1);
+}
+
 void Scene::Load(ifstream& _file)
 {
 	string dummy;
@@ -405,6 +440,8 @@ void Scene::Load(ifstream& _file)
 				size_t colon = line.find(':');
 				if (colon != string::npos)
 				{
+					type = line.substr(colon + 1);
+					type = Trim(type);
 					break;
 				}
 			}

@@ -1,28 +1,34 @@
 #include "LightFactory.h"
-#include <assert.h>
 #include "Light.h"
 #include "DirectionLight.h"
 #include "PointLight.h"
+#include <iostream>
+#include <assert.h>
 
-Light* LightFactory::makeNewLight(std::string _type)
+using std::string;
+using std::cout;
+using std::endl;
+
+Light* LightFactory::makeNewLight(const string& type)
 {
-	printf("LIGHT TYPE: %s \n", _type.c_str());
-	if (_type == "LIGHT")
+	cout << "[LIGHTFACTORY] Requested Light Type: " << type << endl;
+
+	if (type == "LIGHT")
 	{
 		return new Light();
 	}
-	else if (_type == "DIRECTIONAL")
+	else if (type == "DIRECTIONAL")
 	{
 		return new DirectionLight();
 	}
-	else if (_type == "POINT")
+	else if (type == "POINT")
 	{
 		return new PointLight();
 	}
 	else
 	{
-		printf("UNKNOWN LIGHT TYPE: %s\n", _type.c_str());
-		assert(0);
+		cout << "[LIGHTFACTORY] Error. Unknown Light Type: " << type << endl;
+		assert(false && "Unknown light type passed to LightFactory.");
 		return nullptr;
 	}
 }

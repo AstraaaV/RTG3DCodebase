@@ -14,6 +14,7 @@ using namespace std;
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObject.h"
+
 #include "Cube.h"
 #include "AIMesh.h"
 #include "ArcballCamera.h"
@@ -31,6 +32,7 @@ public:
 	void Init();
 	void Update(float _dt, GLFWwindow* window);
 	void Render();
+
 	void BuildMap();
 	void RenderMapLayout(GLuint shaderProgram, const glm::mat4& view, const glm::mat4& projection);
 	void RenderCreature();

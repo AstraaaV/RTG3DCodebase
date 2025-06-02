@@ -7,6 +7,6 @@ class GameObjectFactory
 {
 public:
 
-	static GameObject* makeNewGO(std::string _type);
+	static GameObject* makeNewGO(const std::string& type);
 };
 

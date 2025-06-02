@@ -3,33 +3,37 @@
 #include "Beast.h"
 #include "Background.h"
 #include "ExampleGO.h"
+#include <iostream>
 #include <assert.h>
 
 using std::string;
+using std::cout;
+using std::endl;
 
-GameObject* GameObjectFactory::makeNewGO(string _type)
+GameObject* GameObjectFactory::makeNewGO(const string& type)
 {
-	printf("GAME OBJECT TYPE: %s \n", _type.c_str());
-	if (_type == "GAME_OBJECT")
+	cout << "[GAMEOBJECTFACTORY} Requested GameObject Type: " << type << endl;
+
+	if (type == "GAME_OBJECT")
 	{
 		return new GameObject();
 	}
-	else if (_type == "EXAMPLE")
+	else if (type == "EXAMPLE")
 	{
 		return new ExampleGO();
 	}
-	else if (_type == "BACKGROUND")
+	else if (type == "BACKGROUND")
 	{
 		return new Background();
 	}
-	else if (_type == "BEAST")
+	else if (type == "BEAST")
 	{
 		return new Beast();
 	}
 	else
 	{
-		printf("UNKNOWN GAME OBJECT TYPE: %s \n", _type.c_str());
-		assert(0);
+		cout << "[GAMEOBJECTFACTORY] Error. Unknown GameObject Type: " << type << endl;
+		assert(false && "Unknown GameObject type passed to GameObjectFactory.");
 		return nullptr;
 	}
 }

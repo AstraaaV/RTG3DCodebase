@@ -10,6 +10,8 @@ IsometricCamera::IsometricCamera()
 	m_zoom = 15.0f;
 	m_angle = glm::radians(45.0f);
 
+	m_viewSize = 10.0f;
+
 	m_fov = 45.0f;
 	m_near = 0.1f;
 	m_far = 100.0f;

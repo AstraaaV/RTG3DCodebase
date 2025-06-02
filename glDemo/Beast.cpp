@@ -82,7 +82,7 @@ void Beast::Render()
 
 void Beast::Init(AIMesh* mesh, glm::vec3 start, glm::vec3 end)
 {
-	if(mesh)
+	if(m_mesh != nullptr)
 		m_mesh = mesh;
 
 	m_patrolStart = start;
