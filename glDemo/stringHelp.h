@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -19,9 +20,17 @@ public:
 
 	static void Float3(ifstream& _file, string _message, float& _out1, float& _out2, float& _out3)
 	{
-		string dummy;
-		_file >> dummy >> _out1 >> _out2 >> _out3; _file.ignore(255, '\n');
-		std::cout << _message << " : " << _out1 << " " << _out2 << " " << _out3 << endl;
+		string line;
+		if (getline(_file, line))
+		{
+			size_t colonPos = line.find(':');
+			if (colonPos != string::npos)
+			{
+				istringstream iss(line.substr(colonPos + 1));
+				iss >> _out1 >> _out2 >> _out3;
+				std::cout << _message << " : " << _out1 << " " << _out2 << " " << _out3 << endl;
+			}
+		}
 	}
 
 	static void Float(ifstream& _file, string _message, float& _out)
