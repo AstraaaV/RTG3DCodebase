@@ -58,6 +58,11 @@ void ExampleGO::PreRender()
 
 void ExampleGO::Render()
 {
+	if (!m_model)
+	{
+		cout << "[ExampleGO::Render] Warning: m_model is null.\n";
+		return;
+	}
 	m_model->Render();
 }
 

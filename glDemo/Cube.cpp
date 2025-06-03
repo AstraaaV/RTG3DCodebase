@@ -4,95 +4,110 @@
 using namespace std;
 using namespace glm;
 
-Cube::Cube()
-{
-	setupMesh();
-}
+
+// Example data for cube model
+
+// Packed vertex buffer for cube
+static float positionArray[] = {
+
+	-1.0f, 1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, -1.0f, 1.0f,
+	1.0f, 1.0f, -1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f, 1.0f,
+
+	-1.0f, -1.0f, 1.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f, 1.0f,
+	1.0f, -1.0f, -1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f, 1.0f
+};
+
+// Packed colour buffer for principle axes model
+static float colourArray[] = {
+
+	1.0f, 0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 0.0f, 1.0f,
+	1.0f, 1.0f, 0.0f, 1.0f,
+
+	0.0f, 0.0f, 1.0f, 1.0f,
+	0.0f, 1.0f, 1.0f, 1.0f,
+	0.0f, 0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 0.0f, 1.0f
+};
 
 
-Cube::~Cube()
-{
-	glDeleteVertexArrays(1, &m_vao);
-	glDeleteBuffers(1, &m_vbo);
-	glDeleteBuffers(1, &m_ebo);
-}
+// Line list topology to render principle axes
+static unsigned int indexArray[] = {
 
-void Cube::Init(Scene* scene)
-{
-	GameObject::Init(scene);
-}
+	// Top face
+	2, 1, 0,
+	3, 2, 0,
 
-void Cube::Render()
-{
-	render();
-}
+	// Bottom face
+	5, 6, 4,
+	6, 7, 4,
 
-void Cube::Load(std::ifstream& file)
-{
-	GameObject::Load(file);
-}
+	// Right face
+	3, 7, 2,
+	7, 6, 2,
 
-void Cube::render()
-{
-	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-}
+	// Front face
+	0, 4, 3,
+	4, 7, 3,
 
-void Cube::setupMesh()
-{
-	float vertices[] =
-	{
-		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+	// Left face
+	0, 1, 5,
+	4, 0, 5,
 
-		-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-	};
+	// Back face
+	2, 6, 1,
+	6, 5, 1
+};
 
-	unsigned int indices[] =
-	{
-		// Back face
-		0, 1, 2, 2, 3, 0,
-		// Front face
-		4, 5, 6, 6, 7, 4,
-		// Left face
-		4, 0, 3, 3, 7, 4,
-		// Right face
-		1, 5, 6, 6, 2, 1,
-		// Bottom face
-		4, 5, 1, 1, 0, 4,
-		// Top face
-		3, 2, 6, 6, 7, 3
-	};
+
+
+Cube::Cube() {
+
+	m_numFaces = 6 * 2;
 
 	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
-	glGenBuffers(1, &m_ebo);
-
 	glBindVertexArray(m_vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Vertex positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	// setup vbo for position attribute
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 32 * sizeof(float), positionArray, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	// Normals
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	// setup vbo for colour attribute
+	glGenBuffers(1, &m_colourBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_colourBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 32 * sizeof(float), colourArray, GL_STATIC_DRAW);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(4);
 
-	// Texture coordinates
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	// setup vbo for cube) index buffer
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), indexArray, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
+}
+
+
+Cube::~Cube() {
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glDeleteBuffers(1, &m_vertexBuffer);
+	glDeleteBuffers(1, &m_colourBuffer);
+	glDeleteBuffers(1, &m_indexBuffer);
+}
+
+
+void Cube::render() {
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_TRIANGLES, m_numFaces * 3, GL_UNSIGNED_INT, (const GLvoid*)0);
 }

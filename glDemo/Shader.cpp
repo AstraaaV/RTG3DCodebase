@@ -10,6 +10,15 @@ Shader::Shader(ifstream& _file)
 	StringHelp::String(_file, "FRAGFILE", fileNameF);
 
 	m_shaderProg = setupShaders(fileNameV, fileNameF);
+
+	GLint success;
+	glGetProgramiv(m_shaderProg, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		char infoLog[512];
+		glGetProgramInfoLog(m_shaderProg, 512, NULL, infoLog);
+		cout << "[SHADER LINK ERROR]: " << infoLog << endl;
+	}
 }
 
 Shader::~Shader()

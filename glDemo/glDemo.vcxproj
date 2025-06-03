@@ -199,6 +199,7 @@
     <ClCompile Include="PrincipleAxes.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shader_setup.cpp" />
+    <ClCompile Include="stringHelp.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
@@ -212,6 +213,8 @@
     <None Include="Assets\Shaders\flatTexture.vert" />
     <None Include="Assets\Shaders\texture-directional.frag" />
     <None Include="Assets\Shaders\texture-directional.vert" />
+    <None Include="Assets\Shaders\texture-pointlight.frag" />
+    <None Include="Assets\Shaders\texture-pointlight.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

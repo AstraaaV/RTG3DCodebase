@@ -11,6 +11,8 @@ using namespace std;
 class StringHelp {
 public:
 
+	static void Int(std::ifstream& file, const std::string& label, int& value);
+
 	static void String(ifstream& _file, string _message, string& _out)
 	{
 		string dummy;

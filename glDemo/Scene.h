@@ -73,5 +73,7 @@ protected:
 	int m_useCameraIndex = 0;
 
 	GLFWwindow* m_window = nullptr;
+	GLuint m_texDirLightShader = 0;
+	GLuint m_texPointLightShader = 0;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

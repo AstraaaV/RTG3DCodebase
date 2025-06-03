@@ -133,8 +133,8 @@ FRAGFILE: Assets\\Shaders\\texture-directional.frag
 }
 {
 NAME: TEXPOINT
-VERTFILE: Assets\\Shaders\\texpoint.vert
-FRAGFILE: Assets\\Shaders\\texpoint.frag
+VERTFILE: Assets\\Shaders\\texture-pointlight.vert
+FRAGFILE: Assets\\Shaders\\texture-pointlight.frag
 }
 
 GAMEOBJECTS 11
@@ -144,7 +144,7 @@ NAME: BEAST
 POS: 0.0 0.0 0.0
 ROT: 0.0 0.0 0.0
 SCALE: 1.0 1.0 1.0
-ROTINC: 0.0 0.1 0.001
+ROTINC: 0.0 0.0 0.0
 MODEL: BEAST
 TEXTURE: BEAST
 SHADER: TEXDIR

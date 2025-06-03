@@ -1,6 +1,8 @@
 #pragma once
 #include "core.h"
 #include <string>
+#include "Shader.h"
+#include "Texture.h"
 
 using namespace std;
 class Scene;
@@ -39,11 +41,18 @@ protected:
 	string m_type;
 
 	GLuint m_shaderID = 0;
-	GLuint m_shaderProg;
+	GLuint m_shaderProg = 0;
+
+	GLuint m_VAO = 0;
+	GLuint m_VBO = 0;
+	GLuint m_EBO = 0;
+	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 
 	glm::vec3 m_pos = glm::vec3(0.0f);
 	int m_renderPass = 0;
 
 	Scene* m_scene = nullptr;
+	Shader* m_shader = nullptr;
+	Texture* m_texture;
 };
 

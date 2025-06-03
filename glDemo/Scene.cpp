@@ -157,7 +157,19 @@ void Scene::Render()
 		return;
 	}
 
+	glm::mat4 view = m_useCamera->GetView();
+	glm::mat4 proj = m_useCamera->GetProj();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(m_texPointLightShader);
+
+	for (auto light : m_Lights)
+	{
+		if (light && light->GetType() == "POINT")
+		{
+			light->SetRenderValues(m_texPointLightShader);
+		}
+	}
 
 	//TODO: Set up for the Opaque Render Pass will go here
 	//check out the example stuff back in main.cpp to see what needs setting up here
@@ -299,7 +311,14 @@ void Scene::Load(ifstream& _file)
 		_file.ignore(256, '\n');
 		cout << "{\n";
 
-		m_Shaders.push_back(new Shader(_file));
+		Shader* shader = new Shader(_file);
+		m_Shaders.push_back(shader);
+
+		string shaderName = shader->GetName();
+		if (shaderName == "TEXDIR")
+			m_texDirLightShader = shader->GetProg();
+		if (shaderName == "TEXPOINT")
+			m_texPointLightShader = shader->GetProg();
 
 		//skip }
 		_file.ignore(256, '\n');

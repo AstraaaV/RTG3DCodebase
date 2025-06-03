@@ -1,26 +1,23 @@
 #pragma once
 
-#include "Model.h"
-#include "GameObject.h"
 #include "core.h"
+#include "Model.h"
 
-class Cube: public Model, public GameObject
-{
+class Cube : public Model {
+
+private:
+
+	GLuint				m_numFaces = 0;
+	GLuint				m_vao = 0;
+
+	GLuint				m_vertexBuffer;
+	GLuint				m_colourBuffer;
+	GLuint				m_indexBuffer;
+
 public:
 
 	Cube();
-	virtual ~Cube();
+	~Cube();
 
-	void Init(Scene* scene) override;
-	void Render() override;
-
-	void Load(std::ifstream& file) override;
 	void render();
-private:
-
-	GLuint m_vao = 0;
-	GLuint m_vbo = 0;
-	GLuint m_ebo = 0;
-
-	void setupMesh();
 };
