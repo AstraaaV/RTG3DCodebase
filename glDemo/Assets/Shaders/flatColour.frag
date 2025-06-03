@@ -14,5 +14,5 @@ layout (location=0) out vec4 fragColour;
 
 void main(void) {
 
-	fragColour = vec4(1.0, 1.0, 1.0, 1.0);
+	fragColour = vec4(inputFragment.colour, 1.0);
 }

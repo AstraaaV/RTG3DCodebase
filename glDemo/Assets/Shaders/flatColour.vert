@@ -4,10 +4,8 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
-layout (location=0) in vec3 vertexPos;
-layout (location=2) in vec3 vertexTexCoord;
-layout (location=3) in vec3 vertexNormal;
-layout (location=4) in vec3 vertexColour;
+layout (location=0) in vec4 vertexPos;
+layout (location=4) in vec4 vertexColour;
 
 out SimplePacket {
 
@@ -18,9 +16,7 @@ out SimplePacket {
 
 void main(void) {
 
-	outputVertex.colour = vertexColour;
+	outputVertex.colour = vertexColour.rgb;
 
-	vec4 worldCoord = modelMatrix * vec4(vertexPos, 1.0);
-
-	gl_Position = projMatrix * viewMatrix * worldCoord;
+	gl_Position = projMatrix * viewMatrix * modelMatrix * vertexPos;
 }
