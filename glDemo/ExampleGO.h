@@ -1,6 +1,9 @@
 #pragma once
 #include "GameObject.h"
+
 class Model;
+class Shader;
+class Texture;
 
 //replicate the examples from the main.cpp
 //each Game Object has a Mesh, a texture and a shader
@@ -13,7 +16,7 @@ public:
 	~ExampleGO();
 
 	//load me from the file
-	virtual void Load(ifstream& _file);
+	virtual void Load(std::istream& _file);
 
 	//update _window allows for Keyboard access
 	virtual void Tick(float _dt, GLFWwindow* window);
@@ -22,15 +25,14 @@ public:
 	virtual void PreRender();
 	virtual void Render();
 
-	virtual void Init(Scene* _scene, GLuint shaderProg, GLuint textureID, Model* model);
-
 protected:
 
 	string m_ShaderName, m_TexName, m_ModelName;
 
-	GLuint m_texture;
-	GLuint m_shader;
-	GLuint m_normalMap;
-	Model* m_model;
+	Shader* m_shader = nullptr;
+	Texture* m_texture = nullptr;
+	GLuint m_normalMap = 0;
+
+	Model* m_model = nullptr;
 };
 

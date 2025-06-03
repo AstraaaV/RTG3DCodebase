@@ -11,6 +11,7 @@
 #include "GameObjectFactory.h"
 #include "RenderPass.h"
 #include <assert.h>
+#include <sstream>
 
 Scene::Scene()
 {
@@ -181,8 +182,18 @@ void Scene::Render()
 		if (obj->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
 		{
 			//set shader program using
-			GLuint SP = obj->GetShaderProg();
-			glUseProgram(SP);
+			Shader* shader = obj->GetShader();
+			GLuint SP = 0;
+			if (shader)
+			{
+				SP = shader->GetProg();
+				glUseProgram(SP);
+			}
+			else
+			{
+				cout << "[Scene] Warning: Shader not set for GO. " << obj->GetName() << "\n";
+				continue;
+			}
 
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
@@ -328,43 +339,56 @@ void Scene::Load(ifstream& _file)
 	cout << endl << endl;
 
 	//load GameObjects
-	_file >> dummy >> m_numGameObjects; _file.ignore(256, '\n');
+	_file >> dummy >> m_numGameObjects;
+	_file.ignore(256, '\n');
 	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
+	
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
-		//skip {
-		_file.ignore(256, '\n');
-		cout << "{\n";
-
 		string line;
 		string type;
+		bool foundType = false;
 
+		std::stringstream blockStream;
 		while (getline(_file, line))
 		{
 			line = Trim(line);
-			if (line.find("TYPE:") == 0)
+			if (line == "{")
 			{
-				type = Trim(line.substr(line.find(":") + 1));
+				blockStream.str("");
+				blockStream.clear();
+				continue;
+			}
+			else if (line == "}")
+			{
 				break;
 			}
+			blockStream << line << "\n";
+
+			if(line.find("TYPE:") == 0)
+			{
+				type = Trim(line.substr(line.find(":") + 1));
+				foundType = true;
+			}
 		}
-		
-		if (type.empty())
+
+		if (!foundType || type.empty())
 		{
 			cout << "[Scene::Load] Error. GameObject block missing TYPE line.\n";
 			continue;
 		}
 		
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
-		newGO->Load(_file);
+		if (!newGO)
+		{
+			cout << "[Scene::Load] Error. Unknown GO type: " << type << endl;
+			continue;
+		}
+		
+		newGO->Load(blockStream);
 		m_GameObjects.push_back(newGO);
-
-		//skip }
-		_file.ignore(256, '\n');
 		cout << "}\n";
 	}
-
-
 }
 
 void Scene::Init()

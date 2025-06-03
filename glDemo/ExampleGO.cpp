@@ -14,13 +14,34 @@ ExampleGO::~ExampleGO()
 {
 }
 
-void ExampleGO::Load(ifstream& _file)
+void ExampleGO::Load(std::istream& _file)
 {
 	GameObject::Load(_file);
+
 	StringHelp::String(_file, "MODEL", m_ModelName);
 	StringHelp::String(_file, "TEXTURE", m_TexName);
 	StringHelp::String(_file, "SHADER", m_ShaderName);
 
+	if (!m_ShaderName.empty())
+	{
+		m_shader = m_scene->GetShader(m_ShaderName);
+		if (!m_shader)
+			cout << "[ExampleGO::Load] Shader \"" << m_ShaderName << "\" not found.\n";
+	}
+
+	if (!m_TexName.empty())
+	{
+		m_texture = m_scene->GetTexture(m_TexName);
+		if (!m_texture)
+			cout << "[ExampleGO::Load] Texture \"" << m_TexName << "\" not found.\n";
+	}
+
+	if (!m_ModelName.empty())
+	{
+		m_model = m_scene->GetModel(m_ModelName);
+		if (!m_model)
+			cout << "[ExampleGO::Load] Texture \"" << m_ModelName << "\" not found.\n";
+	}
 }
 
 void ExampleGO::Tick(float _dt, GLFWwindow* window)
@@ -30,17 +51,24 @@ void ExampleGO::Tick(float _dt, GLFWwindow* window)
 
 void ExampleGO::PreRender()
 {
+	if (!m_shader) return;
+
+	GLuint prog = m_shader->GetProg();
+	glUseProgram(prog);
 	//only thing I need to do is tell the shader about my texture
 
-	glEnable(GL_TEXTURE_2D);
+	if (m_texture)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_texture->GetTexID());
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
+		GLint texLoc = glGetUniformLocation(prog, "diffuseTex");
+		glUniform1i(texLoc, 0);
+	}
 
-	GLint pLocation;
 	float time = glfwGetTime();
-	Helper::SetUniformLocation(m_shader, "u_time", &pLocation);
-	glUniform1f(pLocation, time);
+	GLint timeLoc = glGetUniformLocation(prog, "u_time");
+	glUniform1f(timeLoc, time);
 
 	//TODO: this does sort of replicate stuff in the AIMesh class, could we make them more compatible.
 
@@ -52,7 +80,7 @@ void ExampleGO::PreRender()
 	glBindTexture(GL_TEXTURE_2D, m_normalMap);
 
 	GLint normLoc;
-	Helper::SetUniformLocation(m_shader, "u_normalMap", &normLoc);
+	Helper::SetUniformLocation(m_shader->GetProg(), "u_normalMap", &normLoc);
 	glUniform1i(normLoc, 1);
 }
 
@@ -64,11 +92,4 @@ void ExampleGO::Render()
 		return;
 	}
 	m_model->Render();
-}
-
-void ExampleGO::Init(Scene* _scene, GLuint shaderProg, GLuint textureID, Model* model)
-{
-	m_shader = shaderProg;
-	m_texture = textureID;
-	m_model = model;
 }

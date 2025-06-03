@@ -19,7 +19,7 @@ public:
 	virtual ~Light() = default;
 
 	//load from mainfest
-	virtual void Load(ifstream& _file);
+	virtual void Load(istream& _file);
 
 	//tick this light
 	virtual void Tick(float _dt);

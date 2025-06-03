@@ -100,17 +100,18 @@ void GameObject::Render()
 	glBindVertexArray(0);
 }
 
-void GameObject::Load(std::ifstream& file)
+void GameObject::Load(std::istream& file)
 {
 	StringHelp::String(file, "NAME", m_name);
 	StringHelp::Float3(file, "POS", m_pos.x, m_pos.y, m_pos.z);
 
-	int shaderIndex = -1;
-	StringHelp::Int(file, "SHADER", shaderIndex);
+	StringHelp::String(file, "MODEL", m_modelName);
+	StringHelp::String(file, "TEXTURE", m_textureName);
+	StringHelp::String(file, "SHADER", m_shaderName);
 
-	if (shaderIndex >= 0)
+	if (!m_shaderName.empty())
 	{
-		Shader* myShader = m_scene->GetShader("TEXDIR");
+		Shader* myShader = m_scene->GetShader(m_shaderName);
 
 		if (myShader)
 		{
@@ -118,12 +119,21 @@ void GameObject::Load(std::ifstream& file)
 		}
 		else
 		{
-			cout << "[GameObject::Load] Warning: Shader index " << shaderIndex << " not found.\n";
+			cout << "[GameObject::Load] Warning: Shader \"" << m_shaderName << "\" not found for" << m_name << "\n";
 		}
 	}
 	else
 	{
 		cout << "[GameObject::Load] Warning: Shader index missing or invalid for " << m_name << "\n";
+	}
+
+	if (!m_textureName.empty())
+	{
+		m_texture = m_scene->GetTexture(m_textureName);
+		if (!m_texture)
+		{
+			cout << "[GameObject::Load] Warning: Texture \"" << m_textureName << "\" not found for " << m_name << "\n";
+		}
 	}
 	m_renderPass = RP_OPAQUE;
 }

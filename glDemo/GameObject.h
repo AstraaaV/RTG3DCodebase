@@ -20,8 +20,7 @@ public:
 	virtual void Tick(float deltaTime, GLFWwindow* window);
 	virtual void Render();
 	virtual void PreRender() {}
-	virtual void Load(std::ifstream& file);
-	virtual void SetShader(GLuint id) { m_shaderID = id; }
+	virtual void Load(std::istream& file);
 
 	void SetName(const std::string& name) { m_name = name; }
 	std::string GetName() const { return m_name; }
@@ -32,7 +31,8 @@ public:
 	void SetRenderPass(int pass) { m_renderPass = pass; }
 	int GetRenderPass() const { return m_renderPass; }
 
-	GLuint GetShaderProg() const { return m_shaderProg; }
+	Shader* GetShader() const { return m_shader; }
+
 	unsigned int GetRP() const { return m_renderPass; }
 
 protected:
@@ -40,19 +40,21 @@ protected:
 	string m_name;
 	string m_type;
 
-	GLuint m_shaderID = 0;
-	GLuint m_shaderProg = 0;
+	glm::vec3 m_pos = glm::vec3(0.0f);
+	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 
 	GLuint m_VAO = 0;
 	GLuint m_VBO = 0;
 	GLuint m_EBO = 0;
-	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
 
-	glm::vec3 m_pos = glm::vec3(0.0f);
 	int m_renderPass = 0;
 
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;
-	Texture* m_texture;
+	Texture* m_texture = nullptr;
+
+	string m_modelName;
+	string m_textureName;
+	string m_shaderName;
 };
 

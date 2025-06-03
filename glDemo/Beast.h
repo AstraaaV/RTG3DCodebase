@@ -24,4 +24,6 @@ private:
 	glm::vec3 m_patrolEnd;
 	float m_patrolSpeed = 1.5f;
 	bool m_moveToEnd = true;
+
+	GLuint m_shaderID;
 };
