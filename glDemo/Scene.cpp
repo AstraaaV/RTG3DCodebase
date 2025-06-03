@@ -347,36 +347,36 @@ void Scene::Load(ifstream& _file)
 	{
 		string line;
 		string type;
-		bool foundType = false;
+		bool insideBlock = false;
 
-		std::stringstream blockStream;
+		std::streampos blockStart = _file.tellg();
+
 		while (getline(_file, line))
 		{
 			line = Trim(line);
 			if (line == "{")
 			{
-				blockStream.str("");
-				blockStream.clear();
+				blockStart = _file.tellg();
+				insideBlock = true;
 				continue;
 			}
-			else if (line == "}")
-			{
-				break;
-			}
-			blockStream << line << "\n";
+
+			if (line == "}") break;
 
 			if(line.find("TYPE:") == 0)
 			{
 				type = Trim(line.substr(line.find(":") + 1));
-				foundType = true;
 			}
 		}
 
-		if (!foundType || type.empty())
+		if (!insideBlock || type.empty())
 		{
 			cout << "[Scene::Load] Error. GameObject block missing TYPE line.\n";
 			continue;
 		}
+
+		_file.clear();
+		_file.seekg(blockStart);
 		
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		if (!newGO)
@@ -385,9 +385,9 @@ void Scene::Load(ifstream& _file)
 			continue;
 		}
 		
-		newGO->Load(blockStream);
+		newGO->Load(_file);
 		m_GameObjects.push_back(newGO);
-		cout << "}\n";
+		cout << "[Scene::Load] GameObject loaded: " << newGO->GetName() << "\n";
 	}
 }
 

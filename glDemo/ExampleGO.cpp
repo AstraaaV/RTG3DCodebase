@@ -14,7 +14,7 @@ ExampleGO::~ExampleGO()
 {
 }
 
-void ExampleGO::Load(std::istream& _file)
+void ExampleGO::Load(std::ifstream& _file)
 {
 	GameObject::Load(_file);
 

@@ -16,7 +16,7 @@ public:
 	~ExampleGO();
 
 	//load me from the file
-	virtual void Load(std::istream& _file);
+	virtual void Load(std::ifstream& _file);
 
 	//update _window allows for Keyboard access
 	virtual void Tick(float _dt, GLFWwindow* window);

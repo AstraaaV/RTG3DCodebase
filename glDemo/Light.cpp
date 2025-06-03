@@ -12,7 +12,7 @@ Light::Light()
 	m_pos.z = 0.0f;
 }
 
-void Light::Load(istream& _file)
+void Light::Load(ifstream& _file)
 {
 	StringHelp::String(_file, "NAME", m_name);
 	StringHelp::Float3(_file, "POS", m_pos.x, m_pos.y, m_pos.z);

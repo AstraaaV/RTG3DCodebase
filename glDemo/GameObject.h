@@ -20,7 +20,7 @@ public:
 	virtual void Tick(float deltaTime, GLFWwindow* window);
 	virtual void Render();
 	virtual void PreRender() {}
-	virtual void Load(std::istream& file);
+	virtual void Load(std::ifstream& file);
 
 	void SetName(const std::string& name) { m_name = name; }
 	std::string GetName() const { return m_name; }

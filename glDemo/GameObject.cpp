@@ -100,7 +100,7 @@ void GameObject::Render()
 	glBindVertexArray(0);
 }
 
-void GameObject::Load(std::istream& file)
+void GameObject::Load(std::ifstream& file)
 {
 	StringHelp::String(file, "NAME", m_name);
 	StringHelp::Float3(file, "POS", m_pos.x, m_pos.y, m_pos.z);
@@ -135,5 +135,11 @@ void GameObject::Load(std::istream& file)
 			cout << "[GameObject::Load] Warning: Texture \"" << m_textureName << "\" not found for " << m_name << "\n";
 		}
 	}
+
+	std::cout << "[DEBUG] Loaded GO \"" << m_name
+		<< "\" | Model: " << m_modelName
+		<< " | Texture: " << m_textureName
+		<< " | Shader: " << m_shaderName << std::endl;
+
 	m_renderPass = RP_OPAQUE;
 }
