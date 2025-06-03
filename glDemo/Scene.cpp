@@ -315,8 +315,25 @@ void Scene::Load(ifstream& _file)
 		_file.ignore(256, '\n');
 		cout << "{\n";
 
-		std::getline(_file, dummy);
-		string type = Trim(dummy.substr(dummy.find(":") + 1));
+		string line;
+		string type;
+
+		while (getline(_file, line))
+		{
+			line = Trim(line);
+			if (line.find("TYPE:") == 0)
+			{
+				type = Trim(line.substr(line.find(":") + 1));
+				break;
+			}
+		}
+		
+		if (type.empty())
+		{
+			cout << "[Scene::Load] Error. GameObject block missing TYPE line.\n";
+			continue;
+		}
+		
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
 		m_GameObjects.push_back(newGO);
