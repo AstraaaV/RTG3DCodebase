@@ -111,9 +111,9 @@ void GameObject::Load(std::ifstream& file)
 
 	if (!m_shaderName.empty())
 	{
-		Shader* myShader = m_scene->GetShader(m_shaderName);
+		m_shader = m_scene->GetShader(m_shaderName);
 
-		if (!myShader)
+		if (!m_shader)
 		{
 			cout << "[GameObject::Load] Warning: Shader \"" << m_shaderName << "\" not found for" << m_name << "\n";
 		}
@@ -121,6 +121,19 @@ void GameObject::Load(std::ifstream& file)
 	else
 	{
 		cout << "[GameObject::Load] Warning: Shader index missing or invalid for " << m_name << "\n";
+	}
+
+	if (!m_modelName.empty())
+	{
+		m_model = m_scene->GetModel(m_modelName);
+		if (!m_model)
+		{
+			cout << "[GameObject::Load] Warning: Model \"" << m_textureName << "\" not found for " << m_name << "\n";
+		}
+	}
+	else
+	{
+		cout << "[GameObject::Load] Warning: Model name is missing or invalid for \"" << m_name << "\".\n";
 	}
 
 	if (!m_textureName.empty())
@@ -137,7 +150,7 @@ void GameObject::Load(std::ifstream& file)
 	}
 
 	std::cout << "[DEBUG] Loaded GO \"" << m_name
-		<< "\" | Model: " << m_modelName
+		<< "\" | Model: " << (m_model ? m_modelName : "nullptr")
 		<< " | Texture: " << (m_texture ? m_textureName : "nullptr")
 		<< " | Shader: " << (m_shader ? m_shaderName : "nullptr") << "";
 
