@@ -199,7 +199,6 @@
     <ClCompile Include="PrincipleAxes.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shader_setup.cpp" />
-    <ClCompile Include="stringHelp.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>

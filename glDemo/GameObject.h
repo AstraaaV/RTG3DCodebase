@@ -3,6 +3,7 @@
 #include <string>
 #include "Shader.h"
 #include "Texture.h"
+#include "Model.h"
 
 using namespace std;
 class Scene;
@@ -32,6 +33,8 @@ public:
 	int GetRenderPass() const { return m_renderPass; }
 
 	Shader* GetShader() const { return m_shader; }
+	Texture* GetTexture() const { return m_texture; }
+	Model* GetModel() const { return m_model; }
 
 	unsigned int GetRP() const { return m_renderPass; }
 
@@ -52,6 +55,7 @@ protected:
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;
 	Texture* m_texture = nullptr;
+	Model* m_model = nullptr;
 
 	string m_modelName;
 	string m_textureName;

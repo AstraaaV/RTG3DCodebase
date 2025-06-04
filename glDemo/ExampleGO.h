@@ -29,10 +29,6 @@ protected:
 
 	string m_ShaderName, m_TexName, m_ModelName;
 
-	Shader* m_shader = nullptr;
-	Texture* m_texture = nullptr;
 	GLuint m_normalMap = 0;
-
-	Model* m_model = nullptr;
 };
 

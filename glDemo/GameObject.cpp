@@ -113,11 +113,7 @@ void GameObject::Load(std::ifstream& file)
 	{
 		Shader* myShader = m_scene->GetShader(m_shaderName);
 
-		if (myShader)
-		{
-			m_shader = myShader;
-		}
-		else
+		if (!myShader)
 		{
 			cout << "[GameObject::Load] Warning: Shader \"" << m_shaderName << "\" not found for" << m_name << "\n";
 		}
@@ -135,11 +131,15 @@ void GameObject::Load(std::ifstream& file)
 			cout << "[GameObject::Load] Warning: Texture \"" << m_textureName << "\" not found for " << m_name << "\n";
 		}
 	}
+	else
+	{
+		cout << "[GameObject::Load] Warning: Texture field is missing or invalid for \"" << m_name << "\".\n";
+	}
 
 	std::cout << "[DEBUG] Loaded GO \"" << m_name
 		<< "\" | Model: " << m_modelName
-		<< " | Texture: " << m_textureName
-		<< " | Shader: " << m_shaderName << std::endl;
+		<< " | Texture: " << (m_texture ? m_textureName : "nullptr")
+		<< " | Shader: " << (m_shader ? m_shaderName : "nullptr") << "";
 
 	m_renderPass = RP_OPAQUE;
 }

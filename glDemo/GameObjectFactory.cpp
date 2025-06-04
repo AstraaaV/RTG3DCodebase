@@ -22,14 +22,7 @@ GameObject* GameObjectFactory::makeNewGO(const string& type)
 	{
 		return new ExampleGO();
 	}
-	else if (type == "BACKGROUND")
-	{
-		return new Background();
-	}
-	else if (type == "BEAST")
-	{
-		return new Beast();
-	}
+
 	else
 	{
 		cout << "[GAMEOBJECTFACTORY] Error. Unknown GameObject Type: " << type << endl;

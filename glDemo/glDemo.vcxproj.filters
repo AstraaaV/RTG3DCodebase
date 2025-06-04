@@ -218,9 +218,6 @@
     <ClCompile Include="Beast.cpp">
       <Filter>Scene Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stringHelp.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="manifest.txt">

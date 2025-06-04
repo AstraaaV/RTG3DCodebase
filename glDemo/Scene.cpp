@@ -19,8 +19,12 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	//TODO: We are being really naught and not deleting everything as we finish
-	//what shoudl really go here and in similar places throughout the code base?
+	for (auto cam : m_Cameras) delete cam;
+	for (auto light : m_Lights) delete light;
+	for (auto model : m_Models) delete model;
+	for (auto tex : m_Textures) delete tex;
+	for (auto shader : m_Shaders) delete shader;
+	for (auto obj : m_GameObjects) delete obj;
 }
 
 inline std::string Scene::Trim(const std::string& str)
@@ -183,17 +187,19 @@ void Scene::Render()
 		{
 			//set shader program using
 			Shader* shader = obj->GetShader();
-			GLuint SP = 0;
-			if (shader)
-			{
-				SP = shader->GetProg();
-				glUseProgram(SP);
-			}
-			else
+			if (!shader)
 			{
 				cout << "[Scene] Warning: Shader not set for GO. " << obj->GetName() << "\n";
 				continue;
 			}
+
+			GLuint SP = shader->GetProg();
+			glUseProgram(SP);
+
+			if (!obj->GetTexture())
+				cout << "[Scene] Warning: Texture not set for GO. " << obj->GetName() << "\n";
+			if (!obj->GetModel())
+				cout << "[Scene] Warning: Model not set for GO. " << obj->GetName() << "\n";
 
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
@@ -347,31 +353,29 @@ void Scene::Load(ifstream& _file)
 	{
 		string line;
 		string type;
-		bool insideBlock = false;
+
+		while (getline(_file, line))
+		{
+			line = Trim(line);
+			if (line == "{") break;
+		}
 
 		std::streampos blockStart = _file.tellg();
 
 		while (getline(_file, line))
 		{
 			line = Trim(line);
-			if (line == "{")
-			{
-				blockStart = _file.tellg();
-				insideBlock = true;
-				continue;
-			}
-
 			if (line == "}") break;
 
-			if(line.find("TYPE:") == 0)
+			if (line.find("TYPE:") == 0)
 			{
 				type = Trim(line.substr(line.find(":") + 1));
 			}
 		}
 
-		if (!insideBlock || type.empty())
+		if (type.empty())
 		{
-			cout << "[Scene::Load] Error. GameObject block missing TYPE line.\n";
+			cout << "[Scene::Load] Error: Missing TYPE for GO.\n";
 			continue;
 		}
 
@@ -388,6 +392,12 @@ void Scene::Load(ifstream& _file)
 		newGO->Load(_file);
 		m_GameObjects.push_back(newGO);
 		cout << "[Scene::Load] GameObject loaded: " << newGO->GetName() << "\n";
+	
+		while (getline(_file, line))
+		{
+			if (Trim(line) == "}") break;
+		}
+	
 	}
 }
 
