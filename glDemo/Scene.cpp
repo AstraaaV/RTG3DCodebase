@@ -196,8 +196,17 @@ void Scene::Render()
 			GLuint SP = shader->GetProg();
 			glUseProgram(SP);
 
-			if (!obj->GetTexture())
-				cout << "[Scene] Warning: Texture not set for GO. " << obj->GetName() << "\n";
+			if (obj->GetTexture())
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, obj->GetTexture()->GetTexID());
+
+				GLint texLoc = glGetUniformLocation(SP, "texture");
+				if (texLoc >= 0)
+					glUniform1i(texLoc, 0);
+				else
+					cout << "[Scene] Warning: Texture not found in shader for " << obj->GetName() << endl;
+			}
 			if (!obj->GetModel())
 				cout << "[Scene] Warning: Model not set for GO. " << obj->GetName() << "\n";
 

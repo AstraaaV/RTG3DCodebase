@@ -29,7 +29,7 @@ void main(void) {
 	float l = dot(N, DIRDir);
 
 	// Calculate diffuse brightness / colour for fragment
-	vec4 surfaceColour = texture2D(texture, inputFragment.texCoord);
+	vec4 surfaceColour = texture(texture, inputFragment.texCoord);
 	vec3 diffuseColour = surfaceColour.rgb * DIRCol * l;
 
 	fragColour = vec4(DIRAmb,1.0)+vec4(diffuseColour, 1.0);
