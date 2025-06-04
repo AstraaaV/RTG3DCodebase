@@ -168,8 +168,6 @@ void Scene::Render()
 	glm::mat4 proj = m_useCamera->GetProj();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(m_texPointLightShader);
-
 	for (auto light : m_Lights)
 	{
 		if (light && light->GetType() == "POINT")
@@ -180,23 +178,23 @@ void Scene::Render()
 
 	//TODO: Set up for the Opaque Render Pass will go here
 	//check out the example stuff back in main.cpp to see what needs setting up here
-	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	for (GameObject* obj : m_GameObjects)
 	{
-		GameObject* obj = *it;
 		if (!obj) continue;
-
-		if (obj->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
+		if (!(obj->GetRP() & RP_OPAQUE))continue;// TODO: note the bit-wise operation. Why?
 		{
-			//set shader program using
-			/*Shader* shader = obj->GetShader();
-			if (!shader)
-			{
-				cout << "[Scene] Warning: Shader not set for GO. " << obj->GetName() << "\n";
-				continue;
-			}*/
+		//set shader program using
+		Shader* shader = obj->GetShader();
+		GLuint SP = shader ? shader->GetProg() : m_texDirLightShader;
 
-			GLuint SP = m_texDirLightShader;
-			glUseProgram(SP);
+		if (!shader)
+		{
+			cout << "[Scene] Warning: Shader not set for GO. " << obj->GetName() << "\n";
+			continue;
+		}
+
+		SP = shader->GetProg();
+		glUseProgram(SP);
 
 			if (obj->GetTexture())
 			{
@@ -209,8 +207,6 @@ void Scene::Render()
 				else
 					cout << "[Scene] Warning: Texture not found in shader for " << obj->GetName() << endl;
 			}
-			if (!obj->GetModel())
-				cout << "[Scene] Warning: Model not set for GO. " << obj->GetName() << "\n";
 
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
@@ -417,6 +413,13 @@ void Scene::Load(ifstream& _file)
 		
 		newGO->Load(_file);
 		m_GameObjects.push_back(newGO);
+
+		Shader* fallbackShader = GetShader("TEXDIR");
+		if (fallbackShader)
+			newGO->SetShader(fallbackShader);
+		else
+			std::cout << "[Scene::Load] Warning. TEXDIR not found for GO: " << newGO->GetName() << "\n";
+
 		cout << "[Scene::Load] GameObject loaded: " << newGO->GetName() << "\n";
 	
 		while (getline(_file, line))
