@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include "Map.h"
 #include <list>
 #include <string>
 #include <fstream>
@@ -52,6 +53,7 @@ public:
 
 	void CycleCams();
 	void SetLightsEnabled(bool _enabled);
+	void AddLight(Light* light);
 
 protected:
 
@@ -68,6 +70,9 @@ protected:
 	std::list<Texture*>		m_Textures;
 	std::list<Shader*>		m_Shaders;
 	std::list<GameObject*> m_GameObjects;
+
+	std::vector<Light*> m_lights;
+	Map* m_map = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;

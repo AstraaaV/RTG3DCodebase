@@ -13,6 +13,7 @@ private:
 	GLuint				m_vertexBuffer;
 	GLuint				m_colourBuffer;
 	GLuint				m_indexBuffer;
+	GLuint				m_uvBuffer;
 
 public:
 

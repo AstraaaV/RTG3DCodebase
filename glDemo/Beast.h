@@ -11,6 +11,7 @@ public:
 	~Beast() override;
 
 	void Tick(float dt, GLFWwindow* window) override;
+	void Load(std::ifstream& file) override;
 	void Render() override;
 
 	void Init(AIMesh* mesh, glm::vec3 start, glm::vec3 end);

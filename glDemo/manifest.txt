@@ -37,7 +37,7 @@ AMB: 0.4 0.4 0.4
 DIR: 0.0 -1.0 0.0
 }
 
-MODELS 3
+MODELS 4
 {
 TYPE: AI
 NAME: BEAST
@@ -52,12 +52,22 @@ FILE: Assets\\gsphere.obj
 TYPE: CUBE
 NAME: CUBE
 }
+{
+TYPE: AI
+NAME: DOOR
+FILE: Assets\\door\\dungeon_door_stableprojectorz_obj.obj
+}
 
 TEXTURES 12
 {
 TYPE: FIF_BMP
 NAME: BEAST
 FILE: Assets\\beast\\beast_texture.bmp
+}
+{
+TYPE: FIF_PNG
+NAME: DOOR
+FILE: Assets\\door\\Tex_StableProjectorz_2048.obj
 }
 {
 TYPE: FIF_JPEG
@@ -139,18 +149,18 @@ FRAGFILE: Assets\\Shaders\\texture-pointlight.frag
 
 GAMEOBJECTS 2
 {
-TYPE: EXAMPLE
-NAME: TEST
-POS: 0.0 0.0 0.0
-MODEL: CUBE
-TEXTURE: ROCK
-SHADER: TEXDIR
-}
-{
-TYPE: EXAMPLE
+TYPE: BEAST
 NAME: BEAST
 POS: -2.0 0.0 0.0
 MODEL: BEAST
 TEXTURE: BEAST
+SHADER: TEXDIR
+}
+{
+TYPE: BASIC
+NAME: DOOR
+POS: 3.0 0.0 2.0
+MODEL: DOOR
+TEXTURE: DOOR
 SHADER: TEXDIR
 }

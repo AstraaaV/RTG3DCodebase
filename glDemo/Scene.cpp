@@ -140,9 +140,11 @@ Model* Scene::GetModel(string _modelName)
 
 Shader* Scene::GetShader(string _shaderName)
 {
+	_shaderName = Trim(_shaderName);
+
 	for (list<Shader*>::iterator it = m_Shaders.begin(); it != m_Shaders.end(); it++)
 	{
-		if ((*it)->GetName() == _shaderName)
+		if (Trim((*it)->GetName()) == Trim(_shaderName))
 		{
 			return (*it);
 		}
@@ -186,14 +188,14 @@ void Scene::Render()
 		if (obj->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
 		{
 			//set shader program using
-			Shader* shader = obj->GetShader();
+			/*Shader* shader = obj->GetShader();
 			if (!shader)
 			{
 				cout << "[Scene] Warning: Shader not set for GO. " << obj->GetName() << "\n";
 				continue;
-			}
+			}*/
 
-			GLuint SP = shader->GetProg();
+			GLuint SP = m_texDirLightShader;
 			glUseProgram(SP);
 
 			if (obj->GetTexture())
@@ -333,22 +335,33 @@ void Scene::Load(ifstream& _file)
 	cout << "SHADERS : " << m_numShaders << endl;
 	for (int i = 0; i < m_numShaders; i++)
 	{
-		//skip {
-		_file.ignore(256, '\n');
-		cout << "{\n";
+		string line, name, vertFile, fragFile;
 
-		Shader* shader = new Shader(_file);
+		while (getline(_file, line))
+		{
+			if (Trim(line) == "{") break;
+		}
+
+		while (getline(_file, line))
+		{
+			line = Trim(line);
+			if (line == "}") break;
+
+			if (line.find("NAME:") == 0)
+				name = Trim(line.substr(5));
+			else if (line.find("VERTFILE:") == 0)
+				vertFile = Trim(line.substr(9));
+			else if (line.find("FRAGFILE:") == 0)
+				fragFile = Trim(line.substr(9));
+		}
+
+		Shader* shader = new Shader(name, vertFile, fragFile);
 		m_Shaders.push_back(shader);
 
-		string shaderName = shader->GetName();
-		if (shaderName == "TEXDIR")
+		if (name == "TEXDIR")
 			m_texDirLightShader = shader->GetProg();
-		if (shaderName == "TEXPOINT")
+		else if (name == "TEXPOINT")
 			m_texPointLightShader = shader->GetProg();
-
-		//skip }
-		_file.ignore(256, '\n');
-		cout << "}\n";
 	}
 
 	cout << endl << endl;
@@ -357,19 +370,22 @@ void Scene::Load(ifstream& _file)
 	_file >> dummy >> m_numGameObjects;
 	_file.ignore(256, '\n');
 	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
-	
+
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
 		string line;
 		string type;
 
+		std::streampos blockStart;
+
 		while (getline(_file, line))
 		{
-			line = Trim(line);
-			if (line == "{") break;
+			if (Trim(line) == "{")
+			{
+				blockStart = _file.tellg();
+				break;
+			}
 		}
-
-		std::streampos blockStart = _file.tellg();
 
 		while (getline(_file, line))
 		{
@@ -379,6 +395,7 @@ void Scene::Load(ifstream& _file)
 			if (line.find("TYPE:") == 0)
 			{
 				type = Trim(line.substr(line.find(":") + 1));
+				break;
 			}
 		}
 
@@ -406,7 +423,18 @@ void Scene::Load(ifstream& _file)
 		{
 			if (Trim(line) == "}") break;
 		}
-	
+	}
+
+	if (m_numShaders == 0)
+	{
+		Shader* dirShader = new Shader("TEXDIR", "Assets\\Shaders\\texture-directional.vert", "Assets\\Shaders\\texture-directional.frag");
+		Shader* pointShader = new Shader("TEXDIR", "Assets\\Shaders\\texture-pointlight.vert", "Assets\\Shaders\\texture-pointlight.frag");
+
+		m_Shaders.push_back(dirShader);
+		m_Shaders.push_back(pointShader);
+
+		m_texDirLightShader = dirShader->GetProg();
+		m_texPointLightShader = pointShader->GetProg();
 	}
 }
 
@@ -444,6 +472,9 @@ void Scene::Init()
 	{
 		(*it)->Init(this);
 	}
+
+	m_map = new Map();
+	m_map->SpawnIntoMap(this);
 }
 
 void Scene::CycleCams()
@@ -466,4 +497,10 @@ void Scene::SetLightsEnabled(bool _enabled)
 		if(light)
 			light->SetEnabled(_enabled);
 	}
+}
+
+void Scene::AddLight(Light* light)
+{
+	if (light)
+		m_Lights.push_back(light);
 }

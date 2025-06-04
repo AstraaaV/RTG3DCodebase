@@ -63,10 +63,10 @@ void GameObject::Init(Scene* scene)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(3);
 
 	glBindVertexArray(0);
@@ -148,7 +148,7 @@ void GameObject::Load(std::ifstream& file)
 		m_model = m_scene->GetModel(m_modelName);
 		if (!m_model)
 		{
-			cout << "[GameObject::Load] Warning: Model \"" << m_textureName << "\" not found for " << m_name << "\n";
+			cout << "[GameObject::Load] Warning: Model \"" << m_modelName << "\" not found for " << m_name << "\n";
 		}
 	}
 	else
@@ -175,4 +175,7 @@ void GameObject::Load(std::ifstream& file)
 		<< " | Shader: " << (m_shader ? m_shaderName : "nullptr") << "";
 
 	m_renderPass = RP_OPAQUE;
+
+	if (!m_model)
+		Init(m_scene);
 }

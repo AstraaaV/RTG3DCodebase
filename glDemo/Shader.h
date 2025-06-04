@@ -10,6 +10,7 @@ class Shader
 {
 public:
 	Shader(ifstream& _file);
+	Shader(const std::string& name, const std::string& vertFile, const std::string& fragFile);
 	~Shader();
 
 	GLuint GetProg() { return m_shaderProg; }
@@ -18,5 +19,7 @@ public:
 protected:
 	string m_name;
 	GLuint m_shaderProg;
+	string m_vertFilename;
+	string m_fragFilename;
 
 };

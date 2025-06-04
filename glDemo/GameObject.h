@@ -32,6 +32,10 @@ public:
 	void SetRenderPass(int pass) { m_renderPass = pass; }
 	int GetRenderPass() const { return m_renderPass; }
 
+	void SetShader(Shader* shader) { m_shader = shader; }
+	void SetTexture(Texture* texture) { m_texture = texture; }
+	void SetModel(Model* model) { m_model = model; }
+
 	Shader* GetShader() const { return m_shader; }
 	Texture* GetTexture() const { return m_texture; }
 	Model* GetModel() const { return m_model; }

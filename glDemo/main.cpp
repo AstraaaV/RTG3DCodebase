@@ -95,8 +95,8 @@ int main()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearDepth(1.0f);
 	glPolygonMode(GL_FRONT, GL_FILL); //Normal solid render
-	//glPolygonMode(GL_BACK, GL_LINE); // Draws back faces as wireframe (debugging)
 	glFrontFace(GL_CCW);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // Add this in your Scene::Render() or main loop
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glEnable(GL_DEPTH_TEST);

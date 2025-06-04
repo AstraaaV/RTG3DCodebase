@@ -59,6 +59,11 @@ void Beast::Tick(float dt, GLFWwindow* window)
 	}
 }
 
+void Beast::Load(std::ifstream& file)
+{
+	GameObject::Load(file);
+}
+
 void Beast::Render()
 {
 	if (!m_mesh || m_shaderID == 0) return;
