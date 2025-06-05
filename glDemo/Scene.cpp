@@ -369,3 +369,62 @@ void Scene::CycleCameras()
 
 	std::cout << "Switched to camera: " << m_useCamera->GetName() << std::endl;
 }
+
+void Scene::LoadMap()
+{
+	m_mapLayout =
+	{
+		"WWWWWWWWWW",
+		"W..T.....W",
+		"W..D..P..W",
+		"W........W",
+		"WWWWWWWWWW"
+	};
+
+	float tileSize = 1.0f;
+	for (int z = 0; z < m_mapLayout.size(); ++z)
+	{
+		const std::string& row = m_mapLayout[z];
+
+		for (int x = 0; x < row.size(); ++x)
+		{
+			char tile = row[x];
+
+			if (tile == 'W')
+			{
+				GameObject* wall = new GameObject();
+
+				wall->SetName("WALL_" + std::to_string(x) + "_" + std::to_string(z));
+				wall->SetModel(GetModel("CUBE"));
+				wall->SetTexture(GetTexture("ROCK"));
+				wall->SetShader(GetShader("TEXDIR"));
+				wall->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
+				wall->SetScale(vec3(1.0f));
+
+				AddGameObject(wall);
+			}
+
+			else if (tile == 'T')
+			{
+				GameObject* torch = new GameObject();
+
+				torch->SetName("TORCH_" + std::to_string(x) + "_" + std::to_string(z));
+				torch->SetModel(GetModel("CUBE"));
+				torch->SetTexture(GetTexture("ROCK"));
+				torch->SetShader(GetShader("TEXDIR"));
+				torch->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
+				torch->SetScale(vec3(0.5f));
+
+				AddGameObject(torch);
+
+				Light* point = new Light();
+				point->SetName("TORCH_LIGHT_" + std::to_string(x) + "_" + std::to_string(z));
+				point->SetPos(vec3(x * tileSize, 1.5f, z * tileSize));
+				point->SetColour(vec3(1.0f, 0.5f, 0.2f));
+				point->SetAmbient(vec3(0.1f, 0.05f, 0.02f));
+
+				m_Lights.push_back(point);
+			}
+		}
+	}
+}

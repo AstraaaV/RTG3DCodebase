@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string>
 #include "RenderPass.h"
+#include "Shader.h"
+#include "Model.h"
+#include "Texture.h"
 
 using namespace std;
 class Scene;
@@ -27,7 +30,13 @@ public:
 	virtual void Render();//render this object
 
 	//various getters and setters
+	void SetModel(Model* model) { m_model = model; }
+	void SetTexture(Texture* tex) { m_texture = tex; }
+	void SetShader(Shader* shader) { m_shader = shader; }
+	void SetPos(const glm::vec3& pos) { m_pos = pos; }
+	void SetScale(const glm::vec3& scale) { m_scale = scale; }
 	void SetName(string _name) { m_name = _name; }
+	
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
 
@@ -41,6 +50,10 @@ protected:
 
 	string m_name;
 	string m_type;
+
+	Model* m_model = nullptr;
+	Texture* m_texture = nullptr;
+	Shader* m_shader = nullptr;
 
 	vec3		m_pos;
 	vec3		m_rot;

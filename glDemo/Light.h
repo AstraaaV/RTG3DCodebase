@@ -30,6 +30,10 @@ public:
 	void SetTye(string _type) { m_type = _type; }
 	string GetType() { return m_type; }
 
+	void SetColour(const vec3& col) { m_col = col; }
+	void SetAmbient(const vec3& amb) { m_amb = amb; }
+	void SetPos(const vec3& pos) { m_pos = pos; }
+
 	vec3 GetCol() { return m_col; }
 	vec3 GetAmb() { return m_amb; }
 	vec3 GetPos() { return m_pos; }

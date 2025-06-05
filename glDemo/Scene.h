@@ -48,6 +48,7 @@ public:
 	void Init();
 
 	void CycleCameras();
+	void LoadMap();
 
 protected:
 
@@ -64,6 +65,8 @@ protected:
 	std::list<Texture*>		m_Textures;
 	std::list<Shader*>		m_Shaders;
 	std::list<GameObject*> m_GameObjects;
+
+	std::vector<std::string> m_mapLayout;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
