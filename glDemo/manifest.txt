@@ -1,4 +1,4 @@
-CAMERAS 4
+CAMERAS 5
 {
 TYPE: CAMERA
 NAME: CAM1
@@ -31,6 +31,15 @@ TYPE: CAMERA
 NAME: CAM4
 POS:  0.0 5.0 -5.0
 LOOKAT: 0.0 0.0 0.0
+FOV: 45.0
+NEAR: 0.5
+FAR 100.0
+}
+{
+TYPE: CAMERA
+NAME: OVERVIEW
+POS:  5.0 12.0 2.5
+LOOKAT: 5.0 0.0 2.5
 FOV: 45.0
 NEAR: 0.5
 FAR 100.0
@@ -74,7 +83,7 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 3
+MODELS 4
 {
 TYPE: AI
 NAME: BEAST
@@ -86,11 +95,16 @@ NAME: SPHERE
 FILE: Assets\\gsphere.obj
 }
 {
+TYPE: AI
+NAME: WALL
+FILE: Assets\\wall\\sample_wall.obj
+}
+{
 TYPE: CUBE
 NAME: CUBE
 }
 
-TEXTURES 5
+TEXTURES 8
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -115,6 +129,21 @@ FILE: Assets\\Textures\\stars.jpg
 TYPE: FIF_JPEG
 NAME: STARS2
 FILE: Assets\\Textures\\stars2.jpg
+}
+{
+TYPE: FIF_JPEG
+NAME: WALL_DIFFUSE
+FILE: Assets\\Textures\\diffuse_old_stone_walls.jpg
+}
+{
+TYPE: FIF_JPEG
+NAME: WALL_NORMAL
+FILE: Assets\\Textures\\normal_old_stone_walls.jpg
+}
+{
+TYPE: FIF_JPEG
+NAME: WALL_ROUGH
+FILE: Assets\\Textures\\roughness_old_stone_walls.jpg
 }
 
 SHADERS 3

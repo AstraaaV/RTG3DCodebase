@@ -338,7 +338,7 @@ void Scene::Init()
 
 		//if a camera is called MAIN
 		//this will be the starting camera used
-		if ((*it)->GetName() == "MAIN")
+		if ((*it)->GetName() == "OVERVIEW")
 		{
 			m_useCamera = (*it);
 			m_useCameraIndex = count;
@@ -389,9 +389,12 @@ void Scene::LoadMap()
 	};
 
 	float tileSize = 1.0f;
-	for (int z = 0; z < m_mapLayout.size(); ++z)
+	int numRows = static_cast<int>(m_mapLayout.size());
+
+	for (int z = 0; z < numRows; ++z)
 	{
 		const std::string& row = m_mapLayout[z];
+		int flipZ = numRows - 1 - z;
 
 		for (int x = 0; x < row.size(); ++x)
 		{
@@ -403,10 +406,10 @@ void Scene::LoadMap()
 
 				wall->SetName("WALL_" + std::to_string(x) + "_" + std::to_string(z));
 				wall->SetModel(GetModel("CUBE"));
-				wall->SetTexture(GetTexture("ROCK"));
-				wall->SetShader(GetShader("TEXMAP"));
-				wall->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
-				wall->SetScale(vec3(1.0f));
+				wall->SetTexture(GetTexture("WALL_DIFFUSE"));
+				wall->SetShader(GetShader("TEXDIR"));
+				wall->SetPos(vec3(x * tileSize, 1.0f, flipZ * tileSize));
+				wall->SetScale(vec3(1.0f, 2.0f, 1.0f));
 
 				AddGameObject(wall);
 			}
@@ -416,17 +419,17 @@ void Scene::LoadMap()
 				GameObject* torch = new GameObject();
 
 				torch->SetName("TORCH_" + std::to_string(x) + "_" + std::to_string(z));
-				torch->SetModel(GetModel("SPHERE"));
+				torch->SetModel(GetModel("WALL"));
 				torch->SetTexture(GetTexture("ROCK"));
 				torch->SetShader(GetShader("TEXDIR"));
-				torch->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
+				torch->SetPos(vec3(x * tileSize, 0.0f, flipZ * tileSize));
 				torch->SetScale(vec3(0.5f));
 
 				AddGameObject(torch);
 
 				Light* point = new Light();
 				point->SetName("TORCH_LIGHT_" + std::to_string(x) + "_" + std::to_string(z));
-				point->SetPos(vec3(x * tileSize, 1.5f, z * tileSize));
+				point->SetPos(vec3(x * tileSize, 1.5f, flipZ * tileSize));
 				point->SetColour(vec3(1.0f, 0.5f, 0.2f));
 				point->SetAmbient(vec3(0.1f, 0.05f, 0.02f));
 
@@ -438,10 +441,9 @@ void Scene::LoadMap()
 				GameObject* door = new GameObject();
 
 				door->SetName("DOOR_" + std::to_string(x) + "_" + std::to_string(z));
-				door->SetModel(GetModel("CUBE"));
-				door->SetTexture(GetTexture("ROCK"));
-				door->SetShader(GetShader("TEXMAP"));
-				door->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
+				door->SetModel(GetModel("WALL"));
+				door->SetTexture(GetTexture("ROCK"));	door->SetShader(GetShader("FLAT"));
+				door->SetPos(vec3(x * tileSize, 0.0f, flipZ * tileSize));
 				door->SetScale(vec3(1.0f, 1.5f, 0.1f));
 
 				AddGameObject(door);
@@ -453,7 +455,7 @@ void Scene::LoadMap()
 
 				if (beast)
 				{
-					beast->SetPos(vec3(x * tileSize, 0.0, z * tileSize));
+					beast->SetPos(vec3(x * tileSize, 0.0, flipZ * tileSize));
 				}
 			}
 		}
