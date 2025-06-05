@@ -425,6 +425,30 @@ void Scene::LoadMap()
 
 				m_Lights.push_back(point);
 			}
+
+			else if (tile == 'D')
+			{
+				GameObject* door = new GameObject();
+
+				door->SetName("DOOR_" + std::to_string(x) + "_" + std::to_string(z));
+				door->SetModel(GetModel("CUBE"));
+				door->SetTexture(GetTexture("ROCK"));
+				door->SetShader(GetShader("TEXDIR"));
+				door->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
+				door->SetScale(vec3(1.0f, 1.5f, 0.1f));
+
+				AddGameObject(door);
+			}
+
+			else if (tile == 'P')
+			{
+				GameObject* player = new GameObject();
+
+				if (player)
+				{
+					player->SetPos(vec3(x * tileSize, 0.0, z * tileSize));
+				}
+			}
 		}
 	}
 }
