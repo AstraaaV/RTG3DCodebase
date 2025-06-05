@@ -16,6 +16,7 @@ public:
 	void MoveUp(float amount);
 	void Rotate(float yawDt, float pitchDt);
 
+	void ProcessMouse(float deltaX, float deltaY);
 
 private:
 	float m_yaw, m_pitch;

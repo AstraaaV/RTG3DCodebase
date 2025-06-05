@@ -56,6 +56,21 @@ void FirstPersonCamera::Rotate(float yawDt, float pitchDt)
 	updateCamVectors();
 }
 
+void FirstPersonCamera::ProcessMouse(float deltaX, float deltaY)
+{
+	float sensitivity = 0.1f;
+	deltaX *= sensitivity;
+	deltaY *= sensitivity;
+
+	m_yaw += deltaX;
+	m_pitch += deltaY;
+
+	if (m_pitch > 89.0f) m_pitch = 89.0f;
+	if (m_pitch < -89.0f) m_pitch = -89.0f;
+
+	updateCamVectors();
+}
+
 void FirstPersonCamera::updateCamVectors()
 {
 	vec3 front;

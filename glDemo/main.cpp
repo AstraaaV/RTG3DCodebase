@@ -318,9 +318,9 @@ void updateScene()
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 			fpc->MoveForward(-speed);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			fpc->MoveRight(speed);
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			fpc->MoveRight(-speed);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			fpc->MoveRight(speed);
 		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 			fpc->MoveUp(speed);
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
@@ -397,15 +397,20 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 {
-	if (g_mouseDown) {
+	if (g_mouseDown && g_Scene) {
 
 		//float tDelta = gameClock->gameTimeDelta();
 
 		float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
 		float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
 
-		if (g_mainCamera)
-			g_mainCamera->rotateCamera(-dy, -dx);
+		Camera* activeCam = g_Scene->GetActiveCamera();
+
+		FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(activeCam);
+		if (fpc)
+		{
+			fpc->ProcessMouse(dx, -dy);
+		}
 
 		g_prevMouseX = _xpos;
 		g_prevMouseY = _ypos;
