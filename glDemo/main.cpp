@@ -322,6 +322,8 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 // Function to call to handle keyboard input
 void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods)
 {
+	static bool cKeyPressed = false;
+
 	if (_action == GLFW_PRESS) {
 
 		// check which key was pressed...
@@ -334,9 +336,19 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		case GLFW_KEY_SPACE:
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
+			break;
+
+		case GLFW_KEY_C:
+			if (!cKeyPressed)
+			{
+				if (g_Scene) g_Scene->CycleCameras();
+				cKeyPressed = true;
+			}
+			break;
 
 		default:
 		{
+			break;
 		}
 		}
 	}
@@ -345,13 +357,17 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		// handle key release events
 		switch (_key)
 		{
+		case GLFW_KEY_C:
+			cKeyPressed = false;
+			break;
+
 		default:
 		{
+			break;
 		}
 		}
 	}
 }
-
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 {

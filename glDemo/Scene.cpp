@@ -355,3 +355,17 @@ void Scene::Init()
 		(*it)->Init(this);
 	}
 }
+
+void Scene::CycleCameras()
+{
+	if (m_Cameras.empty()) return;
+
+	auto it = std::find(m_Cameras.begin(), m_Cameras.end(), m_useCamera);
+
+	if (it != m_Cameras.end() && ++it != m_Cameras.end())
+		m_useCamera = *it;
+	else
+		m_useCamera = m_Cameras.front();
+
+	std::cout << "Switched to camera: " << m_useCamera->GetName() << std::endl;
+}
