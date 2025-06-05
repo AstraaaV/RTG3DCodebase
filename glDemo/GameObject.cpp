@@ -1,7 +1,9 @@
 #include "core.h"
 #include "GameObject.h"
 #include "stringHelp.h"
+#include <sstream>
 #include "helper.h"
+#include "Scene.h"
 
 using namespace glm;
 
@@ -16,11 +18,50 @@ GameObject::~GameObject()
 
 void GameObject::Load(ifstream& _file)
 {
-	StringHelp::String(_file, "NAME", m_name);
-	StringHelp::Float3(_file, "POS", m_pos.x, m_pos.y, m_pos.z);
-	StringHelp::Float3(_file, "ROT", m_rot.x, m_rot.y, m_rot.z);
-	StringHelp::Float3(_file, "SCALE", m_scale.x, m_scale.y, m_scale.z);
-	StringHelp::Float3(_file, "ROT INC", m_rot_incr.x, m_rot_incr.y, m_rot_incr.z);
+	string line;
+	while (std::getline(_file, line))
+	{
+		if (line.find("}") != string::npos)
+			break;
+
+		std::istringstream iss(line);
+		string key;
+		iss >> key;
+
+		if (key == "NAME")
+			iss >> m_name;
+		else if (key == "POS")
+			iss >> m_pos.x >> m_pos.y >> m_pos.z;
+		else if (key == "ROT")
+			iss >> m_rot.x >> m_rot.y >> m_rot.z;
+		else if (key == "SCALE")
+			iss >> m_scale.x >> m_scale.y >> m_scale.z;
+		else if (key == "ROTINC")
+			iss >> m_rot_incr.x >> m_rot_incr.y >> m_rot_incr.z;
+		else if (key == "MODEL")
+		{
+			string modelName;
+			iss >> modelName;
+			m_modelName = modelName;
+		}
+		else if (key == "TEXTURE")
+		{
+			string texName;
+			iss >> texName;
+			m_textureName = texName;
+		}
+		else if (key == "SHADER")
+		{
+			string shaderName;
+			iss >> shaderName;
+			m_shaderName = shaderName;
+		}
+	}
+	cout << "[DEBUG] GO loaded: " << m_name << "\n";
+
+	if (m_modelName.empty()) cout << "[WARN] " << m_name << " has no model assigned!\n";
+	if (m_textureName.empty()) cout << "[WARN] " << m_name << " has no texture assigned!\n";
+	if (m_shaderName.empty()) cout << "[WARN] " << m_name << " has no shader assigned!\n";
 }
 
 void GameObject::Tick(float _dt)
@@ -91,5 +132,14 @@ void GameObject::EnablePacing(const glm::vec3& direction, float distance, float 
 
 void GameObject::Init(Scene* _scene)
 {
-	//I have nothing to link up to
+	m_scene = _scene;
+
+	if (!m_model && !m_modelName.empty())
+		m_model = _scene->GetModel(m_modelName);
+
+	if (!m_texture && !m_textureName.empty())
+		m_texture = _scene->GetTexture(m_textureName);
+
+	if (!m_shader && !m_shaderName.empty())
+		m_shader = _scene->GetShader(m_shaderName);
 }

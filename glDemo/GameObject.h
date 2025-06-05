@@ -38,9 +38,13 @@ public:
 	void SetName(string _name) { m_name = _name; }
 	void SetAnimated(bool anim) { m_isAnimated = anim; }
 	void EnablePacing(const glm::vec3& direction, float distance, float speed);
+	void EnableFloating(bool state) { m_isAnimated = state; m_basePos = m_pos; }
 
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
+	Model* GetModel() const { return m_model; }
+	Texture* GetTexture() const { return m_texture; }
+	Shader* GetShader() const { return m_shader; }
 
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
@@ -52,10 +56,14 @@ protected:
 
 	string m_name;
 	string m_type;
+	string m_modelName;
+	string m_textureName;
+	string m_shaderName;
 
 	Model* m_model = nullptr;
 	Texture* m_texture = nullptr;
 	Shader* m_shader = nullptr;
+	Scene* m_scene = nullptr;
 
 	vec3		m_pos;
 	vec3		m_rot;

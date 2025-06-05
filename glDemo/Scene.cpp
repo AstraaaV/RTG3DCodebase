@@ -147,8 +147,9 @@ void Scene::Render()
 		{
 			GLuint shaderProg = (*it)->GetShaderProg();
 			glUseProgram(shaderProg);
-			if (m_activeCamera
-				)m_activeCamera->SetRenderValues(shaderProg);
+
+			if (m_activeCamera)
+				m_activeCamera->SetRenderValues(shaderProg);
 
 			SetShaderUniforms(shaderProg);
 
@@ -332,6 +333,23 @@ void Scene::Load(ifstream& _file)
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
 
+		std::cout << "[DEBUG] GO loaded: " << newGO->GetName() << std::endl;
+
+		if (!newGO->GetModel())
+		{
+			cout << "[WARN] " << newGO->GetName() << " has no model assigned!" << std::endl;
+		}
+
+		if (!newGO->GetTexture())
+		{
+			cout << "[WARN] " << newGO->GetName() << " has no texture assigned!" << std::endl;
+		}
+
+		if (!newGO->GetShaderProg() == 0)
+		{
+			cout << "[WARN] " << newGO->GetName() << " has no shader assigned!" << std::endl;
+		}
+
 		m_GameObjects.push_back(newGO);
 
 		//skip }
@@ -431,7 +449,7 @@ void Scene::LoadMap()
 		"WWWWWWWWWW",
 		"W..T.....W",
 		"W..D..P..W",
-		"W........W",
+		"W....G...W",
 		"WWWWWWWWWW"
 	};
 
@@ -506,6 +524,17 @@ void Scene::LoadMap()
 					beast->SetPos(pos);
 					beast->SetAnimated(true);
 					beast->EnablePacing(glm::vec3(1.0f, 0.0f, 0.0f), 2.0f, 1.5f);
+				}
+			}
+
+			else if (tile == 'G')
+			{
+				GameObject* ghost = GetGameObject("GHOST");
+
+				if (ghost)
+				{
+					ghost->SetPos(vec3(6.0f, 0.0f, 6.0f));
+					ghost->EnableFloating(true);
 				}
 			}
 		}
