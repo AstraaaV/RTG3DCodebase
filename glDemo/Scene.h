@@ -1,6 +1,5 @@
 #pragma once
 #include "core.h"
-#include "Map.h"
 #include <list>
 #include <string>
 #include <fstream>
@@ -22,10 +21,8 @@ public:
 	Scene();
 	~Scene();
 
-	inline std::string Trim(const std::string& str);
-
 	//tick all GOs
-	void Update(float _dt, GLFWwindow* window);
+	void Update(float _dt);
 
 	//add this GO to my list
 	void AddGameObject(GameObject* _new);
@@ -33,7 +30,6 @@ public:
 	//return a pointer to a given thing by its name
 	GameObject* GetGameObject(string _GOName);
 	Camera* GetCamera(string _camName);
-	Camera* GetActiveCamera() const;
 	Light* GetLight(string _lightName);
 	Texture* GetTexture(string _texName);
 	Model* GetModel(string _modelName);
@@ -51,11 +47,6 @@ public:
 	//initialise links between items in the scene
 	void Init();
 
-	void CycleCams();
-	void SetCamera(Camera* cam);
-	void SetLightsEnabled(bool _enabled);
-	void AddLight(Light* light);
-
 protected:
 
 	//data structures containing pointers to all our stuff
@@ -72,14 +63,7 @@ protected:
 	std::list<Shader*>		m_Shaders;
 	std::list<GameObject*> m_GameObjects;
 
-	std::vector<Light*> m_lights;
-	Map* m_map = nullptr;
-
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
-
-	GLFWwindow* m_window = nullptr;
-	GLuint m_texDirLightShader = 0;
-	GLuint m_texPointLightShader = 0;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

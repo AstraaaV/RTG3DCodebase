@@ -1,8 +1,5 @@
 #include "CameraFactory.h"
 #include "Camera.h"
-#include "FirstPersonCamera.h"
-#include "ArcballCamera.h"
-#include "IsometricCamera.h"
 #include <assert.h>
 
 using std::string;
@@ -10,17 +7,9 @@ using std::string;
 Camera* CameraFactory::makeNewCam(string _type)
 {
 	printf("CAM TYPE: %s \n", _type.c_str());
-	if (_type == "Arcball")
+	if (_type == "CAMERA")
 	{
-		return new ArcballCamera();
-	}
-	else if (_type == "Isometric")
-	{
-		return new IsometricCamera();
-	}
-	else if (_type == "FirstPerson")
-	{
-		return new FirstPersonCamera();
+		return new Camera();
 	}
 	else
 	{

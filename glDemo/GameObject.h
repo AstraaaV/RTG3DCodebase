@@ -1,9 +1,8 @@
 #pragma once
 #include "core.h"
+#include <stdio.h>
 #include <string>
-#include "Shader.h"
-#include "Texture.h"
-#include "Model.h"
+#include "RenderPass.h"
 
 using namespace std;
 class Scene;
@@ -17,52 +16,40 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	virtual void Init(Scene* scene);
-	virtual void Tick(float deltaTime, GLFWwindow* window);
-	virtual void Render();
-	virtual void PreRender() {}
-	virtual void Load(std::ifstream& file);
+	//load me from the file
+	virtual void Load(ifstream& _file);
 
-	void SetName(const std::string& name) { m_name = name; }
-	std::string GetName() const { return m_name; }
+	//update the GameObject
+	//TODO: possibly pass keyboard / mouse stuff down here for player controls?
+	virtual void Tick(float _dt);
 
-	glm::vec3 GetPosition() const { return m_pos; }
-	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
+	virtual void PreRender();//set up any shader values needed for this object
+	virtual void Render();//render this object
 
-	void SetRenderPass(int pass) { m_renderPass = pass; }
-	int GetRenderPass() const { return m_renderPass; }
+	//various getters and setters
+	void SetName(string _name) { m_name = _name; }
+	string GetName() { return m_name; }
+	GLuint GetShaderProg() { return m_ShaderProg; }
 
-	void SetShader(Shader* shader) { m_shader = shader; }
-	void SetTexture(Texture* texture) { m_texture = texture; }
-	void SetModel(Model* model) { m_model = model; }
+	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
+	virtual void Init(Scene* _scene);
 
-	Shader* GetShader() const { return m_shader; }
-	Texture* GetTexture() const { return m_texture; }
-	Model* GetModel() const { return m_model; }
-
-	unsigned int GetRP() const { return m_renderPass; }
+	//this GameObject should be drawn in THIS render pass
+	RenderPass GetRP() { return m_RP; }
 
 protected:
 
 	string m_name;
 	string m_type;
 
-	glm::vec3 m_pos = glm::vec3(0.0f);
-	glm::mat4 m_modelMatrix = glm::mat4(1.0f);
+	vec3		m_pos;
+	vec3		m_rot;
+	vec3		m_scale;
+	vec3		m_rot_incr;
 
-	GLuint m_VAO = 0;
-	GLuint m_VBO = 0;
-	GLuint m_EBO = 0;
+	glm::mat4	m_worldMatrix;
 
-	int m_renderPass = 0;
+	GLuint m_ShaderProg;
 
-	Scene* m_scene = nullptr;
-	Shader* m_shader = nullptr;
-	Texture* m_texture = nullptr;
-	Model* m_model = nullptr;
-
-	string m_modelName;
-	string m_textureName;
-	string m_shaderName;
+	RenderPass m_RP = RP_OPAQUE;
 };
-

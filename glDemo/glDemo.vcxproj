@@ -140,20 +140,14 @@
     <ClInclude Include="AIMesh.h" />
     <ClInclude Include="AIModel.h" />
     <ClInclude Include="ArcballCamera.h" />
-    <ClInclude Include="Background.h" />
-    <ClInclude Include="Beast.h" />
     <ClInclude Include="CameraFactory.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="FirstPersonCamera.h" />
-    <ClInclude Include="IsometricCamera.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="ExampleGO.h" />
     <ClInclude Include="FreeImage\FreeImage.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="GameObject.h" />
@@ -177,19 +171,13 @@
     <ClCompile Include="AIMesh.cpp" />
     <ClCompile Include="AIModel.cpp" />
     <ClCompile Include="ArcballCamera.cpp" />
-    <ClCompile Include="Background.cpp" />
-    <ClCompile Include="Beast.cpp" />
     <ClCompile Include="CameraFactory.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FirstPersonCamera.cpp" />
-    <ClCompile Include="IsometricCamera.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="ExampleGO.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
@@ -210,12 +198,8 @@
   <ItemGroup>
     <None Include="Assets\Shaders\flatColour.frag" />
     <None Include="Assets\Shaders\flatColour.vert" />
-    <None Include="Assets\Shaders\flatTexture.frag" />
-    <None Include="Assets\Shaders\flatTexture.vert" />
     <None Include="Assets\Shaders\texture-directional.frag" />
     <None Include="Assets\Shaders\texture-directional.vert" />
-    <None Include="Assets\Shaders\texture-pointlight.frag" />
-    <None Include="Assets\Shaders\texture-pointlight.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

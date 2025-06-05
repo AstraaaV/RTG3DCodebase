@@ -117,24 +117,6 @@
     <ClInclude Include="DirectionLight.h">
       <Filter>Scene Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IsometricCamera.h">
-      <Filter>Base Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FirstPersonCamera.h">
-      <Filter>Base Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Base Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Background.h">
-      <Filter>Base Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Beast.h">
-      <Filter>Scene Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Base Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -206,24 +188,6 @@
     <ClCompile Include="DirectionLight.cpp">
       <Filter>Scene Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IsometricCamera.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FirstPersonCamera.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Background.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Beast.cpp">
-      <Filter>Scene Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="manifest.txt">
@@ -237,22 +201,10 @@
     <None Include="Assets\Shaders\flatColour.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\flatTexture.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\flatTexture.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Assets\Shaders\texture-directional.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\texture-directional.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\texture-pointlight.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\texture-pointlight.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

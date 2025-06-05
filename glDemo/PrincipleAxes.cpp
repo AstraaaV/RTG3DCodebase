@@ -118,13 +118,5 @@ CGPrincipleAxes::~CGPrincipleAxes() {
 
 void CGPrincipleAxes::render(bool _showZAxis) {
 	glBindVertexArray(m_vao);
-
-	if (_showZAxis)
-	{
-		glDrawElements(GL_LINES, m_numFaces * 3, GL_UNSIGNED_INT, (const GLvoid*)0);
-	}
-	else
-	{
-		glDrawElements(GL_LINES, (m_numFaces - 2) * 3, GL_UNSIGNED_INT, (const GLvoid*)0);
-	}
+	glDrawElements(GL_LINES, m_numFaces * 3, GL_UNSIGNED_INT, (const GLvoid*)0);
 }

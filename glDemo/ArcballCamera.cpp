@@ -184,18 +184,4 @@ glm::mat4 ArcballCamera::projectionTransform() {
 	return m_projectionMatrix;
 }
 
-glm::mat4 ArcballCamera::GetView() const
-{
-	return m_viewMatrix;
-}
-
-glm::mat4 ArcballCamera::GetProj() const
-{
-	return m_projectionMatrix;
-}
-
-void ArcballCamera::Tick(float dt, GLFWwindow* window)
-{
-}
-
 #pragma endregion

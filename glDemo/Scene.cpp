@@ -9,9 +9,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObjectFactory.h"
-#include "RenderPass.h"
 #include <assert.h>
-#include <sstream>
 
 Scene::Scene()
 {
@@ -19,24 +17,12 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	for (auto cam : m_Cameras) delete cam;
-	for (auto light : m_Lights) delete light;
-	for (auto model : m_Models) delete model;
-	for (auto tex : m_Textures) delete tex;
-	for (auto shader : m_Shaders) delete shader;
-	for (auto obj : m_GameObjects) delete obj;
-}
-
-inline std::string Scene::Trim(const std::string& str)
-{
-	size_t first = str.find_first_not_of(" \t\r\n");
-	if (first == std::string::npos) return "";
-	size_t last = str.find_last_not_of(" \t\r\n");
-	return str.substr(first, last - first + 1);
+	//TODO: We are being really naught and not deleting everything as we finish
+	//what shoudl really go here and in similar places throughout the code base?
 }
 
 //tick all my Game Objects, lights and cameras
-void Scene::Update(float _dt, GLFWwindow* window)
+void Scene::Update(float _dt)
 {
 	//update all lights
 	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
@@ -47,13 +33,13 @@ void Scene::Update(float _dt, GLFWwindow* window)
 	//update all cameras
 	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
-		(*it)->Tick(_dt, m_window);
+		(*it)->Tick(_dt);
 	}
 
 	//update all GameObjects
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		(*it)->Tick(_dt, m_window);
+		(*it)->Tick(_dt);
 	}
 }
 
@@ -89,11 +75,6 @@ Camera* Scene::GetCamera(string _camName)
 	printf("Unknown Camera NAME : %s \n", _camName.c_str());
 	assert(0);
 	return nullptr;
-}
-
-Camera* Scene::GetActiveCamera() const
-{
-	return m_useCamera;
 }
 
 Light* Scene::GetLight(string _lightName)
@@ -140,11 +121,9 @@ Model* Scene::GetModel(string _modelName)
 
 Shader* Scene::GetShader(string _shaderName)
 {
-	_shaderName = Trim(_shaderName);
-
 	for (list<Shader*>::iterator it = m_Shaders.begin(); it != m_Shaders.end(); it++)
 	{
-		if (Trim((*it)->GetName()) == Trim(_shaderName))
+		if ((*it)->GetName() == _shaderName)
 		{
 			return (*it);
 		}
@@ -158,60 +137,15 @@ Shader* Scene::GetShader(string _shaderName)
 //Render Everything
 void Scene::Render()
 {
-	if (!m_useCamera)
-	{
-		std::cout << "[Scene::Render] Error. No active camera!\n";
-		return;
-	}
-
-	glm::mat4 view = m_useCamera->GetView();
-	glm::mat4 proj = m_useCamera->GetProj();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (auto light : m_Lights)
-	{
-		if (light && light->GetType() == "POINT")
-		{
-			light->SetRenderValues(m_texPointLightShader);
-		}
-	}
-
 	//TODO: Set up for the Opaque Render Pass will go here
 	//check out the example stuff back in main.cpp to see what needs setting up here
-	for (GameObject* obj : m_GameObjects)
+	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		if (!obj) continue;
-		if (!(obj->GetRP() & RP_OPAQUE))continue;// TODO: note the bit-wise operation. Why?
+		if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
 		{
-		//set shader program using
-		Shader* shader = obj->GetShader();
-		GLuint SP = shader ? shader->GetProg() : m_texDirLightShader;
-
-		if (!shader)
-		{
-			cout << "[Scene] Warning: Shader not set for GO. " << obj->GetName() << "\n";
-			continue;
-		}
-
-		SP = shader->GetProg();
-		glUseProgram(SP);
-
-		if (SP == 0)
-		{
-			cout << "[Render] Shader program is 0.\n";
-		}
-
-			if (obj->GetTexture())
-			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, obj->GetTexture()->GetTexID());
-
-				GLint texLoc = glGetUniformLocation(SP, "texture");
-				if (texLoc >= 0)
-					glUniform1i(texLoc, 0);
-				else
-					cout << "[Scene] Warning: Texture not found in shader for " << obj->GetName() << endl;
-			}
+			//set shader program using
+			GLuint SP = (*it)->GetShaderProg();
+			glUseProgram(SP);
 
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
@@ -220,10 +154,10 @@ void Scene::Render()
 			SetShaderUniforms(SP);
 
 			//set any uniform shader values for the actual model
-			obj->PreRender();
+			(*it)->PreRender();
 
 			//actually render the GameObject
-			obj->Render();
+			(*it)->Render();
 		}
 	}
 
@@ -246,8 +180,6 @@ void Scene::Load(ifstream& _file)
 
 	//load Cameras
 	_file >> dummy >> m_numCameras; _file.ignore(256, '\n');
-	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
-
 	cout << "CAMERAS : " << m_numCameras << endl;
 	for (int i = 0; i < m_numCameras; i++)
 	{
@@ -271,8 +203,6 @@ void Scene::Load(ifstream& _file)
 
 	//load Lights
 	_file >> dummy >> m_numLights; _file.ignore(256, '\n');
-	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
-
 	cout << "LIGHTS : " << m_numLights << endl;
 	for (int i = 0; i < m_numLights; i++)
 	{
@@ -296,8 +226,6 @@ void Scene::Load(ifstream& _file)
 
 	//load Models
 	_file >> dummy >> m_numModels; _file.ignore(256, '\n');
-	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
-
 	cout << "MODELS : " << m_numModels << endl;
 	for (int i = 0; i < m_numModels; i++)
 	{
@@ -321,8 +249,6 @@ void Scene::Load(ifstream& _file)
 
 	//load Textures
 	_file >> dummy >> m_numTextures; _file.ignore(256, '\n');
-	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
-
 	cout << "TEXTURES : " << m_numTextures << endl;
 	for (int i = 0; i < m_numTextures; i++)
 	{
@@ -340,11 +266,7 @@ void Scene::Load(ifstream& _file)
 	cout << endl << endl;
 
 	//load Shaders
-	_file >> dummy;
-	std::string colon;
-	_file >> colon >> m_numShaders;
-	_file.ignore(256, '\n');
-	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
+	_file >> dummy >> m_numShaders; _file.ignore(256, '\n');
 	cout << "SHADERS : " << m_numShaders << endl;
 	for (int i = 0; i < m_numShaders; i++)
 	{
@@ -362,10 +284,7 @@ void Scene::Load(ifstream& _file)
 	cout << endl << endl;
 
 	//load GameObjects
-	_file >> dummy;
-	_file >> colon >> m_numGameObjects;
-	_file.ignore(256, '\n');
-	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
+	_file >> dummy >> m_numGameObjects; _file.ignore(256, '\n');
 	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
@@ -408,58 +327,15 @@ void Scene::Init()
 	}
 
 	//if no MAIN camera just use the first one
-	if (!m_useCamera && !m_Cameras.empty())
+	if (!m_useCamera)
 	{
 		m_useCamera = (*m_Cameras.begin());
 		m_useCameraIndex = 0;
 	}
-	else if (!m_useCamera)
-	{
-		std::cout << "[Scene::Init] Error. No cameras found in scene.\n";
-	}
+
 	//set up links between everything and GameObjects
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
 		(*it)->Init(this);
 	}
-
-	m_map = new Map();
-	m_map->SpawnIntoMap(this);
-}
-
-void Scene::CycleCams()
-{
-	if (m_Cameras.empty()) return;
-
-	m_useCameraIndex = (m_useCameraIndex + 1) % m_Cameras.size();
-
-	auto it = m_Cameras.begin();
-	std::advance(it, m_useCameraIndex);
-	m_useCamera = *it;
-
-	cout << "Camera switched to: " << m_useCamera->GetName() << std::endl;
-}
-void Scene::SetCamera(Camera* cam)
-{
-	m_useCamera = cam;
-	if (cam)
-	{
-		cout << "[Scene] Cam set to: " << cam->GetName() << endl;
-	}
-}
-
-
-void Scene::SetLightsEnabled(bool _enabled)
-{
-	for (Light* light : m_Lights)
-	{
-		if(light)
-			light->SetEnabled(_enabled);
-	}
-}
-
-void Scene::AddLight(Light* light)
-{
-	if (light)
-		m_Lights.push_back(light);
 }

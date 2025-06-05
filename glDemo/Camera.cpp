@@ -11,16 +11,7 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////////////
 Camera::Camera()
 {
-	m_pos = glm::vec3(0.0f, 0.0f, 3.0f);
-	m_lookAt = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_fov = 45.0f;
-	m_near = 0.1f;
-	m_far = 100.0f;
-	m_aspect = 1.0f;
-	m_type = "BaseCam";
-
-	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, glm::vec3(0, 1, 0));
-	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+	m_type = "CAMERA";
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -30,63 +21,23 @@ Camera::~Camera()
 {
 }
 
-//set the base render values for this camera in the shaders
-void Camera::SetRenderValues(unsigned int shaderProgram)
-{
-	GLint loc;
-
-	glm::mat4 viewMatrix = GetView();
-	glm::mat4 projMatrix = GetProj();
-
-	//matrix for the view transform
-	if (Helper::SetUniformLocation(shaderProgram, "viewMatrix", &loc))
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-	//matrix for the projection transform
-	if (Helper::SetUniformLocation(shaderProgram, "projMatrix", &loc))
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(projMatrix));
-
-	// Camera Position
-	if (Helper::SetUniformLocation(shaderProgram, "cameraPosition", &loc))
-		glUniform3fv(loc, 1, glm::value_ptr(m_pos));
-}
-
 /////////////////////////////////////////////////////////////////////////////////////
 // Init() - 
 /////////////////////////////////////////////////////////////////////////////////////
 void Camera::Init(float _screenWidth, float _screenHeight, Scene* _scene)
 {
-	m_aspect = _screenWidth / _screenHeight;
-	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+	//TODO: move the calculation of the Projection Matrix to Camera::Tick
+	// so that we can do the same rescaling of the aspect ratio to match the current window
+	float aspect_ratio = _screenWidth / _screenHeight;
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), aspect_ratio, m_near, m_far);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Update() - 
 /////////////////////////////////////////////////////////////////////////////////////
-void Camera::Tick(float _dt, GLFWwindow* window)
+void Camera::Tick(float _dt)
 {
 	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, vec3(0, 1, 0));
-
-	// Ensure window is valid before using it
-	if (!window) {
-		std::cerr << "ERROR: GLFW window is null in Camera::Tick()" << std::endl;
-		return;
-	}
-
-	// Update aspect ratio based on window size
-	int width = 1, height = 1;
-	glfwGetFramebufferSize(window, &width, &height);
-
-	if (width <= 0) width = 1;
-	if (height <= 0) height = 1;
-
-	float newAsp = static_cast<float>(width) / static_cast<float>(height);
-	
-	if (fabs(newAsp - m_aspect) > 0.001f)
-	{
-		SetAspect(newAsp);
-		m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
-	}
 }
 
 void Camera::Load(ifstream& _file)
@@ -97,4 +48,22 @@ void Camera::Load(ifstream& _file)
 	StringHelp::Float(_file, "FOV", m_fov);
 	StringHelp::Float(_file, "NEAR", m_near);
 	StringHelp::Float(_file, "FAR", m_far);
+}
+
+//set the base render values for this camera in the shaders
+void Camera::SetRenderValues(unsigned int _prog)
+{
+	GLint loc;
+
+	//matrix for the view transform
+	if (Helper::SetUniformLocation(_prog, "viewMatrix", &loc))
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(GetView()));
+
+	//matrix for the projection transform
+	if (Helper::SetUniformLocation(_prog, "projMatrix", &loc))
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(GetProj()));
+
+	//the current camera is at this position
+	if (Helper::SetUniformLocation(_prog, "camPos", &loc))
+		glUniform3fv(loc, 1, glm::value_ptr(GetPos()));
 }

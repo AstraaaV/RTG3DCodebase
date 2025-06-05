@@ -1,11 +1,10 @@
 #pragma once
 
 #include "core.h"
-#include "Model.h"
-#include "GameObject.h"
 
 
-class CGPrincipleAxes : public Model, public GameObject {
+
+class CGPrincipleAxes {
 
 private:
 

@@ -1,43 +1,80 @@
-CAMERAS 3
+CAMERAS 4
 {
-TYPE: Arcball
-NAME: ARC
+TYPE: CAMERA
+NAME: CAM1
+POS:  5.0 5.0 0.0
+LOOKAT: 0.0 0.0 0.0
+FOV: 45.0
+NEAR: 0.5
+FAR 100.0
+}
+{
+TYPE: CAMERA
+NAME: CAM2
 POS:  -5.0 5.0 0.0
 LOOKAT: 0.0 0.0 0.0
 FOV: 45.0
 NEAR: 0.5
-FAR: 100.0
+FAR 100.0
 }
 {
-TYPE: Isometric
-NAME: ISO
+TYPE: CAMERA
+NAME: CAM3
 POS:  0.0 5.0 5.0
 LOOKAT: 0.0 0.0 0.0
 FOV: 45.0
 NEAR: 0.5
-FAR: 100.0
+FAR 100.0
 }
 {
-TYPE: FirstPerson
-NAME: MAIN
-POS:  2.2 1.5 2.2
-LOOKAT: 2.2 0.0 4.4
+TYPE: CAMERA
+NAME: CAM4
+POS:  0.0 5.0 -5.0
+LOOKAT: 0.0 0.0 0.0
 FOV: 45.0
 NEAR: 0.5
-FAR: 100.0
+FAR 100.0
 }
 
-LIGHTS 1
+LIGHTS 5
+{
+TYPE: LIGHT
+NAME: WHITE
+POS: 0.0 5.0 0.0
+COL: 1.0 1.0 1.0
+AMB: 0.5 0.5 0.5
+}
+{
+TYPE: LIGHT
+NAME: RED
+POS: 5.0 5.0 0.0
+COL: 1.0 0.0 0.0
+AMB: 0.0 0.5 0.5
+}
+{
+TYPE: LIGHT
+NAME: GREEN
+POS: -5.0 5.0 0.0
+COL: 0.0 1.0 0.0
+AMB: 0.5 0.0 0.5
+}
+{
+TYPE: LIGHT
+NAME: BLUE
+POS: -5.0 5.0 5.0
+COL: 0.0 0.0 1.0
+AMB: 0.5 0.5 0.0
+}
 {
 TYPE: DIRECTION
 NAME: DIR
 POS: 0.0 5.0 0.0
 COL: 1.0 1.0 1.0
-AMB: 0.4 0.4 0.4
-DIR: 0.0 -1.0 0.0
+AMB: 0.2 0.2 0.2
+DIR: 0.0 1.0 0.0
 }
 
-MODELS 4
+MODELS 2
 {
 TYPE: AI
 NAME: BEAST
@@ -48,26 +85,12 @@ TYPE: AI
 NAME: SPHERE
 FILE: Assets\\gsphere.obj
 }
-{
-TYPE: CUBE
-NAME: CUBE
-}
-{
-TYPE: AI
-NAME: DOOR
-FILE: Assets\\door\\dungeon_door_stableprojectorz_obj.obj
-}
 
-TEXTURES 12
+TEXTURES 5
 {
 TYPE: FIF_BMP
 NAME: BEAST
 FILE: Assets\\beast\\beast_texture.bmp
-}
-{
-TYPE: FIF_PNG
-NAME: DOOR
-FILE: Assets\\door\\Tex_StableProjectorz_2048.obj
 }
 {
 TYPE: FIF_JPEG
@@ -89,78 +112,39 @@ TYPE: FIF_JPEG
 NAME: STARS2
 FILE: Assets\\Textures\\stars2.jpg
 }
-{
-TYPE: FIF_JPEG
-NAME: CORONA_RIGHT
-FILE: Assets\\Textures\\corona_rt.jpeg
-}
-{
-TYPE: FIF_JPEG
-NAME: CORONA_LEFT
-FILE: Assets\\Textures\\corona_lf.jpeg
-}
-{
-TYPE: FIF_JPEG
-NAME: CORONA_TOP
-FILE: Assets\\Textures\\corona_up.jpeg
-}
-{
-TYPE: FIF_JPEG
-NAME: CORONA_BOTTOM
-FILE: Assets\\Textures\\corona_dn.jpeg
-}
-{
-TYPE: FIF_JPEG
-NAME: CORONA_FRONT
-FILE: Assets\\Textures\\corona_ft.jpeg
-}
-{
-TYPE: FIF_JPEG
-NAME: CORONA_BACK
-FILE: Assets\\Textures\\corona_bk.jpeg
-}
-{
-TYPE: FIF_JPEG
-NAME: WALL
-FILE: Assets\\Textures\\rock_wall.JPG
-}
 
-SHADERS 4
+SHADERS 2
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
 FRAGFILE: Assets\\Shaders\\flatColour.frag
 }
 {
-NAME: FLAT_TEX
-VERTFILE: Assets\\Shaders\\flatTexture.vert
-FRAGFILE: Assets\\Shaders\\flatTexture.frag
-}
-{
 NAME: TEXDIR
 VERTFILE: Assets\\Shaders\\texture-directional.vert
 FRAGFILE: Assets\\Shaders\\texture-directional.frag
 }
-{
-NAME: TEXPOINT
-VERTFILE: Assets\\Shaders\\texture-pointlight.vert
-FRAGFILE: Assets\\Shaders\\texture-pointlight.frag
-}
 
 GAMEOBJECTS 2
 {
-TYPE: BEAST
+TYPE: EXAMPLE
 NAME: BEAST
-POS: -2.0 0.0 0.0
+POS: 0.0 0.0 0.0
+ROT: 0.0 0.0 0.0
+SCALE: 1.0 1.0 1.0
+ROTINC: 0.0 0.1 0.001
 MODEL: BEAST
 TEXTURE: BEAST
 SHADER: TEXDIR
 }
 {
-TYPE: BASIC
-NAME: DOOR
-POS: 3.0 0.0 2.0
-MODEL: DOOR
-TEXTURE: DOOR
+TYPE: EXAMPLE
+NAME: PLANET
+POS: 4.0 4.0 4.0
+ROT: 0.0 0.0 0.0 
+SCALE: 1.0 1.0 1.0
+ROTINC: 0.0 0.2 0.0
+MODEL: SPHERE
+TEXTURE: ROCK
 SHADER: TEXDIR
 }

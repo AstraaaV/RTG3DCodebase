@@ -8,6 +8,5 @@ class ModelFactory
 {
 public:
 
-	static Model* makeNewModel(const std::string& type);
+	static Model* makeNewModel(std::string _type);
 };
-

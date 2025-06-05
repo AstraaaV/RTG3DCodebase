@@ -16,7 +16,7 @@ class Light
 {
 public:
 	Light();
-	virtual ~Light() = default;
+	~Light() {}
 
 	//load from mainfest
 	virtual void Load(ifstream& _file);
@@ -27,19 +27,12 @@ public:
 	//Getters and Setters
 	void SetName(string _name) { m_name = _name; }
 	string GetName() { return m_name; }
-	void SetType(string _type) { m_type = _type; }
+	void SetTye(string _type) { m_type = _type; }
 	string GetType() { return m_type; }
-
-	void SetCol(const vec3& col) { m_col = col; }
-	void SetAmb(const vec3& amb) { m_amb = amb; }
-	void SetPos(const vec3& pos) { m_pos = pos; }
 
 	vec3 GetCol() { return m_col; }
 	vec3 GetAmb() { return m_amb; }
 	vec3 GetPos() { return m_pos; }
-
-	void SetEnabled(bool enabled) { m_enabled = enabled; }
-	bool isEnabled() const { return m_enabled; }
 
 	//set my shader values
 	//base version: if name of light is LG
@@ -50,8 +43,6 @@ public:
 protected:
 	string m_name;
 	string m_type;
-
-	bool m_enabled = true;
 
 	vec3 m_pos; // position of the light
 	vec3 m_col; // colour of the light

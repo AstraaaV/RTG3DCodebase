@@ -64,18 +64,7 @@ static unsigned int indexArray[] = {
 	6, 5, 1
 };
 
-static float texCoordArray[] =
-{
-	0.0f, 1.0f,
-	0.0f, 0.0f,
-	1.0f, 0.0f,
-	1.0f, 1.0f,
 
-	0.0f, 1.0f,
-	0.0f, 0.0f,
-	1.0f, 0.0f,
-	1.0f, 1.0f
-};
 
 Cube::Cube() {
 
@@ -103,12 +92,6 @@ Cube::Cube() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), indexArray, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &m_uvBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoordArray), texCoordArray, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-	glEnableVertexAttribArray(1);
-
 	glBindVertexArray(0);
 }
 
@@ -121,7 +104,6 @@ Cube::~Cube() {
 	glDeleteBuffers(1, &m_vertexBuffer);
 	glDeleteBuffers(1, &m_colourBuffer);
 	glDeleteBuffers(1, &m_indexBuffer);
-	glDeleteBuffers(1, &m_uvBuffer);
 }
 
 

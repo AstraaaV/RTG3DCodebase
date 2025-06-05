@@ -1,31 +1,20 @@
 #include "ModelFactory.h"
-#include "AIModel.h"
-#include "Cube.h"
-#include <iostream>
 #include <assert.h>
+#include "AIModel.h"
 
-using std::string;
-using std::cout;
-using std::endl;
-
-Model* ModelFactory::makeNewModel(const string& type)
+Model* ModelFactory::makeNewModel(std::string _type)
 {
-	cout << "[MODELFACTORY] Requested Model Type: " << type << endl;
-
+	printf("TYPE: %s \n", _type.c_str());
 	//There is no point in making one of the model base class 
 	//as it doesn't do anything 
-	if (type == "AI")
+	if (_type == "AI")
 	{
 		return new AIModel();
 	}
-	if (type == "CUBE")
-	{
-		return new Cube();
-	}
 	else
 	{
-		cout << "[MODELFACTORY] Error. Unknown Model Type: " << type << endl;
-		assert(false && "Unknown Model type passed to ModelFactory.");
+		printf("UNKNOWN MODEL TYPE: %s \n", _type.c_str());
+		assert(0);
 		return nullptr;
 	}
 }
