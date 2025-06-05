@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "ArcballCamera.h"
 #include "FirstPersonCamera.h"
+#include "IsometricCamera.h"
 #include <assert.h>
 
 using std::string;
@@ -20,6 +21,10 @@ Camera* CameraFactory::makeNewCam(string _type)
 	else if (_type == "FPC")
 	{
 		return new FirstPersonCamera();
+	}
+	else if (_type == "ISO")
+	{
+		return new IsometricCamera();
 	}
 	else
 	{

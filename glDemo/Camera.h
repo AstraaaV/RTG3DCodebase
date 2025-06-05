@@ -71,6 +71,7 @@ protected:
 
 	//Location this camera is looking at
 	glm::vec3 m_lookAt;
+	glm::vec3 m_worldUp;
 
 	float m_fov; //field of view
 	float m_near;//near plane distance

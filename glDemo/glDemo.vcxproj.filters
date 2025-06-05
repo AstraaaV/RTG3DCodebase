@@ -120,6 +120,9 @@
     <ClInclude Include="FirstPersonCamera.h">
       <Filter>Scene Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IsometricCamera.h">
+      <Filter>Scene Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -192,6 +195,9 @@
       <Filter>Scene Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FirstPersonCamera.cpp">
+      <Filter>Scene Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IsometricCamera.cpp">
       <Filter>Scene Source Files</Filter>
     </ClCompile>
   </ItemGroup>

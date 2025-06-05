@@ -1,0 +1,33 @@
+#include "IsometricCamera.h"
+
+IsometricCamera::IsometricCamera()
+{
+	m_type = "ISO";
+	m_pos = glm::vec3(10.0f, 10.0f, 10.0f);
+	m_lookAt = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	m_fov = 45.0f;
+	m_near = 0.1f;
+	m_far = 100.0f;
+	m_aspect = 1.0f;
+
+	updateCam();
+}
+
+void IsometricCamera::Init(float width, float height, Scene* scene)
+{
+	m_aspect = width / height;
+	updateCam();
+}
+
+void IsometricCamera::Tick(float dt)
+{
+	updateCam();
+}
+
+void IsometricCamera::updateCam()
+{
+	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, m_worldUp);
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+}
