@@ -95,7 +95,7 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Set callback functions to handle different events
 	glfwSetFramebufferSizeCallback(window, resizeWindow); // resize window callback
@@ -397,24 +397,28 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 {
-	if (g_mouseDown && g_Scene) {
+	static bool fpcMouse = true;
 
-		//float tDelta = gameClock->gameTimeDelta();
-
-		float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
-		float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
-
-		Camera* activeCam = g_Scene->GetActiveCamera();
-
-		FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(activeCam);
-		if (fpc)
-		{
-			fpc->ProcessMouse(dx, -dy);
-		}
-
+	if (!g_Scene) return;
+	
+	FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
+	if (!fpc) return;
+		
+	if (fpcMouse)
+	{
 		g_prevMouseX = _xpos;
 		g_prevMouseY = _ypos;
+		fpcMouse = false;
+		return;
 	}
+		
+	float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
+	float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
+
+	fpc->ProcessMouse(dx, -dy);
+
+	g_prevMouseX = _xpos;
+	g_prevMouseY = _ypos;
 }
 
 void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods)
