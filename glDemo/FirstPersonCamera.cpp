@@ -39,6 +39,7 @@ void FirstPersonCamera::Tick(float dt, GLFWwindow* window)
 		glfwGetFramebufferSize(window, &w, &h);
 	
 	m_aspect = static_cast<float>(w) / static_cast<float>(h);
+	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
 }
 
 void FirstPersonCamera::processKeys(CameraMovement direction, float deltaTime)
