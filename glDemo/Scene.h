@@ -1,5 +1,6 @@
 #pragma once
 #include "core.h"
+#include "Terrain.h"
 #include <list>
 #include <string>
 #include <fstream>
@@ -73,5 +74,6 @@ protected:
 	int m_useCameraIndex = 0;
 	int m_activeCamIndex = 0;
 	Camera* m_activeCamera = nullptr;
+	Terrain* m_terrain = nullptr;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

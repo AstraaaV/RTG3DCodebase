@@ -166,6 +166,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="shader_setup.h" />
     <ClInclude Include="stringHelp.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureLoader.h" />
   </ItemGroup>
@@ -193,6 +194,7 @@
     <ClCompile Include="PrincipleAxes.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shader_setup.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>

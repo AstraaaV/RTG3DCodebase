@@ -163,6 +163,20 @@ void Scene::Render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
 
+	if (m_terrain)
+	{
+		GLuint shaderProg = m_terrain->GetShader()->GetProg();
+		glUseProgram(shaderProg);
+
+		if (m_activeCamera)
+			m_activeCamera->SetRenderValues(shaderProg);
+
+		SetShaderUniforms(shaderProg);
+
+		m_terrain->PreRender();
+		m_terrain->Render();
+	}
+
 	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ++it)
 	{
 		if ((*it)->GetRP() & RP_TRANSPARENT)
@@ -325,7 +339,28 @@ void Scene::Load(ifstream& _file)
 		cout << "}\n";
 	}
 
+	//load Terrain
+	if (_file >> dummy && dummy == "TERRAIN")
+	{
+		int numTerrain;
+		_file >> numTerrain; _file.ignore(256, '\n');
 
+		for (int i = 0; i < numTerrain; ++i)
+		{
+			_file.ignore(256, '\n');
+			std::string type;
+			_file >> dummy >> type; _file.ignore(256, '\n');
+
+			m_terrain = new Terrain();
+			m_terrain->Load(_file);
+
+			m_terrain->SetModel(GetModel("CUBE"));
+			m_terrain->SetTexture(GetTexture("ROCK"));
+			m_terrain->SetShader(GetShader("TEXDIR"));
+
+			_file.ignore(256, '\n');
+		}
+	}
 }
 
 void Scene::Init()
