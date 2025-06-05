@@ -246,6 +246,8 @@ void Scene::Load(ifstream& _file)
 
 	//load Cameras
 	_file >> dummy >> m_numCameras; _file.ignore(256, '\n');
+	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
+
 	cout << "CAMERAS : " << m_numCameras << endl;
 	for (int i = 0; i < m_numCameras; i++)
 	{
@@ -269,6 +271,8 @@ void Scene::Load(ifstream& _file)
 
 	//load Lights
 	_file >> dummy >> m_numLights; _file.ignore(256, '\n');
+	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
+
 	cout << "LIGHTS : " << m_numLights << endl;
 	for (int i = 0; i < m_numLights; i++)
 	{
@@ -292,6 +296,8 @@ void Scene::Load(ifstream& _file)
 
 	//load Models
 	_file >> dummy >> m_numModels; _file.ignore(256, '\n');
+	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
+
 	cout << "MODELS : " << m_numModels << endl;
 	for (int i = 0; i < m_numModels; i++)
 	{
@@ -315,6 +321,8 @@ void Scene::Load(ifstream& _file)
 
 	//load Textures
 	_file >> dummy >> m_numTextures; _file.ignore(256, '\n');
+	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
+
 	cout << "TEXTURES : " << m_numTextures << endl;
 	for (int i = 0; i < m_numTextures; i++)
 	{
@@ -332,118 +340,52 @@ void Scene::Load(ifstream& _file)
 	cout << endl << endl;
 
 	//load Shaders
-	_file >> dummy >> m_numShaders; _file.ignore(256, '\n');
+	_file >> dummy;
+	std::string colon;
+	_file >> colon >> m_numShaders;
+	_file.ignore(256, '\n');
+	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
 	cout << "SHADERS : " << m_numShaders << endl;
 	for (int i = 0; i < m_numShaders; i++)
 	{
-		string line, name, vertFile, fragFile;
+		//skip {
+		_file.ignore(256, '\n');
+		cout << "{\n";
 
-		while (getline(_file, line))
-		{
-			if (Trim(line) == "{") break;
-		}
+		m_Shaders.push_back(new Shader(_file));
 
-		while (getline(_file, line))
-		{
-			line = Trim(line);
-			if (line == "}") break;
-
-			if (line.find("NAME:") == 0)
-				name = Trim(line.substr(5));
-			else if (line.find("VERTFILE:") == 0)
-				vertFile = Trim(line.substr(9));
-			else if (line.find("FRAGFILE:") == 0)
-				fragFile = Trim(line.substr(9));
-		}
-
-		Shader* shader = new Shader(name, vertFile, fragFile);
-		m_Shaders.push_back(shader);
-
-		if (name == "TEXDIR")
-			m_texDirLightShader = shader->GetProg();
-		else if (name == "TEXPOINT")
-			m_texPointLightShader = shader->GetProg();
+		//skip }
+		_file.ignore(256, '\n');
+		cout << "}\n";
 	}
 
 	cout << endl << endl;
 
 	//load GameObjects
-	_file >> dummy >> m_numGameObjects;
+	_file >> dummy;
+	_file >> colon >> m_numGameObjects;
 	_file.ignore(256, '\n');
+	std::cout << "[Scene::Load] Loading section: " << dummy << std::endl;
 	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
-
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
-		string line;
+		//skip {
+		_file.ignore(256, '\n');
+		cout << "{\n";
+
 		string type;
-
-		std::streampos blockStart;
-
-		while (getline(_file, line))
-		{
-			if (Trim(line) == "{")
-			{
-				blockStart = _file.tellg();
-				break;
-			}
-		}
-
-		while (getline(_file, line))
-		{
-			line = Trim(line);
-			if (line == "}") break;
-
-			if (line.find("TYPE:") == 0)
-			{
-				type = Trim(line.substr(line.find(":") + 1));
-				break;
-			}
-		}
-
-		if (type.empty())
-		{
-			cout << "[Scene::Load] Error: Missing TYPE for GO.\n";
-			continue;
-		}
-
-		_file.clear();
-		_file.seekg(blockStart);
-		
+		_file >> dummy >> type; _file.ignore(256, '\n');
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
-		if (!newGO)
-		{
-			cout << "[Scene::Load] Error. Unknown GO type: " << type << endl;
-			continue;
-		}
-		
 		newGO->Load(_file);
+
 		m_GameObjects.push_back(newGO);
 
-		Shader* fallbackShader = GetShader("TEXDIR");
-		if (fallbackShader)
-			newGO->SetShader(fallbackShader);
-		else
-			std::cout << "[Scene::Load] Warning. TEXDIR not found for GO: " << newGO->GetName() << "\n";
-
-		cout << "[Scene::Load] GameObject loaded: " << newGO->GetName() << "\n";
-	
-		while (getline(_file, line))
-		{
-			if (Trim(line) == "}") break;
-		}
+		//skip }
+		_file.ignore(256, '\n');
+		cout << "}\n";
 	}
 
-	if (m_numShaders == 0)
-	{
-		Shader* dirShader = new Shader("TEXDIR", "Assets\\Shaders\\texture-directional.vert", "Assets\\Shaders\\texture-directional.frag");
-		Shader* pointShader = new Shader("TEXDIR", "Assets\\Shaders\\texture-pointlight.vert", "Assets\\Shaders\\texture-pointlight.frag");
 
-		m_Shaders.push_back(dirShader);
-		m_Shaders.push_back(pointShader);
-
-		m_texDirLightShader = dirShader->GetProg();
-		m_texPointLightShader = pointShader->GetProg();
-	}
 }
 
 void Scene::Init()
