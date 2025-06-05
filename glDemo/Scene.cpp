@@ -137,31 +137,47 @@ Shader* Scene::GetShader(string _shaderName)
 //Render Everything
 void Scene::Render()
 {
-	//TODO: Set up for the Opaque Render Pass will go here
-	//check out the example stuff back in main.cpp to see what needs setting up here
-	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
+	// Render all opaque objects first
+	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ++it)
 	{
-		if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
+		// Only draw if object is marked as opaque
+		if ((*it)->GetRP() & RP_OPAQUE)
 		{
-			//set shader program using
-			GLuint SP = (*it)->GetShaderProg();
-			glUseProgram(SP);
+			GLuint shaderProg = (*it)->GetShaderProg();
+			glUseProgram(shaderProg);
 
-			//set up for uniform shader values for current camera
-			m_useCamera->SetRenderValues(SP);
+			m_useCamera->SetRenderValues(shaderProg);
 
-			//loop through setting up uniform shader values for anything else
-			SetShaderUniforms(SP);
+			SetShaderUniforms(shaderProg);
 
-			//set any uniform shader values for the actual model
 			(*it)->PreRender();
 
-			//actually render the GameObject
 			(*it)->Render();
 		}
 	}
 
-	//TODO: now do the same for RP_TRANSPARENT here
+	// Transparent objects
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_FALSE);
+
+	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ++it)
+	{
+		if ((*it)->GetRP() & RP_TRANSPARENT)
+		{
+			GLuint shaderProg = (*it)->GetShaderProg();
+			glUseProgram(shaderProg);
+
+			m_useCamera->SetRenderValues(shaderProg);
+			SetShaderUniforms(shaderProg);
+			(*it)->PreRender();
+			(*it)->Render();
+		}
+	}
+
+	// Restore settings for next frame
+	glDepthMask(GL_TRUE);
+	glDisable(GL_BLEND);
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)
