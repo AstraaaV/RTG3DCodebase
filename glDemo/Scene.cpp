@@ -32,9 +32,9 @@ void Scene::Update(float _dt)
 	}
 
 	//update all cameras
-	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
+	for (auto* cam : m_Cameras)
 	{
-		(*it)->Tick(_dt);
+		cam->Tick(_dt);
 	}
 
 	//update all GameObjects
@@ -66,11 +66,11 @@ GameObject* Scene::GetGameObject(string _GOName)
 
 Camera* Scene::GetCamera(string _camName)
 {
-	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
+	for (auto* cam : m_Cameras)
 	{
-		if ((*it)->GetName() == _camName)
+		if (cam->GetName() == _camName)
 		{
-			return (*it);
+			return (cam);
 		}
 	}
 	printf("Unknown Camera NAME : %s \n", _camName.c_str());
@@ -146,8 +146,8 @@ void Scene::Render()
 		{
 			GLuint shaderProg = (*it)->GetShaderProg();
 			glUseProgram(shaderProg);
-
-			m_useCamera->SetRenderValues(shaderProg);
+			if (m_activeCamera
+				)m_activeCamera->SetRenderValues(shaderProg);
 
 			SetShaderUniforms(shaderProg);
 
@@ -332,18 +332,18 @@ void Scene::Init()
 	//initialise all cameras
 	//scene is passed down here to allow for linking of cameras to game objects
 	int count = 0;
-	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); ++it)
+	for (auto* cam : m_Cameras)
 	{
-		(*it)->Init(100, 100, this);// TODO: set correct screen sizes here
+		(cam)->Init(100, 100, this);// TODO: set correct screen sizes here
 
 		//if a camera is called MAIN
 		//this will be the starting camera used
-		if ((*it)->GetName() == "OVERVIEW")
+		if ((cam)->GetName() == "OVERVIEW")
 		{
-			m_useCamera = (*it);
+			m_useCamera = (cam);
 			m_useCameraIndex = count;
 		}
-		else if ((*it)->GetName() == "FIRSTPERSONCAMERA")
+		else if ((cam)->GetName() == "FIRSTPERSONCAMERA")
 		{
 			
 		}
@@ -356,6 +356,9 @@ void Scene::Init()
 		m_useCamera = GetCamera("FIRSTPERSONCAMERA");
 		m_useCameraIndex = 0;
 	}
+
+	m_activeCamera = m_useCamera;
+	m_activeCamIndex = m_useCameraIndex;
 
 	//set up links between everything and GameObjects
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
@@ -371,12 +374,11 @@ void Scene::CycleCameras()
 {
 	if (m_Cameras.empty()) return;
 
-	auto it = std::find(m_Cameras.begin(), m_Cameras.end(), m_useCamera);
-
-	if (it != m_Cameras.end() && ++it != m_Cameras.end())
-		m_useCamera = *it;
-	else
-		m_useCamera = m_Cameras.front();
+	m_activeCamIndex = (m_activeCamIndex + 1) % m_Cameras.size();
+	
+	auto it = m_Cameras.begin();
+	std::advance(it, m_activeCamIndex);
+	m_activeCamera = *it;
 
 	std::cout << "Switched to camera: " << m_useCamera->GetName() << std::endl;
 }

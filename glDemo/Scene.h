@@ -60,7 +60,7 @@ protected:
 	int m_numModels = 0;
 	int m_numTextures = 0;
 	int m_numShaders = 0;
-	std::list<Camera*>    m_Cameras;
+	std::vector<Camera*>    m_Cameras;
 	std::list<Light*>    m_Lights;
 	std::list<Model*>		m_Models;
 	std::list<Texture*>		m_Textures;

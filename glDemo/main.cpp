@@ -2,6 +2,7 @@
 #include "core.h"
 #include "TextureLoader.h"
 #include "ArcballCamera.h"
+#include "FirstPersonCamera.h"
 #include "GUClock.h"
 #include "PrincipleAxes.h"
 #include "shader_setup.h"
@@ -301,6 +302,30 @@ void updateScene()
 	}
 
 	g_Scene->Update(tDelta);
+
+	Camera* cam = g_Scene->GetActiveCamera();
+
+	if (cam && cam->GetType() == "FPC")
+	{
+		FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(cam);
+		if (!fpc) return;
+
+		float speed = 3.0f * tDelta;
+
+		GLFWwindow* window = glfwGetCurrentContext();
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			fpc->MoveForward(speed);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			fpc->MoveForward(-speed);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			fpc->MoveRight(speed);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			fpc->MoveRight(-speed);
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+			fpc->MoveUp(speed);
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+			fpc->MoveUp(-speed);
+	}
 }
 
 
