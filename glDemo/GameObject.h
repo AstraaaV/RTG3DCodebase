@@ -33,10 +33,11 @@ public:
 	void SetModel(Model* model) { m_model = model; }
 	void SetTexture(Texture* tex) { m_texture = tex; }
 	void SetShader(Shader* shader) { m_shader = shader; }
-	void SetPos(const glm::vec3& pos) { m_pos = pos; }
+	void SetPos(const glm::vec3& pos) { m_pos = pos; m_basePos = pos; }
 	void SetScale(const glm::vec3& scale) { m_scale = scale; }
 	void SetName(string _name) { m_name = _name; }
-	
+	void SetAnimated(bool anim) { m_isAnimated = anim; }
+
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
 
@@ -65,4 +66,8 @@ protected:
 	GLuint m_ShaderProg = 0;
 
 	RenderPass m_RP = RP_OPAQUE;
+
+	bool m_isAnimated = false;
+	float m_animTime = 0.0f;
+	vec3 m_basePos;
 };

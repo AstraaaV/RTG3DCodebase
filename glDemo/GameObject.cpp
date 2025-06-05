@@ -33,6 +33,15 @@ void GameObject::Tick(float _dt)
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 	m_worldMatrix = glm::scale(m_worldMatrix, glm::vec3(m_scale));
+
+	if (m_isAnimated)
+	{
+		m_animTime += _dt;
+
+		vec3 animatedPos = m_basePos;
+		animatedPos.y += sin(m_animTime * 2.0f) * 0.2f;
+		m_pos = animatedPos;
+	}
 }
 
 void GameObject::PreRender()

@@ -469,6 +469,7 @@ void Scene::LoadMap()
 				if (beast)
 				{
 					beast->SetPos(pos);
+					beast->SetAnimated(true);
 				}
 			}
 		}
