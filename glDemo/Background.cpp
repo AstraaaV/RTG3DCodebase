@@ -38,8 +38,9 @@ void Background::PreRender()
 
 	if (m_shader != 0)
 	{
+		GLuint shaderID = m_shader->GetProg();
 		GLint timeLoc;
-		Helper::SetUniformLocation(m_shader, "u_time", &timeLoc);
+		Helper::SetUniformLocation(shaderID, "u_time", &timeLoc);
 		glUniform1f(timeLoc, glfwGetTime());
 	}
 }
@@ -50,9 +51,11 @@ void Background::Render()
 		m_model->Render();
 }
 
-void Background::Init(GLuint shader, GLuint texture, Model* model)
+void Background::Init(Shader* shader, GLuint texture, Model* model)
 {
 	m_shader = shader;
+	SetShader(shader);
+
 	m_texture = texture;
 	m_model = model;
 

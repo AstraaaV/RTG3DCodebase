@@ -18,16 +18,15 @@ public:
 	virtual void PreRender();
 	virtual void Render();
 
-	virtual void Init(GLuint shader, GLuint texture, Model* model);
+	virtual void Init(Shader* shader, GLuint texture, Model* model);
 
 protected:
 
 	string m_ShaderName, m_TexName, m_ModelName;
 
 	GLuint m_texture = 0;
-	GLuint m_shader = 0;
 	GLuint m_normalMap = 0;
-	
+	Shader* m_shader = nullptr;
 	Model* m_model = nullptr;
 };
 

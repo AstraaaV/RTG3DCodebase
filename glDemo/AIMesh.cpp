@@ -81,6 +81,8 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_meshFaceIndexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, faceIndexArray, GL_STATIC_DRAW);
 
+	free(faceIndexArray);
+
 	glBindVertexArray(0);
 
 	// Once done, release all resources associated with this import
@@ -89,7 +91,18 @@ AIMesh::AIMesh(std::string _filename, GLuint _meshIndex)
 
 AIMesh::~AIMesh()
 {
+	if (m_vao) glDeleteVertexArrays(1, &m_vao);
 
+	GLuint buffers[] =
+	{
+		m_meshVertexPosBuffer,
+		m_meshTexCoordBuffer,
+		m_meshNormalBuffer,
+		m_meshTangentBuffer,
+		m_meshBiTangentBuffer,
+		m_meshFaceIndexBuffer
+	};
+	glDeleteBuffers(6, buffers);
 }
 
 // Texture setup methods
@@ -123,8 +136,6 @@ void AIMesh::setupTextures()
 	if (m_meshTexCoordBuffer != 0) {
 
 		if (m_textureID != 0) {
-
-			glEnable(GL_TEXTURE_2D);
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_textureID);
