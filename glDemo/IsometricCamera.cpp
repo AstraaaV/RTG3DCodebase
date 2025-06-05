@@ -57,7 +57,7 @@ void IsometricCamera::SetFocusPoint(const glm::vec3& focus)
 
 void IsometricCamera::SetZoom(float zoomLevel)
 {
-	m_zoom = zoomLevel;
+	m_zoom = glm::clamp(zoomLevel, 2.0f, 100.0f);
 }
 
 glm::mat4 IsometricCamera::GetView() const
