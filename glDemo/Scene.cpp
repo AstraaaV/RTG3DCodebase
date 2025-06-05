@@ -196,6 +196,11 @@ void Scene::Render()
 		SP = shader->GetProg();
 		glUseProgram(SP);
 
+		if (SP == 0)
+		{
+			cout << "[Render] Shader program is 0.\n";
+		}
+
 			if (obj->GetTexture())
 			{
 				glActiveTexture(GL_TEXTURE0);

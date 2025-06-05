@@ -57,6 +57,7 @@ void Map::SpawnIntoMap(Scene* scene)
 				beast->SetPosition(pos);
 				beast->SetShader(scene->GetShader("TEXDIR"));
 				beast->SetModel(scene->GetModel("BEAST"));
+				beast->SetRenderPass(RP_OPAQUE);
 				scene->AddGameObject(beast);
 			}
 			else if (tile == 'D')
@@ -66,6 +67,7 @@ void Map::SpawnIntoMap(Scene* scene)
 				door->SetModel(scene->GetModel("CUBE"));
 				door->SetTexture(scene->GetTexture("DOOR"));
 				door->SetShader(scene->GetShader("TEXDIR"));
+				door->SetRenderPass(RP_OPAQUE);
 				scene->AddGameObject(door);
 			}
 		}
