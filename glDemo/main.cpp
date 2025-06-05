@@ -117,6 +117,15 @@ int main()
 	manifest.close();
 	g_Scene->Init();
 
+	if (!g_Scene->GetActiveCamera())
+	{
+		IsometricCamera* isoCam = new IsometricCamera();
+		isoCam->Init((float)g_initWidth, (float)g_initHeight, g_Scene);
+		g_Scene->SetCamera(isoCam);
+
+		cout << "[main] Default IsoCam set.\n";
+	}
+
 	//
 	//Set up Scene class
 	//

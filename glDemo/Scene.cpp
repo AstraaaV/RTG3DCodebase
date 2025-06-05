@@ -491,7 +491,16 @@ void Scene::CycleCams()
 	m_useCamera = *it;
 
 	cout << "Camera switched to: " << m_useCamera->GetName() << std::endl;
-} 
+}
+void Scene::SetCamera(Camera* cam)
+{
+	m_useCamera = cam;
+	if (cam)
+	{
+		cout << "[Scene] Cam set to: " << cam->GetName() << endl;
+	}
+}
+
 
 void Scene::SetLightsEnabled(bool _enabled)
 {

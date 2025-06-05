@@ -52,6 +52,7 @@ public:
 	void Init();
 
 	void CycleCams();
+	void SetCamera(Camera* cam);
 	void SetLightsEnabled(bool _enabled);
 	void AddLight(Light* light);
 

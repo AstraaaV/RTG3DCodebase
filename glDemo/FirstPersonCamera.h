@@ -45,6 +45,6 @@ private:
 
 	float m_speed, m_sensitivity;
 
-	//glm::vec3 m_direction; reserved for later
+	glm::vec3 m_direction;
 };
 

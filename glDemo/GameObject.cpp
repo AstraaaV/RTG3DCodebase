@@ -78,7 +78,7 @@ void GameObject::Tick(float deltaTime, GLFWwindow* window)
 
 void GameObject::Render()
 {
-	if (!m_shader) return;
+	if (!m_shader || !m_scene) return;
 
 	GLuint shaderProg = m_shader->GetProg();
 	glUseProgram(shaderProg);
