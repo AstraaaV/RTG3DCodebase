@@ -42,6 +42,14 @@ void GameObject::Tick(float _dt)
 		animatedPos.y += sin(m_animTime * 2.0f) * 0.2f;
 		m_pos = animatedPos;
 	}
+
+	if (m_isPacing)
+	{
+		m_paceTime += _dt;
+
+		float offset = sin(m_paceTime * m_paceSpeed) * m_paceDistance;
+		m_pos = m_initialPacePos + m_paceDirection * offset;
+	}
 }
 
 void GameObject::PreRender()
@@ -70,6 +78,15 @@ void GameObject::Render()
 	{
 		m_model->Render();
 	}
+}
+
+void GameObject::EnablePacing(const glm::vec3& direction, float distance, float speed)
+{
+	m_isPacing = true;
+	m_paceDirection = direction;
+	m_paceDistance = distance;
+	m_paceSpeed = speed;
+	m_initialPacePos = m_pos;
 }
 
 void GameObject::Init(Scene* _scene)

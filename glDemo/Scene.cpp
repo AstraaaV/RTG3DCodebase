@@ -470,6 +470,7 @@ void Scene::LoadMap()
 				{
 					beast->SetPos(pos);
 					beast->SetAnimated(true);
+					beast->EnablePacing(glm::vec3(1.0f, 0.0f, 0.0f), 2.0f, 1.5f);
 				}
 			}
 		}

@@ -37,6 +37,7 @@ public:
 	void SetScale(const glm::vec3& scale) { m_scale = scale; }
 	void SetName(string _name) { m_name = _name; }
 	void SetAnimated(bool anim) { m_isAnimated = anim; }
+	void EnablePacing(const glm::vec3& direction, float distance, float speed);
 
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
@@ -70,4 +71,12 @@ protected:
 	bool m_isAnimated = false;
 	float m_animTime = 0.0f;
 	vec3 m_basePos;
+
+	bool m_isPacing = false;
+	float m_paceTime = 0.0f;
+	float m_paceSpeed = 1.0f;
+	float m_paceDistance = 2.0f;
+
+	glm::vec3 m_paceDirection = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 m_initialPacePos = glm::vec3(0.0f);
 };
