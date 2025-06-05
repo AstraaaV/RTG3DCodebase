@@ -41,4 +41,7 @@ void PointLight::SetRenderValues(unsigned int _prog)
 
 	if (Helper::SetUniformLocation(_prog, quadString.c_str(), &loc))
 	glUniform1f(loc, m_quadratic);
+
+	if (m_name.empty())
+		cout << "[PointLight] Warning. Light has no name; uniforms may not bind correctly." << endl;
 }

@@ -216,6 +216,13 @@ GLuint setupShaders(const string& vsPath, const string& fsPath, ShaderError* err
 
 #endif
 
+	if (fsPath.empty())
+	{
+		cout << "[Shader Error] Fragment shader path is empty." << endl;
+		if (error_result) *error_result = ShaderError::GLSL_FRAGMENT_SHADER_SOURCE_NOT_FOUND;
+		return 0;
+	}
+
 	// Load fragment shader
 	err = createShaderFromFile(GL_FRAGMENT_SHADER, fsPath, &(buildInfo.fragmentShader));
 
@@ -465,6 +472,7 @@ ShaderError createShaderFromFile(GLenum shaderType, const string& shaderFilePath
 		glShaderSource(shader, 1, static_cast<const GLchar**>(&src), 0);
 
 		glCompileShader(shader);
+		reportShaderInfoLog(shader);
 
 		GLint compileStatus;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compileStatus);
@@ -577,7 +585,7 @@ void printSourceListing(const string& sourceString, bool showLineNumbers) {
 
 		size_t substrLength = strcspn(srcPtr, "\n");
 
-		cout << string(srcPtr, 0, substrLength) << endl;
+		cout << string(srcPtr, substrLength) << endl;
 
 		srcPtr += substrLength + 1;
 	}
