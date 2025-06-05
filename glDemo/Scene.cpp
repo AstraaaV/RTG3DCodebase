@@ -343,13 +343,17 @@ void Scene::Init()
 			m_useCamera = (*it);
 			m_useCameraIndex = count;
 		}
+		else if ((*it)->GetName() == "FIRSTPERSONCAMERA")
+		{
+			
+		}
 		count++;
 	}
 
 	//if no MAIN camera just use the first one
 	if (!m_useCamera)
 	{
-		m_useCamera = (*m_Cameras.begin());
+		m_useCamera = GetCamera("FIRSTPERSONCAMERA");
 		m_useCameraIndex = 0;
 	}
 
@@ -399,6 +403,7 @@ void Scene::LoadMap()
 		for (int x = 0; x < row.size(); ++x)
 		{
 			char tile = row[x];
+			vec3 pos = vec3(x * tileSize, 0.0f, flipZ * tileSize);
 
 			if (tile == 'W')
 			{
@@ -408,8 +413,8 @@ void Scene::LoadMap()
 				wall->SetModel(GetModel("CUBE"));
 				wall->SetTexture(GetTexture("WALL_DIFFUSE"));
 				wall->SetShader(GetShader("TEXDIR"));
-				wall->SetPos(vec3(x * tileSize, 1.0f, flipZ * tileSize));
-				wall->SetScale(vec3(1.0f, 2.0f, 1.0f));
+				wall->SetPos(pos);
+				wall->SetScale(vec3(1.0f));
 
 				AddGameObject(wall);
 			}
@@ -419,10 +424,10 @@ void Scene::LoadMap()
 				GameObject* torch = new GameObject();
 
 				torch->SetName("TORCH_" + std::to_string(x) + "_" + std::to_string(z));
-				torch->SetModel(GetModel("WALL"));
+				torch->SetModel(GetModel("CUBE"));
 				torch->SetTexture(GetTexture("ROCK"));
 				torch->SetShader(GetShader("TEXDIR"));
-				torch->SetPos(vec3(x * tileSize, 0.0f, flipZ * tileSize));
+				torch->SetPos(pos);
 				torch->SetScale(vec3(0.5f));
 
 				AddGameObject(torch);
@@ -441,9 +446,9 @@ void Scene::LoadMap()
 				GameObject* door = new GameObject();
 
 				door->SetName("DOOR_" + std::to_string(x) + "_" + std::to_string(z));
-				door->SetModel(GetModel("WALL"));
+				door->SetModel(GetModel("CUBE"));
 				door->SetTexture(GetTexture("ROCK"));	door->SetShader(GetShader("FLAT"));
-				door->SetPos(vec3(x * tileSize, 0.0f, flipZ * tileSize));
+				door->SetPos(pos);
 				door->SetScale(vec3(1.0f, 1.5f, 0.1f));
 
 				AddGameObject(door);
@@ -455,7 +460,7 @@ void Scene::LoadMap()
 
 				if (beast)
 				{
-					beast->SetPos(vec3(x * tileSize, 0.0, flipZ * tileSize));
+					beast->SetPos(pos);
 				}
 			}
 		}

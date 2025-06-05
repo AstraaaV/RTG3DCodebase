@@ -75,6 +75,7 @@ protected:
 	float m_fov; //field of view
 	float m_near;//near plane distance
 	float m_far;//far plane distance
+	float m_aspect;
 
 	string m_name;
 	string m_type;

@@ -30,6 +30,7 @@ public:
 	//return a pointer to a given thing by its name
 	GameObject* GetGameObject(string _GOName);
 	Camera* GetCamera(string _camName);
+	Camera* GetActiveCamera() const { return m_activeCamera; }
 	Light* GetLight(string _lightName);
 	Texture* GetTexture(string _texName);
 	Model* GetModel(string _modelName);
@@ -70,5 +71,7 @@ protected:
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
+	int m_activeCamIndex = 0;
+	Camera* m_activeCamera = nullptr;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

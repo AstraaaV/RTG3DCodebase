@@ -201,10 +201,10 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 cameraTransform = g_mainCamera->projectionTransform() * g_mainCamera->viewTransform();
+	Camera* activeCam = g_Scene->GetActiveCamera();
 
-	mat4 cameraProjection = g_mainCamera->projectionTransform();
-	mat4 cameraView = g_mainCamera->viewTransform() * translate(identity<mat4>(), -g_beastPos);
+	mat4 cameraProjection = activeCam->GetProj();
+	mat4 cameraView = activeCam->GetView() * translate(identity<mat4>(), -g_beastPos);
 
 #// Render principle axes - no modelling transforms so just use cameraTransform
 	if (true)
