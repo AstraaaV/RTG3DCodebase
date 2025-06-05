@@ -74,7 +74,7 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 2
+MODELS 3
 {
 TYPE: AI
 NAME: BEAST
@@ -84,6 +84,10 @@ FILE: Assets\\beast\\beast.obj
 TYPE: AI
 NAME: SPHERE
 FILE: Assets\\gsphere.obj
+}
+{
+TYPE: CUBE
+NAME: CUBE
 }
 
 TEXTURES 5
@@ -113,7 +117,7 @@ NAME: STARS2
 FILE: Assets\\Textures\\stars2.jpg
 }
 
-SHADERS 2
+SHADERS 3
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -123,6 +127,11 @@ FRAGFILE: Assets\\Shaders\\flatColour.frag
 NAME: TEXDIR
 VERTFILE: Assets\\Shaders\\texture-directional.vert
 FRAGFILE: Assets\\Shaders\\texture-directional.frag
+}
+{
+NAME: TEXMAP
+VERTFILE: Assets\\Shaders\\texture-map.vert
+FRAGFILE: Assets\\Shaders\\texture-map.frag
 }
 
 GAMEOBJECTS 2

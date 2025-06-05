@@ -45,7 +45,10 @@ void GameObject::PreRender()
 
 void GameObject::Render()
 {
-	//I have nothing to draw
+	if (m_model)
+	{
+		m_model->Render();
+	}
 }
 
 void GameObject::Init(Scene* _scene)

@@ -10,6 +10,7 @@
 #include "Shader.h"
 #include "GameObjectFactory.h"
 #include <assert.h>
+#include <helper.h>
 
 Scene::Scene()
 {
@@ -188,6 +189,9 @@ void Scene::SetShaderUniforms(GLuint _shaderprog)
 		(*it)->SetRenderValues(_shaderprog);
 	}
 
+	GLint texLoc;
+	if (Helper::SetUniformLocation(_shaderprog, "tex", &texLoc))
+		glUniform1i(texLoc, 0);
 }
 
 void Scene::Load(ifstream& _file)
@@ -354,6 +358,9 @@ void Scene::Init()
 	{
 		(*it)->Init(this);
 	}
+
+	std::cout << "[DEBUG] LOADING MAP...\n";
+	LoadMap();
 }
 
 void Scene::CycleCameras()
@@ -397,7 +404,7 @@ void Scene::LoadMap()
 				wall->SetName("WALL_" + std::to_string(x) + "_" + std::to_string(z));
 				wall->SetModel(GetModel("CUBE"));
 				wall->SetTexture(GetTexture("ROCK"));
-				wall->SetShader(GetShader("TEXDIR"));
+				wall->SetShader(GetShader("TEXMAP"));
 				wall->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
 				wall->SetScale(vec3(1.0f));
 
@@ -409,7 +416,7 @@ void Scene::LoadMap()
 				GameObject* torch = new GameObject();
 
 				torch->SetName("TORCH_" + std::to_string(x) + "_" + std::to_string(z));
-				torch->SetModel(GetModel("CUBE"));
+				torch->SetModel(GetModel("SPHERE"));
 				torch->SetTexture(GetTexture("ROCK"));
 				torch->SetShader(GetShader("TEXDIR"));
 				torch->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
@@ -433,7 +440,7 @@ void Scene::LoadMap()
 				door->SetName("DOOR_" + std::to_string(x) + "_" + std::to_string(z));
 				door->SetModel(GetModel("CUBE"));
 				door->SetTexture(GetTexture("ROCK"));
-				door->SetShader(GetShader("TEXDIR"));
+				door->SetShader(GetShader("TEXMAP"));
 				door->SetPos(vec3(x * tileSize, 0.0f, z * tileSize));
 				door->SetScale(vec3(1.0f, 1.5f, 0.1f));
 
@@ -442,11 +449,11 @@ void Scene::LoadMap()
 
 			else if (tile == 'P')
 			{
-				GameObject* player = new GameObject();
+				GameObject* beast = GetGameObject("BEAST");
 
-				if (player)
+				if (beast)
 				{
-					player->SetPos(vec3(x * tileSize, 0.0, z * tileSize));
+					beast->SetPos(vec3(x * tileSize, 0.0, z * tileSize));
 				}
 			}
 		}

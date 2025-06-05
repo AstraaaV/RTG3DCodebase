@@ -160,6 +160,7 @@ int main()
 
 	g_Scene->Load(manifest);
 	g_Scene->Init();
+	g_Scene->LoadMap();
 
 	manifest.close();
 

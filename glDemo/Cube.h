@@ -1,8 +1,9 @@
 #pragma once
 
 #include "core.h"
+#include "Model.h"
 
-class Cube {
+class Cube : public Model {
 
 private:
 
@@ -12,6 +13,7 @@ private:
 	GLuint				m_vertexBuffer;
 	GLuint				m_colourBuffer;
 	GLuint				m_indexBuffer;
+	GLuint				m_uvBuffer;
 
 public:
 
