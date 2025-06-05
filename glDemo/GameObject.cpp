@@ -41,6 +41,18 @@ void GameObject::PreRender()
 	GLint pLocation;
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&m_worldMatrix);
+
+	glUseProgram(m_ShaderProg);
+
+	if (m_texture)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_texture->GetTexID());
+
+		GLint texLoc;
+		Helper::SetUniformLocation(m_ShaderProg, "tex", &texLoc);
+		glUniform1i(texLoc, 0);
+	}
 }
 
 void GameObject::Render()
