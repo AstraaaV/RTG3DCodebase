@@ -29,5 +29,10 @@ void IsometricCamera::Tick(float dt)
 void IsometricCamera::updateCam()
 {
 	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, m_worldUp);
-	m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+	
+	float orthoSize = 10.0f;
+	float halfW = orthoSize * m_aspect * 0.5f;
+	float halfH = orthoSize * 0.5f;
+	
+	m_projectionMatrix = glm::ortho(-halfW, halfW, -halfH, halfH, m_near, m_far);
 }

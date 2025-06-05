@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObjectFactory.h"
+#include "IsometricCamera.h"
 #include <assert.h>
 #include <helper.h>
 
@@ -349,6 +350,11 @@ void Scene::Init()
 		}
 		count++;
 	}
+
+	IsometricCamera* isoCam = new IsometricCamera();
+	isoCam->SetName("ISOCAM");
+	isoCam->Init(100, 100, this);
+	m_Cameras.push_back(isoCam);
 
 	//if no MAIN camera just use the first one
 	if (!m_useCamera)
