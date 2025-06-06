@@ -142,4 +142,7 @@ void GameObject::Init(Scene* _scene)
 
 	if (!m_shader && !m_shaderName.empty())
 		m_shader = _scene->GetShader(m_shaderName);
+
+	if (m_shader)
+		m_ShaderProg = m_shader->GetProg();
 }

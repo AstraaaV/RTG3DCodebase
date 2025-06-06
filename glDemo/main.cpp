@@ -41,6 +41,8 @@ AIMesh* g_creatureMesh = nullptr;
 vec3 g_beastPos = vec3(2.0f, 0.0f, 0.0f);
 float g_beastRotation = 0.0f;
 AIMesh* g_planetMesh = nullptr;
+AIMesh* g_ghostMesh = nullptr;
+AIMesh* g_wallMesh = nullptr;
 
 int g_showing = 0;
 int g_NumExamples = 3;
@@ -83,7 +85,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_COMPAT_PROFILE, GLFW_TRUE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 
 	GLFWwindow* window = glfwCreateWindow(g_initWidth, g_initHeight, "GDV5001", NULL, NULL);
 
@@ -150,6 +152,18 @@ int main()
 		g_planetMesh->addTexture(string("Assets\\Textures\\Hodges_G_MountainRock1.jpg"), FIF_JPEG);
 	}
 
+	g_ghostMesh = new AIMesh(string("Assets\\ghost\\ghost.obj"));
+	if (g_ghostMesh)
+	{
+		g_ghostMesh->addTexture(string("Assets\\Textures\\rock_wall.JPG"), FIF_JPEG);
+	}
+
+	g_wallMesh = new AIMesh(string("Assets\\wall\\wall.obj"));
+	if (g_wallMesh)
+	{
+		g_wallMesh->addTexture(string("Assets\\Textures\\diffuse_old_stone_walls.jpg"), FIF_JPEG);
+	}
+
 	//
 	//Set up Scene class
 	//
@@ -161,6 +175,8 @@ int main()
 
 	g_Scene->Load(manifest);
 	g_Scene->Init();
+
+	cout << "[INFO] Scene loaded and initialised.\n";
 
 	manifest.close();
 
