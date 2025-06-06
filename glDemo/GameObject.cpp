@@ -10,6 +10,18 @@ GameObject::GameObject()
 	m_type = "GAMEOBJECT";
 }
 
+GameObject::GameObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader)
+{
+	m_name = name;
+	m_modelName = model;
+	m_textureName = texture;
+	m_shaderName = shader;
+	m_pos = glm::vec3(0.0f);
+	m_rot = glm::vec3(0.0f);
+	m_scale = glm::vec3(1.0f);
+	m_RP = RP_OPAQUE;
+}
+
 GameObject::~GameObject()
 {
 }

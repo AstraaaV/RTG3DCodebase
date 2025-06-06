@@ -1,4 +1,4 @@
-CAMERAS 5
+CAMERAS 4
 {
 TYPE: CAMERA
 NAME: CAM1
@@ -9,8 +9,8 @@ NEAR: 0.5
 FAR 100.0
 }
 {
-TYPE: FPC
-NAME: FIRSTPERSONCAMERA
+TYPE: CAMERA
+NAME: CAM2
 POS:  -5.0 5.0 0.0
 LOOKAT: 0.0 0.0 0.0
 FOV: 45.0
@@ -18,8 +18,8 @@ NEAR: 0.5
 FAR 100.0
 }
 {
-TYPE: ISO
-NAME: ISOCAM
+TYPE: CAMERA
+NAME: CAM3
 POS:  0.0 5.0 5.0
 LOOKAT: 0.0 0.0 0.0
 FOV: 45.0
@@ -31,15 +31,6 @@ TYPE: CAMERA
 NAME: CAM4
 POS:  0.0 5.0 -5.0
 LOOKAT: 0.0 0.0 0.0
-FOV: 45.0
-NEAR: 0.5
-FAR 100.0
-}
-{
-TYPE: ARCBALL
-NAME: OVERVIEW
-POS:  5.0 12.0 2.5
-LOOKAT: 5.0 0.0 2.5
 FOV: 45.0
 NEAR: 0.5
 FAR 100.0
@@ -83,7 +74,7 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 4
+MODELS 2
 {
 TYPE: AI
 NAME: BEAST
@@ -94,17 +85,8 @@ TYPE: AI
 NAME: SPHERE
 FILE: Assets\\gsphere.obj
 }
-{
-TYPE: AI
-NAME: WALL
-FILE: Assets\\wall\\sample_wall.obj
-}
-{
-TYPE: CUBE
-NAME: CUBE
-}
 
-TEXTURES 8
+TEXTURES 5
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -130,23 +112,8 @@ TYPE: FIF_JPEG
 NAME: STARS2
 FILE: Assets\\Textures\\stars2.jpg
 }
-{
-TYPE: FIF_JPEG
-NAME: WALL_DIFFUSE
-FILE: Assets\\Textures\\diffuse_old_stone_walls.jpg
-}
-{
-TYPE: FIF_JPEG
-NAME: WALL_NORMAL
-FILE: Assets\\Textures\\normal_old_stone_walls.jpg
-}
-{
-TYPE: FIF_JPEG
-NAME: WALL_ROUGH
-FILE: Assets\\Textures\\roughness_old_stone_walls.jpg
-}
 
-SHADERS 3
+SHADERS 2
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -156,11 +123,6 @@ FRAGFILE: Assets\\Shaders\\flatColour.frag
 NAME: TEXDIR
 VERTFILE: Assets\\Shaders\\texture-directional.vert
 FRAGFILE: Assets\\Shaders\\texture-directional.frag
-}
-{
-NAME: TEXMAP
-VERTFILE: Assets\\Shaders\\texture-map.vert
-FRAGFILE: Assets\\Shaders\\texture-map.frag
 }
 
 GAMEOBJECTS 2

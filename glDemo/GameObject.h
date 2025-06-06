@@ -14,6 +14,7 @@ class GameObject
 {
 public:
 	GameObject();
+	GameObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader);
 	virtual ~GameObject();
 
 	//load me from the file
@@ -31,6 +32,9 @@ public:
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
 
+	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
+	glm::vec3 GetPosition() const { return m_pos; }
+
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
 
@@ -41,6 +45,9 @@ protected:
 
 	string m_name;
 	string m_type;
+	string m_modelName;
+	string m_textureName;
+	string m_shaderName;
 
 	vec3		m_pos;
 	vec3		m_rot;
