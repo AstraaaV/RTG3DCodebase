@@ -39,8 +39,8 @@ public:
 	//getters
 	string GetType() { return m_type; }
 
-	glm::mat4 GetProj() { return m_projectionMatrix; }
-	glm::mat4 GetView() { return m_viewMatrix; }
+	virtual glm::mat4 GetProj() { return m_projectionMatrix; }
+	virtual glm::mat4 GetView() { return m_viewMatrix; }
 
 	glm::vec3 GetPos() { return m_pos; }
 

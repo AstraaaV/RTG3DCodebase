@@ -18,6 +18,9 @@ public:
 
 	void ProcessMouse(float deltaX, float deltaY);
 
+	glm::mat4 GetView() override { return m_viewMatrix; }
+	glm::mat4 GetProj() override { return m_projectionMatrix; }
+
 private:
 	float m_yaw, m_pitch;
 	

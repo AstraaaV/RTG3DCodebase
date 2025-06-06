@@ -40,6 +40,9 @@ private:
 	// update position, orientation, view and projection matrices when camera rotation and radius are modified
 	void calculateDerivedValues();
 
+	glm::mat4 GetView() override { return m_viewMatrix; }
+	glm::mat4 GetProj() override { return m_projectionMatrix; }
+
 public:
 
 	// Constructors

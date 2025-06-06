@@ -345,7 +345,6 @@ void Scene::CycleCams()
 	if (m_Cameras.empty()) return;
 
 	m_useCameraIndex++;
-
 	if (m_useCameraIndex >= m_Cameras.size())
 	{
 		m_useCameraIndex = 0;
