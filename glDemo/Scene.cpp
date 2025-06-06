@@ -256,7 +256,42 @@ void Scene::Render()
 		}
 	}
 
-	//TODO: now do the same for RP_TRANSPARENT here
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_FALSE);
+
+	std::vector<GameObject*> transparentObjects;
+
+	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ++it)
+	{
+		if ((*it)->GetRP() & RP_TRANSPARENT)// TODO: note the bit-wise operation. Why?
+		{
+			transparentObjects.push_back(*it);
+		}
+	}
+
+	std::sort(transparentObjects.begin(), transparentObjects.end(),
+		[this](GameObject* a, GameObject* b)
+		{
+			glm::vec3 camPos = m_useCamera->GetPos();
+			float distA = glm::length(camPos - a->GetPosition());
+			float distB = glm::length(camPos - b->GetPosition());
+			return distA > distB;
+		}
+	);
+
+	for (GameObject* obj : transparentObjects)
+	{
+		GLuint SP = obj->GetShaderProg();
+		glUseProgram(SP);
+
+		m_useCamera->SetRenderValues(SP);
+		SetShaderUniforms(SP);
+		obj->PreRender();
+		obj->Render();
+	}
+	glDepthMask(GL_TRUE);
+	glDisable(GL_BLEND);
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)
