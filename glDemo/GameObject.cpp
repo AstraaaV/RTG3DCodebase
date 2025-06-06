@@ -1,6 +1,9 @@
 #include "core.h"
 #include "GameObject.h"
 #include "stringHelp.h"
+#include "Shader.h"
+#include "Scene.h"
+#include "Texture.h"
 #include "helper.h"
 
 using namespace glm;
@@ -53,11 +56,44 @@ void GameObject::PreRender()
 	GLint pLocation;
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&m_worldMatrix);
+
+	if (m_shaderName == "TEXWALL")
+	{
+		Texture* texDiffuse = m_scene->GetTexture(m_textureName);
+		if (texDiffuse)
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texDiffuse->m_texID);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "diffuseMap"), 0);
+		}
+	
+		Texture* texNormal = m_scene->GetTexture(m_textureName2);
+		if (texNormal)
+		{
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texNormal->m_texID);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "normalMap"), 1);
+		}
+
+		Texture* texRoughness = m_scene->GetTexture(m_textureName3);
+		if (texRoughness)
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, texRoughness->m_texID);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "roughnessMap"), 2);
+		}
+	
+	}
 }
 
 void GameObject::Render()
 {
 	//I have nothing to draw
+}
+
+void GameObject::SetShader(Shader* _shader)
+{
+	m_shader = _shader;
 }
 
 void GameObject::Init(Scene* _scene)

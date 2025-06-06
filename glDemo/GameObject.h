@@ -2,6 +2,7 @@
 #include "core.h"
 #include <stdio.h>
 #include <string>
+#include "Shader.h"
 #include "RenderPass.h"
 
 using namespace std;
@@ -31,9 +32,13 @@ public:
 	void SetName(string _name) { m_name = _name; }
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
+	void SetShader(Shader* _shader);
 
 	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
 	glm::vec3 GetPosition() const { return m_pos; }
+
+	void SetTexture2(const std::string& texture) { m_textureName2 = texture; }
+	void SetTexture3(const std::string& texture) { m_textureName3 = texture; }
 
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
@@ -47,6 +52,8 @@ protected:
 	string m_type;
 	string m_modelName;
 	string m_textureName;
+	string m_textureName2; //normal
+	string m_textureName3; //roughness
 	string m_shaderName;
 
 	vec3		m_pos;
@@ -59,4 +66,7 @@ protected:
 	GLuint m_ShaderProg;
 
 	RenderPass m_RP = RP_OPAQUE;
+
+	Scene* m_scene = nullptr;
+	Shader* m_shader = nullptr;
 };

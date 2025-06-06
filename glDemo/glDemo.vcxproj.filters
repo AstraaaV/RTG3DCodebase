@@ -123,9 +123,6 @@
     <ClInclude Include="IsometricCamera.h">
       <Filter>Scene Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Scene Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -203,9 +200,6 @@
     <ClCompile Include="IsometricCamera.cpp">
       <Filter>Scene Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Base Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="manifest.txt">
@@ -229,6 +223,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\texture-map.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\texture-wall.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\texture-wall.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

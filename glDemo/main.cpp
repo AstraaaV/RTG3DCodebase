@@ -335,6 +335,13 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
 
+		case GLFW_KEY_C:
+			if (_action == GLFW_PRESS && g_Scene != nullptr)
+			{
+				g_Scene->CycleCams();
+			}
+			break;
+
 		default:
 		{
 		}

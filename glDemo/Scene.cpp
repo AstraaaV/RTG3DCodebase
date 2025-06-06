@@ -339,3 +339,27 @@ void Scene::Init()
 		(*it)->Init(this);
 	}
 }
+
+void Scene::CycleCams()
+{
+	if (m_Cameras.empty()) return;
+
+	m_useCameraIndex++;
+
+	if (m_useCameraIndex >= m_Cameras.size())
+	{
+		m_useCameraIndex = 0;
+	}
+
+	int count = 0;
+	for (Camera* cam : m_Cameras)
+	{
+		if (count == m_useCameraIndex)
+		{
+			m_useCamera = cam;
+			std::cout << "Switched to cam: \n" << cam->GetName() << std::endl;
+			break;
+		}
+		count++;
+	}
+}

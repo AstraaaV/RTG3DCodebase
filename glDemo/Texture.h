@@ -14,8 +14,9 @@ public:
 	GLuint GetTexID() { return m_texID; }
 	const std::string GetName() const { return m_name; }
 
+	GLuint m_texID = 0;
+
 protected:
 	std::string m_name;
-	GLuint m_texID = 0;
 
 };
