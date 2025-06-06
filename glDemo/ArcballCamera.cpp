@@ -91,6 +91,9 @@ void ArcballCamera::rotateCamera(float _dTheta, float _dPhi) {
 	m_theta += _dTheta;
 	m_phi += _dPhi;
 
+	if (m_theta > 89.0f) m_theta = 89.0f;
+	if (m_theta < -89.0f) m_theta = -89.0f;
+
 	calculateDerivedValues();
 }
 
@@ -107,7 +110,11 @@ void ArcballCamera::scaleRadius(float _s) {
 
 void ArcballCamera::incrementRadius(float _i) {
 
-	m_radius = std::max<float>(m_radius + _i, 0.0f);
+	m_radius += _i;
+
+	if (m_radius < 2.0f) m_radius = 2.0f;
+	if (m_radius > 100.0f) m_radius = 100.0f;
+
 	calculateDerivedValues();
 }
 
@@ -152,6 +159,29 @@ float ArcballCamera::getFarPlaneDistance() {
 void ArcballCamera::setFarPlaneDistance(float _farPlaneDistance) {
 
 	this->m_farPlane = _farPlaneDistance;
+	calculateDerivedValues();
+}
+
+void ArcballCamera::AdjustYaw(float delta)
+{
+	m_phi += delta;
+	calculateDerivedValues();
+}
+
+void ArcballCamera::AdjustPitch(float delta)
+{
+	m_theta += delta;
+
+	if (m_theta > 89.0f) m_theta = 89.0f;
+	if (m_theta < -89.0f) m_theta = -89.0f;
+
+	calculateDerivedValues();
+}
+
+void ArcballCamera::Zoom(float delta)
+{
+	m_radius += delta;
+	m_radius = std::max(2.0f, std::min(m_radius, 100.0f));
 	calculateDerivedValues();
 }
 

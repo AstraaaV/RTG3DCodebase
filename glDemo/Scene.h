@@ -45,7 +45,7 @@ public:
 	void Load(ifstream& _file);
 
 	//initialise links between items in the scene
-	void Init();
+	void Init(GLFWwindow* window);
 
 	void CycleCams();
 
@@ -67,5 +67,6 @@ protected:
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
+	GLFWwindow* m_window;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

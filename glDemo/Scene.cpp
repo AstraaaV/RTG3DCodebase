@@ -9,6 +9,9 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObjectFactory.h"
+#include "FirstPersonCamera.h"
+#include "ArcballCamera.h"
+#include "IsometricCamera.h"
 #include <assert.h>
 
 Scene::Scene()
@@ -40,6 +43,98 @@ void Scene::Update(float _dt)
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
 		(*it)->Tick(_dt);
+	}
+
+	if (!m_useCamera || !m_window)
+		return;
+
+	const float moveSpeed = 5.0f * _dt;
+	const float rotateSpeed = 50.0f * _dt;
+
+	FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera);
+
+	if (fpc)
+	{
+		if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+			fpc->MoveForward(moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+			fpc->MoveForward(-moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+			fpc->MoveRight(moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+			fpc->MoveRight(-moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
+			fpc->MoveUp(moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
+			fpc->MoveUp(-moveSpeed);
+		
+	}
+
+	else if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(m_useCamera))
+	{
+		static bool rotate = false;
+		static double lastX = 0.0, lastY = 0.0;
+
+		double xpos, ypos;
+		glfwGetCursorPos(m_window, &xpos, &ypos);
+
+		if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		{
+			if(!rotate)
+			{
+				rotate = true;
+				lastX = xpos;
+				lastY = ypos;
+			}
+			else
+			{
+				float dx = static_cast<float>(xpos - lastX);
+				float dy = static_cast<float>(ypos - lastY);
+				arc->rotateCamera(dy * 0.2f, -dx * 0.2f);
+				lastX = xpos;
+				lastY = ypos;
+			}
+		}
+		else
+		{
+			rotate = false;
+		}
+			arc->rotateCamera(0.0f, -rotateSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			arc->rotateCamera(0.0f, rotateSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
+			arc->rotateCamera(-rotateSpeed, 0.0f);
+		if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+			arc->rotateCamera(rotateSpeed, 0.0f);
+
+		if (glfwGetKey(m_window, GLFW_KEY_KP_ADD) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_EQUAL) == GLFW_PRESS)
+			arc->incrementRadius(-moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_MINUS) == GLFW_PRESS)
+			arc->incrementRadius(moveSpeed);
+	}
+
+	else if (IsometricCamera* iso = dynamic_cast<IsometricCamera*>(m_useCamera))
+	{
+		glm::vec3 panDir(0.0f);
+		float moveSpeed = 5.0f * _dt;
+
+		if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
+			panDir += glm::vec3(0.0f, 0.0f, -1.0f);
+		if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+			panDir += glm::vec3(0.0f, 0.0f, 1.0f);
+		if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			panDir += glm::vec3(-1.0f, 0.0f, 0.0f);
+		if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			panDir += glm::vec3(1.0f, 0.0f, 0.0f);
+	
+		if (glm::length(panDir) > 0.0f)
+			iso->Pan(glm::normalize(panDir) * moveSpeed);
+
+		if (glfwGetKey(m_window, GLFW_KEY_KP_ADD) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_EQUAL) == GLFW_PRESS)
+			iso->Zoom(-moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_MINUS) == GLFW_PRESS)
+			iso->Zoom(moveSpeed);
+	
 	}
 }
 
@@ -307,8 +402,9 @@ void Scene::Load(ifstream& _file)
 
 }
 
-void Scene::Init()
+void Scene::Init(GLFWwindow* window)
 {
+	m_window = window;
 	//initialise all cameras
 	//scene is passed down here to allow for linking of cameras to game objects
 	int count = 0;

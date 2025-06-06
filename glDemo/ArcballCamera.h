@@ -89,6 +89,11 @@ public:
 
 	void setFarPlaneDistance(float _farPlaneDistance);
 
+	void AdjustYaw(float delta);
+
+	void AdjustPitch(float delta);
+
+	void Zoom(float delta);
 
 	// Accessor methods for derived values
 
