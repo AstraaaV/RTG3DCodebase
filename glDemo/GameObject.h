@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <string>
 #include "RenderPass.h"
-#include "Shader.h"
-#include "Model.h"
-#include "Texture.h"
 
 using namespace std;
 class Scene;
@@ -30,25 +27,9 @@ public:
 	virtual void Render();//render this object
 
 	//various getters and setters
-	void SetModel(Model* model) { m_model = model; }
-	void SetTexture(Texture* tex) { m_texture = tex; }
-	void SetShader(Shader* shader) { m_shader = shader; }
-	void SetPos(const glm::vec3& pos) { m_pos = pos; m_basePos = pos; }
-	void SetScale(const glm::vec3& scale) { m_scale = scale; }
 	void SetName(string _name) { m_name = _name; }
-	void SetAnimated(bool anim) { m_isAnimated = anim; }
-	void EnablePacing(const glm::vec3& direction, float distance, float speed);
-	void EnableFloating(bool state) { m_isAnimated = state; m_basePos = m_pos; }
-
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
-	Model* GetModel() const { return m_model; }
-	Texture* GetTexture() const { return m_texture; }
-	Shader* GetShader() const { return m_shader; }
-
-	std::string GetModelName() const { return m_modelName; }
-	std::string GetTextureName() const { return m_textureName; }
-	std::string GetShaderName() const { return m_shaderName; }
 
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
@@ -60,14 +41,6 @@ protected:
 
 	string m_name;
 	string m_type;
-	string m_modelName;
-	string m_textureName;
-	string m_shaderName;
-
-	Model* m_model = nullptr;
-	Texture* m_texture = nullptr;
-	Shader* m_shader = nullptr;
-	Scene* m_scene = nullptr;
 
 	vec3		m_pos;
 	vec3		m_rot;
@@ -76,19 +49,7 @@ protected:
 
 	glm::mat4	m_worldMatrix;
 
-	GLuint m_ShaderProg = 0;
+	GLuint m_ShaderProg;
 
 	RenderPass m_RP = RP_OPAQUE;
-
-	bool m_isAnimated = false;
-	float m_animTime = 0.0f;
-	vec3 m_basePos;
-
-	bool m_isPacing = false;
-	float m_paceTime = 0.0f;
-	float m_paceSpeed = 1.0f;
-	float m_paceDistance = 2.0f;
-
-	glm::vec3 m_paceDirection = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 m_initialPacePos = glm::vec3(0.0f);
 };

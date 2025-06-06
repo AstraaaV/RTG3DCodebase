@@ -2,7 +2,6 @@
 #include "core.h"
 #include "TextureLoader.h"
 #include "ArcballCamera.h"
-#include "FirstPersonCamera.h"
 #include "GUClock.h"
 #include "PrincipleAxes.h"
 #include "shader_setup.h"
@@ -41,8 +40,6 @@ AIMesh* g_creatureMesh = nullptr;
 vec3 g_beastPos = vec3(2.0f, 0.0f, 0.0f);
 float g_beastRotation = 0.0f;
 AIMesh* g_planetMesh = nullptr;
-AIMesh* g_ghostMesh = nullptr;
-AIMesh* g_wallMesh = nullptr;
 
 int g_showing = 0;
 int g_NumExamples = 3;
@@ -85,7 +82,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_COMPAT_PROFILE, GLFW_TRUE);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
 
 	GLFWwindow* window = glfwCreateWindow(g_initWidth, g_initHeight, "GDV5001", NULL, NULL);
 
@@ -97,7 +94,7 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 
 	// Set callback functions to handle different events
 	glfwSetFramebufferSizeCallback(window, resizeWindow); // resize window callback
@@ -152,18 +149,6 @@ int main()
 		g_planetMesh->addTexture(string("Assets\\Textures\\Hodges_G_MountainRock1.jpg"), FIF_JPEG);
 	}
 
-	g_ghostMesh = new AIMesh(string("Assets\\ghost\\ghost.obj"));
-	if (g_ghostMesh)
-	{
-		g_ghostMesh->addTexture(string("Assets\\Textures\\rock_wall.JPG"), FIF_JPEG);
-	}
-
-	g_wallMesh = new AIMesh(string("Assets\\wall\\wall.obj"));
-	if (g_wallMesh)
-	{
-		g_wallMesh->addTexture(string("Assets\\Textures\\diffuse_old_stone_walls.jpg"), FIF_JPEG);
-	}
-
 	//
 	//Set up Scene class
 	//
@@ -175,8 +160,6 @@ int main()
 
 	g_Scene->Load(manifest);
 	g_Scene->Init();
-
-	cout << "[INFO] Scene loaded and initialised.\n";
 
 	manifest.close();
 
@@ -217,10 +200,10 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	Camera* activeCam = g_Scene->GetActiveCamera();
+	mat4 cameraTransform = g_mainCamera->projectionTransform() * g_mainCamera->viewTransform();
 
-	mat4 cameraProjection = activeCam->GetProj();
-	mat4 cameraView = activeCam->GetView() * translate(identity<mat4>(), -g_beastPos);
+	mat4 cameraProjection = g_mainCamera->projectionTransform();
+	mat4 cameraView = g_mainCamera->viewTransform() * translate(identity<mat4>(), -g_beastPos);
 
 #// Render principle axes - no modelling transforms so just use cameraTransform
 	if (true)
@@ -317,30 +300,6 @@ void updateScene()
 	}
 
 	g_Scene->Update(tDelta);
-
-	Camera* cam = g_Scene->GetActiveCamera();
-
-	if (cam && cam->GetType() == "FPC")
-	{
-		FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(cam);
-		if (!fpc) return;
-
-		float speed = 3.0f * tDelta;
-
-		GLFWwindow* window = glfwGetCurrentContext();
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			fpc->MoveForward(speed);
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			fpc->MoveForward(-speed);
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			fpc->MoveRight(-speed);
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			fpc->MoveRight(speed);
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-			fpc->MoveUp(speed);
-		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-			fpc->MoveUp(-speed);
-	}
 }
 
 
@@ -363,8 +322,6 @@ void resizeWindow(GLFWwindow* _window, int _width, int _height)
 // Function to call to handle keyboard input
 void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, int _mods)
 {
-	static bool cKeyPressed = false;
-
 	if (_action == GLFW_PRESS) {
 
 		// check which key was pressed...
@@ -377,19 +334,9 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		case GLFW_KEY_SPACE:
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
-			break;
-
-		case GLFW_KEY_C:
-			if (!cKeyPressed)
-			{
-				if (g_Scene) g_Scene->CycleCameras();
-				cKeyPressed = true;
-			}
-			break;
 
 		default:
 		{
-			break;
 		}
 		}
 	}
@@ -398,42 +345,29 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		// handle key release events
 		switch (_key)
 		{
-		case GLFW_KEY_C:
-			cKeyPressed = false;
-			break;
-
 		default:
 		{
-			break;
 		}
 		}
 	}
 }
 
+
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 {
-	static bool fpcMouse = true;
+	if (g_mouseDown) {
 
-	if (!g_Scene) return;
-	
-	FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(g_Scene->GetActiveCamera());
-	if (!fpc) return;
-		
-	if (fpcMouse)
-	{
+		//float tDelta = gameClock->gameTimeDelta();
+
+		float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
+		float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
+
+		if (g_mainCamera)
+			g_mainCamera->rotateCamera(-dy, -dx);
+
 		g_prevMouseX = _xpos;
 		g_prevMouseY = _ypos;
-		fpcMouse = false;
-		return;
 	}
-		
-	float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
-	float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
-
-	fpc->ProcessMouse(dx, -dy);
-
-	g_prevMouseX = _xpos;
-	g_prevMouseY = _ypos;
 }
 
 void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods)

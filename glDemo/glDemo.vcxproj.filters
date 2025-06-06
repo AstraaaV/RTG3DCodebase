@@ -123,9 +123,6 @@
     <ClInclude Include="IsometricCamera.h">
       <Filter>Scene Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Scene Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -202,9 +199,6 @@
     </ClCompile>
     <ClCompile Include="IsometricCamera.cpp">
       <Filter>Scene Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Base Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

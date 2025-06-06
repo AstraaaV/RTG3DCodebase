@@ -9,10 +9,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "GameObjectFactory.h"
-#include "IsometricCamera.h"
 #include <assert.h>
-#include <helper.h>
-#include <sstream>
 
 Scene::Scene()
 {
@@ -34,9 +31,9 @@ void Scene::Update(float _dt)
 	}
 
 	//update all cameras
-	for (auto* cam : m_Cameras)
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
-		cam->Tick(_dt);
+		(*it)->Tick(_dt);
 	}
 
 	//update all GameObjects
@@ -68,11 +65,11 @@ GameObject* Scene::GetGameObject(string _GOName)
 
 Camera* Scene::GetCamera(string _camName)
 {
-	for (auto* cam : m_Cameras)
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
-		if (cam->GetName() == _camName)
+		if ((*it)->GetName() == _camName)
 		{
-			return (cam);
+			return (*it);
 		}
 	}
 	printf("Unknown Camera NAME : %s \n", _camName.c_str());
@@ -136,68 +133,35 @@ Shader* Scene::GetShader(string _shaderName)
 	return nullptr;
 }
 
-void Scene::AddLight(Light* _light)
-{
-	m_Lights.push_back(_light);
-}
 
 //Render Everything
 void Scene::Render()
 {
-	// Render all opaque objects first
-	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ++it)
+	//TODO: Set up for the Opaque Render Pass will go here
+	//check out the example stuff back in main.cpp to see what needs setting up here
+	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
-		// Only draw if object is marked as opaque
-		if ((*it)->GetRP() & RP_OPAQUE)
+		if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
 		{
-			if (!(*it)->GetModel())
-			{
-				std::cout << "[WARN] " << (*it)->GetName() << " has no model. Skipping...\n";
-				continue;
-			}
+			//set shader program using
+			GLuint SP = (*it)->GetShaderProg();
+			glUseProgram(SP);
 
-			GLuint shaderProg = (*it)->GetShaderProg();
-			if (shaderProg == 0)
-			{
-				std::cout << "[WARN] " << (*it)->GetName() << " has no shader. Skipping...\n";
-				continue;
-			}
-			
-			glUseProgram(shaderProg);
+			//set up for uniform shader values for current camera
+			m_useCamera->SetRenderValues(SP);
 
-			if (m_activeCamera)
-				m_activeCamera->SetRenderValues(shaderProg);
+			//loop through setting up uniform shader values for anything else
+			SetShaderUniforms(SP);
 
-			SetShaderUniforms(shaderProg);
-
+			//set any uniform shader values for the actual model
 			(*it)->PreRender();
 
+			//actually render the GameObject
 			(*it)->Render();
 		}
 	}
 
-	// Transparent objects
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthMask(GL_FALSE);
-
-	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ++it)
-	{
-		if ((*it)->GetRP() & RP_TRANSPARENT)
-		{
-			GLuint shaderProg = (*it)->GetShaderProg();
-			glUseProgram(shaderProg);
-
-			m_useCamera->SetRenderValues(shaderProg);
-			SetShaderUniforms(shaderProg);
-			(*it)->PreRender();
-			(*it)->Render();
-		}
-	}
-
-	// Restore settings for next frame
-	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
+	//TODO: now do the same for RP_TRANSPARENT here
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)
@@ -208,22 +172,6 @@ void Scene::SetShaderUniforms(GLuint _shaderprog)
 		(*it)->SetRenderValues(_shaderprog);
 	}
 
-	GLint texLoc;
-	if (Helper::SetUniformLocation(_shaderprog, "tex", &texLoc))
-		glUniform1i(texLoc, 0);
-}
-
-static void Trim(std::string& s)
-{
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
-	{
-		return !std::isspace(ch);
-	}));
-
-	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
-		{
-			return !std::isspace(ch);
-		}).base(), s.end());
 }
 
 void Scene::Load(ifstream& _file)
@@ -232,12 +180,12 @@ void Scene::Load(ifstream& _file)
 
 	//load Cameras
 	_file >> dummy >> m_numCameras; _file.ignore(256, '\n');
-	std::cout << "CAMERAS : " << m_numCameras << endl;
+	cout << "CAMERAS : " << m_numCameras << endl;
 	for (int i = 0; i < m_numCameras; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -248,19 +196,19 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Lights
 	_file >> dummy >> m_numLights; _file.ignore(256, '\n');
-	std::cout << "LIGHTS : " << m_numLights << endl;
+	cout << "LIGHTS : " << m_numLights << endl;
 	for (int i = 0; i < m_numLights; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -271,19 +219,19 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Models
 	_file >> dummy >> m_numModels; _file.ignore(256, '\n');
-	std::cout << "MODELS : " << m_numModels << endl;
+	cout << "MODELS : " << m_numModels << endl;
 	for (int i = 0; i < m_numModels; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -294,133 +242,69 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Textures
 	_file >> dummy >> m_numTextures; _file.ignore(256, '\n');
-	std::cout << "TEXTURES : " << m_numTextures << endl;
+	cout << "TEXTURES : " << m_numTextures << endl;
 	for (int i = 0; i < m_numTextures; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		m_Textures.push_back(new Texture(_file));
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load Shaders
 	_file >> dummy >> m_numShaders; _file.ignore(256, '\n');
-	std::cout << "SHADERS : " << m_numShaders << endl;
+	cout << "SHADERS : " << m_numShaders << endl;
 	for (int i = 0; i < m_numShaders; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
 		m_Shaders.push_back(new Shader(_file));
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
 
-	std::cout << endl << endl;
+	cout << endl << endl;
 
 	//load GameObjects
 	_file >> dummy >> m_numGameObjects; _file.ignore(256, '\n');
-	std::cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
-	
+	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		std::cout << "{\n";
+		cout << "{\n";
 
-		string type, line;
-		std::streampos pos = _file.tellg();
-		bool foundType = false;
-	
-		while (std::getline(_file, line))
-		{
-			Trim(line);
-			if (line.find("TYPE:") != std::string::npos)
-			{
-				type = line.substr(line.find(":") + 1);
-				Trim(type);
-				foundType = true;
-				break;
-			}
-			if (line == "}") break;
-		}
-
-		if (!foundType || type.empty())
-		{
-			cout << "[ERROR] Failed to find TYPE in GO block. Skipping.\n";
-			while (std::getline(_file, line) && line != "}") {}
-			continue;
-		}
-
-		_file.seekg(pos);
-
+		string type;
+		_file >> dummy >> type; _file.ignore(256, '\n');
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
-
-		if (!newGO->GetModel())
-		{
-			if (!newGO->GetModelName().empty())
-			{
-				newGO->SetModel(GetModel(newGO->GetModelName()));
-			}
-		}
-		
-		if (!newGO->GetTexture())
-		{
-			if (!newGO->GetTextureName().empty())
-			{
-				newGO->SetTexture(GetTexture(newGO->GetTextureName()));
-			}
-		}
-
-		if (!newGO->GetShaderProg())
-		{
-			if (!newGO->GetShaderName().empty())
-			{
-				newGO->SetShader(GetShader(newGO->GetShaderName()));
-			}
-		}
-
-		std::cout << "[DEBUG] GO loaded: " << newGO->GetName() << std::endl;
-
-		if (!newGO->GetModel())
-		{
-			std::cout << "[WARN] " << newGO->GetName() << " has no model assigned!" << std::endl;
-		}
-
-		if (!newGO->GetTexture())
-		{
-			std::cout << "[WARN] " << newGO->GetName() << " has no texture assigned!" << std::endl;
-		}
-
-		if (!newGO->GetShaderProg() == 0)
-		{
-			std::cout << "[WARN] " << newGO->GetName() << " has no shader assigned!" << std::endl;
-		}
 
 		m_GameObjects.push_back(newGO);
 
 		//skip }
 		_file.ignore(256, '\n');
-		std::cout << "}\n";
+		cout << "}\n";
 	}
+
+
 }
 
 void Scene::Init()
@@ -428,60 +312,30 @@ void Scene::Init()
 	//initialise all cameras
 	//scene is passed down here to allow for linking of cameras to game objects
 	int count = 0;
-	for (auto* cam : m_Cameras)
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); ++it)
 	{
-		(cam)->Init(100, 100, this);// TODO: set correct screen sizes here
+		(*it)->Init(100, 100, this);// TODO: set correct screen sizes here
 
 		//if a camera is called MAIN
 		//this will be the starting camera used
-		if ((cam)->GetName() == "OVERVIEW")
+		if ((*it)->GetName() == "MAIN")
 		{
-			m_useCamera = (cam);
+			m_useCamera = (*it);
 			m_useCameraIndex = count;
-		}
-		else if ((cam)->GetName() == "FIRSTPERSONCAMERA")
-		{
-			
 		}
 		count++;
 	}
 
-	IsometricCamera* isoCam = new IsometricCamera();
-	isoCam->SetName("ISOCAM");
-	isoCam->Init(100, 100, this);
-	m_Cameras.push_back(isoCam);
-
 	//if no MAIN camera just use the first one
 	if (!m_useCamera)
 	{
-		m_useCamera = GetCamera("FIRSTPERSONCAMERA");
+		m_useCamera = (*m_Cameras.begin());
 		m_useCameraIndex = 0;
 	}
-
-	m_activeCamera = m_useCamera;
-	m_activeCamIndex = m_useCameraIndex;
 
 	//set up links between everything and GameObjects
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
 		(*it)->Init(this);
 	}
-
-	std::cout << "[DEBUG] LOADING MAP...\n";
-	
-	m_map = new Map(this);
-	m_map->Init();
-}
-
-void Scene::CycleCameras()
-{
-	if (m_Cameras.empty()) return;
-
-	m_activeCamIndex = (m_activeCamIndex + 1) % m_Cameras.size();
-	
-	auto it = m_Cameras.begin();
-	std::advance(it, m_activeCamIndex);
-	m_activeCamera = *it;
-
-	std::cout << "Switched to camera: " << m_useCamera->GetName() << std::endl;
 }

@@ -150,7 +150,6 @@
     <ClInclude Include="DirectionLight.h" />
     <ClInclude Include="ExampleGO.h" />
     <ClInclude Include="FreeImage\FreeImage.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="GameObject.h" />
@@ -183,7 +182,6 @@
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="DirectionLight.cpp" />
     <ClCompile Include="ExampleGO.cpp" />
-    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
