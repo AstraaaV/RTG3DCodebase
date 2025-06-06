@@ -1,6 +1,7 @@
 #pragma once
 #include "core.h"
 #include "Terrain.h"
+#include "Map.h"
 #include <list>
 #include <string>
 #include <fstream>
@@ -14,6 +15,7 @@ class Light;
 class Model;
 class Texture;
 class Shader;
+class Map;
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -37,6 +39,8 @@ public:
 	Model* GetModel(string _modelName);
 	Shader* GetShader(string _shaderName);
 
+	void AddLight(Light* _light);
+
 	//Render Everything
 	void Render();
 
@@ -50,7 +54,6 @@ public:
 	void Init();
 
 	void CycleCameras();
-	void LoadMap();
 
 protected:
 
@@ -75,5 +78,6 @@ protected:
 	int m_activeCamIndex = 0;
 	Camera* m_activeCamera = nullptr;
 	Terrain* m_terrain = nullptr;
+	Map* m_map = nullptr;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

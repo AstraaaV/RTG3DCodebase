@@ -2,11 +2,12 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "GameObject.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <fstream>
 
-class Terrain
+class Terrain : public GameObject
 {
 public:
 	Terrain();

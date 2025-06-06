@@ -12,6 +12,7 @@
 #include "IsometricCamera.h"
 #include <assert.h>
 #include <helper.h>
+#include <sstream>
 
 Scene::Scene()
 {
@@ -135,6 +136,10 @@ Shader* Scene::GetShader(string _shaderName)
 	return nullptr;
 }
 
+void Scene::AddLight(Light* _light)
+{
+	m_Lights.push_back(_light);
+}
 
 //Render Everything
 void Scene::Render()
@@ -145,7 +150,19 @@ void Scene::Render()
 		// Only draw if object is marked as opaque
 		if ((*it)->GetRP() & RP_OPAQUE)
 		{
+			if (!(*it)->GetModel())
+			{
+				std::cout << "[WARN] " << (*it)->GetName() << " has no model. Skipping...\n";
+				continue;
+			}
+
 			GLuint shaderProg = (*it)->GetShaderProg();
+			if (shaderProg == 0)
+			{
+				std::cout << "[WARN] " << (*it)->GetName() << " has no shader. Skipping...\n";
+				continue;
+			}
+			
 			glUseProgram(shaderProg);
 
 			if (m_activeCamera)
@@ -210,18 +227,31 @@ void Scene::SetShaderUniforms(GLuint _shaderprog)
 		glUniform1i(texLoc, 0);
 }
 
+static void Trim(std::string& s)
+{
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+	{
+		return !std::isspace(ch);
+	}));
+
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+		{
+			return !std::isspace(ch);
+		}).base(), s.end());
+}
+
 void Scene::Load(ifstream& _file)
 {
 	string dummy;
 
 	//load Cameras
 	_file >> dummy >> m_numCameras; _file.ignore(256, '\n');
-	cout << "CAMERAS : " << m_numCameras << endl;
+	std::cout << "CAMERAS : " << m_numCameras << endl;
 	for (int i = 0; i < m_numCameras; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
+		std::cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -232,19 +262,19 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		cout << "}\n";
+		std::cout << "}\n";
 	}
 
-	cout << endl << endl;
+	std::cout << endl << endl;
 
 	//load Lights
 	_file >> dummy >> m_numLights; _file.ignore(256, '\n');
-	cout << "LIGHTS : " << m_numLights << endl;
+	std::cout << "LIGHTS : " << m_numLights << endl;
 	for (int i = 0; i < m_numLights; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
+		std::cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -255,19 +285,19 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		cout << "}\n";
+		std::cout << "}\n";
 	}
 
-	cout << endl << endl;
+	std::cout << endl << endl;
 
 	//load Models
 	_file >> dummy >> m_numModels; _file.ignore(256, '\n');
-	cout << "MODELS : " << m_numModels << endl;
+	std::cout << "MODELS : " << m_numModels << endl;
 	for (int i = 0; i < m_numModels; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
+		std::cout << "{\n";
 
 		string type;
 		_file >> dummy >> type; _file.ignore(256, '\n');
@@ -278,83 +308,130 @@ void Scene::Load(ifstream& _file)
 
 		//skip }
 		_file.ignore(256, '\n');
-		cout << "}\n";
+		std::cout << "}\n";
 	}
 
-	cout << endl << endl;
+	std::cout << endl << endl;
 
 	//load Textures
 	_file >> dummy >> m_numTextures; _file.ignore(256, '\n');
-	cout << "TEXTURES : " << m_numTextures << endl;
+	std::cout << "TEXTURES : " << m_numTextures << endl;
 	for (int i = 0; i < m_numTextures; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
+		std::cout << "{\n";
 
 		m_Textures.push_back(new Texture(_file));
 
 		//skip }
 		_file.ignore(256, '\n');
-		cout << "}\n";
+		std::cout << "}\n";
 	}
 
-	cout << endl << endl;
+	std::cout << endl << endl;
 
 	//load Shaders
 	_file >> dummy >> m_numShaders; _file.ignore(256, '\n');
-	cout << "SHADERS : " << m_numShaders << endl;
+	std::cout << "SHADERS : " << m_numShaders << endl;
 	for (int i = 0; i < m_numShaders; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
+		std::cout << "{\n";
 
 		m_Shaders.push_back(new Shader(_file));
 
 		//skip }
 		_file.ignore(256, '\n');
-		cout << "}\n";
+		std::cout << "}\n";
 	}
 
-	cout << endl << endl;
+	std::cout << endl << endl;
 
 	//load GameObjects
 	_file >> dummy >> m_numGameObjects; _file.ignore(256, '\n');
-	cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
+	std::cout << "GAMEOBJECTS : " << m_numGameObjects << endl;
+	
 	for (int i = 0; i < m_numGameObjects; i++)
 	{
 		//skip {
 		_file.ignore(256, '\n');
-		cout << "{\n";
+		std::cout << "{\n";
 
-		string type;
-		_file >> dummy >> type; _file.ignore(256, '\n');
+		string type, line;
+		std::streampos pos = _file.tellg();
+	
+		while (std::getline(_file, line))
+		{
+			Trim(line);
+			if (line.find("TYPE:") != std::string::npos)
+			{
+				type = line.substr(line.find(":") + 1);
+				Trim(type);
+				break;
+			}
+			if (line == "}") break;
+		}
+
+		if (type.empty())
+		{
+			cout << "[ERROR] Failed to find TYPE in GO block. Skipping.\n";
+			while (std::getline(_file, line) && line != "}") {}
+			continue;
+		}
+
+		_file.seekg(pos);
+
 		GameObject* newGO = GameObjectFactory::makeNewGO(type);
 		newGO->Load(_file);
+
+		if (!newGO->GetModel())
+		{
+			if (!newGO->GetModelName().empty())
+			{
+				newGO->SetModel(GetModel(newGO->GetModelName()));
+			}
+		}
+		
+		if (!newGO->GetTexture())
+		{
+			if (!newGO->GetTextureName().empty())
+			{
+				newGO->SetTexture(GetTexture(newGO->GetTextureName()));
+			}
+		}
+
+		if (!newGO->GetShaderProg())
+		{
+			if (!newGO->GetShaderName().empty())
+			{
+				newGO->SetShader(GetShader(newGO->GetShaderName()));
+			}
+		}
 
 		std::cout << "[DEBUG] GO loaded: " << newGO->GetName() << std::endl;
 
 		if (!newGO->GetModel())
 		{
-			cout << "[WARN] " << newGO->GetName() << " has no model assigned!" << std::endl;
+			std::cout << "[WARN] " << newGO->GetName() << " has no model assigned!" << std::endl;
 		}
 
 		if (!newGO->GetTexture())
 		{
-			cout << "[WARN] " << newGO->GetName() << " has no texture assigned!" << std::endl;
+			std::cout << "[WARN] " << newGO->GetName() << " has no texture assigned!" << std::endl;
 		}
 
 		if (!newGO->GetShaderProg() == 0)
 		{
-			cout << "[WARN] " << newGO->GetName() << " has no shader assigned!" << std::endl;
+			std::cout << "[WARN] " << newGO->GetName() << " has no shader assigned!" << std::endl;
 		}
 
 		m_GameObjects.push_back(newGO);
 
 		//skip }
 		_file.ignore(256, '\n');
-		cout << "}\n";
+		std::cout << "}\n";
 	}
 
 	//load Terrain
@@ -426,7 +503,9 @@ void Scene::Init()
 	}
 
 	std::cout << "[DEBUG] LOADING MAP...\n";
-	LoadMap();
+	
+	m_map = new Map(this);
+	m_map->Init();
 }
 
 void Scene::CycleCameras()
@@ -440,103 +519,4 @@ void Scene::CycleCameras()
 	m_activeCamera = *it;
 
 	std::cout << "Switched to camera: " << m_useCamera->GetName() << std::endl;
-}
-
-void Scene::LoadMap()
-{
-	m_mapLayout =
-	{
-		"WWWWWWWWWW",
-		"W..T.....W",
-		"W..D..P..W",
-		"W....G...W",
-		"WWWWWWWWWW"
-	};
-
-	float tileSize = 1.0f;
-	int numRows = static_cast<int>(m_mapLayout.size());
-
-	for (int z = 0; z < numRows; ++z)
-	{
-		const std::string& row = m_mapLayout[z];
-		int flipZ = numRows - 1 - z;
-
-		for (int x = 0; x < row.size(); ++x)
-		{
-			char tile = row[x];
-			vec3 pos = vec3(x * tileSize, 0.0f, flipZ * tileSize);
-
-			if (tile == 'W')
-			{
-				GameObject* wall = new GameObject();
-
-				wall->SetName("WALL_" + std::to_string(x) + "_" + std::to_string(z));
-				wall->SetModel(GetModel("CUBE"));
-				wall->SetTexture(GetTexture("WALL_DIFFUSE"));
-				wall->SetShader(GetShader("TEXDIR"));
-				wall->SetPos(pos);
-				wall->SetScale(vec3(1.0f));
-
-				AddGameObject(wall);
-			}
-
-			else if (tile == 'T')
-			{
-				GameObject* torch = new GameObject();
-
-				torch->SetName("TORCH_" + std::to_string(x) + "_" + std::to_string(z));
-				torch->SetModel(GetModel("CUBE"));
-				torch->SetTexture(GetTexture("ROCK"));
-				torch->SetShader(GetShader("TEXDIR"));
-				torch->SetPos(pos);
-				torch->SetScale(vec3(0.5f));
-
-				AddGameObject(torch);
-
-				Light* point = new Light();
-				point->SetName("TORCH_LIGHT_" + std::to_string(x) + "_" + std::to_string(z));
-				point->SetPos(vec3(x * tileSize, 1.5f, flipZ * tileSize));
-				point->SetColour(vec3(1.0f, 0.5f, 0.2f));
-				point->SetAmbient(vec3(0.1f, 0.05f, 0.02f));
-
-				m_Lights.push_back(point);
-			}
-
-			else if (tile == 'D')
-			{
-				GameObject* door = new GameObject();
-
-				door->SetName("DOOR_" + std::to_string(x) + "_" + std::to_string(z));
-				door->SetModel(GetModel("CUBE"));
-				door->SetTexture(GetTexture("ROCK"));	door->SetShader(GetShader("FLAT"));
-				door->SetPos(pos);
-				door->SetScale(vec3(1.0f, 1.5f, 0.1f));
-
-				AddGameObject(door);
-			}
-
-			else if (tile == 'P')
-			{
-				GameObject* beast = GetGameObject("BEAST");
-
-				if (beast)
-				{
-					beast->SetPos(pos);
-					beast->SetAnimated(true);
-					beast->EnablePacing(glm::vec3(1.0f, 0.0f, 0.0f), 2.0f, 1.5f);
-				}
-			}
-
-			else if (tile == 'G')
-			{
-				GameObject* ghost = GetGameObject("GHOST");
-
-				if (ghost)
-				{
-					ghost->SetPos(vec3(6.0f, 0.0f, 6.0f));
-					ghost->EnableFloating(true);
-				}
-			}
-		}
-	}
 }

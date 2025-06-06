@@ -46,6 +46,10 @@ public:
 	Texture* GetTexture() const { return m_texture; }
 	Shader* GetShader() const { return m_shader; }
 
+	std::string GetModelName() const { return m_modelName; }
+	std::string GetTextureName() const { return m_textureName; }
+	std::string GetShaderName() const { return m_shaderName; }
+
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
 
