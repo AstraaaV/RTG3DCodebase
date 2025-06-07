@@ -123,7 +123,6 @@ Cube::~Cube() {
 	glDeleteBuffers(1, & m_uvBuffer);
 }
 
-
 void Cube::render() {
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, m_numFaces * 3, GL_UNSIGNED_INT, (const GLvoid*)0);

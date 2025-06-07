@@ -104,14 +104,29 @@ void GameObject::SetShader(Shader* _shader)
 	m_shader = _shader;
 }
 
+void GameObject::SetScale(const glm::vec3& scale)
+{
+	m_scale = scale;
+}
+
+void GameObject::SetRenderPass(RenderPass rp)
+{
+	m_RP = rp;
+}
+
 void GameObject::Init(Scene* _scene)
 {
 	m_scene = _scene;
 
 	Model* model = _scene->GetModel(m_modelName);
-	Texture* texture = _scene->GetTexture(m_textureName);
 	m_shader = _scene->GetShader(m_shaderName);
 
 	if (m_shader)
 		m_ShaderProg = m_shader->GetProg();
+
+	if (m_shaderName == "TEXWALL")
+	{
+		m_textureName2 = "WALL_NORMAL";
+		m_textureName3 = "WALL_ROUGHNESS";
+	}
 }

@@ -40,6 +40,9 @@ public:
 	void SetTexture2(const std::string& texture) { m_textureName2 = texture; }
 	void SetTexture3(const std::string& texture) { m_textureName3 = texture; }
 
+	void SetScale(const glm::vec3& scale);
+	void SetRenderPass(RenderPass rp);
+
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
 

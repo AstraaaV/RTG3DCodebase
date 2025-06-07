@@ -65,7 +65,7 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 3
+MODELS 4
 {
 TYPE: AI
 NAME: BEAST
@@ -80,6 +80,10 @@ FILE: Assets\\gsphere.obj
 TYPE: AI
 NAME: WALL
 FILE: Assets\\wall\\wall.obj
+}
+{
+TYPE: CUBE
+NAME: CUBE
 }
 
 TEXTURES 8
@@ -146,7 +150,7 @@ VERTFILE: Assets\\Shaders\\texture-wall.vert
 FRAGFILE: Assets\\Shaders\\texture-wall.frag
 }
 
-GAMEOBJECTS 2
+GAMEOBJECTS 3
 {
 TYPE: EXAMPLE
 NAME: BEAST
@@ -168,4 +172,15 @@ ROTINC: 0.0 0.2 0.0
 MODEL: SPHERE
 TEXTURE: ROCK
 SHADER: TEXDIR
+}
+{
+TYPE: EXAMPLE
+NAME: TEST_WALL
+POS: 0.0 0.0 0.0
+ROT: 0.0 0.0 0.0 
+SCALE: 1.0 1.0 1.0
+ROTINC: 0.0 0.0 0.0
+MODEL: WALL
+TEXTURE: WALL_DIFFUSE
+SHADER: TEXWALL
 }

@@ -12,6 +12,8 @@
 #include "FirstPersonCamera.h"
 #include "ArcballCamera.h"
 #include "IsometricCamera.h"
+#include "Map.h"
+#include "Cube.h"
 #include <assert.h>
 
 Scene::Scene()
@@ -464,6 +466,11 @@ void Scene::Init(GLFWwindow* window)
 	{
 		(*it)->Init(this);
 	}
+
+	m_Models.push_back(new Cube());
+
+	m_map = new Map(this);
+	m_map->Init();
 }
 
 void Scene::CycleCams()

@@ -13,6 +13,7 @@ class Light;
 class Model;
 class Texture;
 class Shader;
+class Map;
 
 //Note quite a proper scene graph but this contains data structures for all of our bits and pieces we want to draw
 class Scene
@@ -68,5 +69,6 @@ protected:
 	Camera* m_useCamera = nullptr; //current main camera in use
 	int m_useCameraIndex = 0;
 	GLFWwindow* m_window;
+	Map* m_map;
 	//TODO: pass down the same keyboard input from main so that we skip through all the cameras
 };

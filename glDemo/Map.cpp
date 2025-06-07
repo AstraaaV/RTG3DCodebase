@@ -43,10 +43,11 @@ void Map::SpawnTile(char tile, int x, int z)
 	switch (tile)
 	{
 	case 'W':
-		CreateObject("Wall", "CUBE", "WALL_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
+		CreateObject("Wall_" + std::to_string(x) + "_" + std::to_string(z),
+			 "CUBE", "WALL_DIFFUSE", "TEXWALL", pos, RP_OPAQUE);
 		break;
 	case 'T':
-		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXPOINT", pos, RP_TRANSPARENT);
+		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, RP_TRANSPARENT);
 		break;
 	case 'B':
 		CreateObject("Beast", "BEAST", "BEAST_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
@@ -63,6 +64,8 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 {
 	GameObject* obj = new GameObject(name, model, texture, shader);
 	obj->SetPosition(pos);
+	obj->SetScale(glm::vec3(1.0f));
 	obj->Init(m_scene);
+	obj->SetRenderPass(rp);
 	m_scene->AddGameObject(obj);
 }
