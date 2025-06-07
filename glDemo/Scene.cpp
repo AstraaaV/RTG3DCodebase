@@ -489,6 +489,10 @@ void Scene::Init(GLFWwindow* window)
 	Cube* cube = new Cube();
 	cube->SetName("CUBE");
 	m_Models.push_back(new Cube());
+
+	Model* floorModel = new Cube();
+	floorModel->SetName("FLOOR");
+	m_Models.push_back(floorModel);
 }
 
 void Scene::CycleCams()

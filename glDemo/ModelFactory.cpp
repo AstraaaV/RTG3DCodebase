@@ -16,6 +16,10 @@ Model* ModelFactory::makeNewModel(std::string _type)
 	{
 		return new Cube();
 	}
+	else if (_type == "FLOOR")
+	{
+		return new Cube();
+	}
 	else
 	{
 		printf("UNKNOWN MODEL TYPE: %s \n", _type.c_str());
