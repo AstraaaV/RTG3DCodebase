@@ -14,6 +14,17 @@ void ArcballCamera::calculateDerivedValues() {
 	const float theta_ = glm::radians<float>(m_theta);
 	const float phi_ = glm::radians<float>(m_phi);
 
+	glm::vec3 direction;
+	direction.x = m_radius * sinf(theta_) * sinf(phi_);
+	direction.y = m_radius * cosf(theta_);
+	direction.z = m_radius * sinf(theta_) * cosf(phi_);
+
+	glm::vec3 position = m_target + direction;
+
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+	m_viewMatrix = glm::lookAt(position, m_target, up);
+
 	// calculate position vector
 	//cameraPos = glm::vec4(sinf(phi_) * cosf(-theta_) * radius, sinf(-theta_) * radius, cosf(phi_) * cosf(-theta_) * radius, 1.0f);
 
@@ -21,7 +32,6 @@ void ArcballCamera::calculateDerivedValues() {
 	//R = glm::eulerAngleY(phi_) * glm::eulerAngleX(theta_);
 
 	// calculate view and projection transform matrices
-	m_viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -m_radius)) * glm::eulerAngleX(-theta_) * glm::eulerAngleY(-phi_);
 	m_projectionMatrix = glm::perspective(glm::radians<float>(m_fovY), m_aspect, m_nearPlane, m_farPlane);
 }
 
@@ -182,6 +192,12 @@ void ArcballCamera::Zoom(float delta)
 {
 	m_radius += delta;
 	m_radius = std::max(2.0f, std::min(m_radius, 100.0f));
+	calculateDerivedValues();
+}
+
+void ArcballCamera::SetRadius(float r)
+{
+	m_radius = r;
 	calculateDerivedValues();
 }
 

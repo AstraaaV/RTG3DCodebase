@@ -46,8 +46,22 @@ void IsometricCamera::Zoom(float amount)
 	m_projectionMatrix = glm::ortho(-halfW, halfW, -halfH, halfH, m_near, m_far);
 }
 
+void IsometricCamera::SetZoom(float z)
+{
+	m_zoom = z;
+	updateCam();
+}
+
+void IsometricCamera::SetFocus(const glm::vec3& f)
+{
+	m_focus = f;
+	updateCam();
+}
+
 void IsometricCamera::updateCam()
 {
+	m_pos = m_focus + glm::vec3(-5.0f, 5.0f, -5.0f) * m_zoom;
+	m_lookAt = m_focus;
 	m_forward = glm::normalize(m_lookAt - m_pos);
 	m_up = glm::normalize(m_worldUp);
 

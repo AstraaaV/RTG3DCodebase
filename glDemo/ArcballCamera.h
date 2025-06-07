@@ -43,6 +43,8 @@ private:
 	glm::mat4 GetView() override { return m_viewMatrix; }
 	glm::mat4 GetProj() override { return m_projectionMatrix; }
 
+	glm::vec3 m_target = glm::vec3(0.0f);
+
 public:
 
 	// Constructors
@@ -94,6 +96,10 @@ public:
 	void AdjustPitch(float delta);
 
 	void Zoom(float delta);
+
+	void SetTarget(const glm::vec3& targ) { m_target = targ; calculateDerivedValues; }
+
+	void SetRadius(float r);
 
 	// Accessor methods for derived values
 

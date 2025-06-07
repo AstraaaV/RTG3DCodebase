@@ -14,6 +14,9 @@ public:
 	glm::mat4 GetView() override { return m_viewMatrix; }
 	glm::mat4 GetProj() override { return m_projectionMatrix; }
 
+	void SetZoom(float z);
+	void SetFocus(const glm::vec3& f);
+
 private:
 	void updateCam();
 
@@ -27,8 +30,11 @@ private:
 	glm::mat4 m_viewMatrix;
 	glm::mat4 m_projectionmatrix;
 
+	glm::vec3 m_focus = glm::vec3(0);
+
 	float m_fov;
 	float m_near;
 	float m_far;
 	float m_aspect;
+	float m_zoom = 1.0f;
 };

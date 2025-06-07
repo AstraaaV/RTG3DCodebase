@@ -450,6 +450,22 @@ void Scene::Init(GLFWwindow* window)
 		{
 			m_useCamera = (*it);
 			m_useCameraIndex = count;
+			glm::vec3 spawn = m_map->GetPlayerSpawn();
+
+			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
+				fpc->SetPos(spawn + glm::vec3(0.0f, 1.8f, 0.0f));
+
+			else if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(m_useCamera))
+			{
+				arc->SetTarget(spawn);
+				arc->SetRadius(10.0f);
+			}
+
+			else if (IsometricCamera* iso = dynamic_cast<IsometricCamera*>(m_useCamera))
+			{
+				iso->SetFocus(spawn);
+				iso->SetZoom(15.0f);
+			}
 		}
 		count++;
 	}
