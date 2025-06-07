@@ -437,6 +437,9 @@ void Scene::Load(ifstream& _file)
 void Scene::Init(GLFWwindow* window)
 {
 	m_window = window;
+
+	m_map = new Map(this);
+	m_map->Init();
 	//initialise all cameras
 	//scene is passed down here to allow for linking of cameras to game objects
 	int count = 0;
@@ -486,9 +489,6 @@ void Scene::Init(GLFWwindow* window)
 	Cube* cube = new Cube();
 	cube->SetName("CUBE");
 	m_Models.push_back(new Cube());
-
-	m_map = new Map(this);
-	m_map->Init();
 }
 
 void Scene::CycleCams()

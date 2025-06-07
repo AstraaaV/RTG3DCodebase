@@ -97,7 +97,7 @@ public:
 
 	void Zoom(float delta);
 
-	void SetTarget(const glm::vec3& targ) { m_target = targ; calculateDerivedValues; }
+	void SetTarget(const glm::vec3& targ) { m_target = targ; calculateDerivedValues(); }
 
 	void SetRadius(float r);
 
