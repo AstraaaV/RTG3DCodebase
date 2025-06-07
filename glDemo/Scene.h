@@ -25,7 +25,7 @@ public:
 	void Update(float _dt);
 
 	//add this GO to my list
-	void AddGameObject(GameObject* _new);
+	void AddGameObject(GameObject* obj);
 
 	//return a pointer to a given thing by its name
 	GameObject* GetGameObject(string _GOName);
@@ -48,11 +48,6 @@ public:
 	void Init(GLFWwindow* window);
 
 	void CycleCams();
-
-	void AddWall(const glm::vec3& pos);
-	void AddTorch(const glm::vec3& pos);
-	void AddBeast(const glm::vec3& pos);
-	void SetPlayerSpawn(const glm::vec3& pos);
 
 protected:
 

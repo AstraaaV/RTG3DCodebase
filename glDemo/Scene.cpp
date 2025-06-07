@@ -138,11 +138,6 @@ void Scene::Update(float _dt)
 	}
 }
 
-void Scene::AddGameObject(GameObject* _new)
-{
-	m_GameObjects.push_back(_new);
-}
-
 //I want THAT Game Object by name
 GameObject* Scene::GetGameObject(string _GOName)
 {
@@ -494,7 +489,7 @@ void Scene::CycleCams()
 	}
 }
 
-void Scene::AddWall(const glm::vec3& pos)
+void Scene::AddGameObject(GameObject* obj)
 {
-
+	m_GameObjects.push_back(obj);
 }
