@@ -493,3 +493,8 @@ void Scene::CycleCams()
 		count++;
 	}
 }
+
+void Scene::AddWall(const glm::vec3& pos)
+{
+
+}

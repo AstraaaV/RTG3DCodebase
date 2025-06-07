@@ -49,6 +49,11 @@ public:
 
 	void CycleCams();
 
+	void AddWall(const glm::vec3& pos);
+	void AddTorch(const glm::vec3& pos);
+	void AddBeast(const glm::vec3& pos);
+	void SetPlayerSpawn(const glm::vec3& pos);
+
 protected:
 
 	//data structures containing pointers to all our stuff

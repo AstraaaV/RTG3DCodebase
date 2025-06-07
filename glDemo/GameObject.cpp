@@ -96,6 +96,11 @@ void GameObject::SetShader(Shader* _shader)
 	m_shader = _shader;
 }
 
+void GameObject::SetTexture(const std::string& textureName)
+{
+	m_textureName = textureName;
+}
+
 void GameObject::Init(Scene* _scene)
 {
 	//I have nothing to link up to
