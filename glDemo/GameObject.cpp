@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Texture.h"
 #include "helper.h"
+#include "Model.h"
 
 using namespace glm;
 
@@ -52,6 +53,8 @@ void GameObject::Tick(float _dt)
 
 void GameObject::PreRender()
 {
+
+	if (!m_ShaderProg) return;
 	// Setup model transform
 	GLint pLocation;
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
@@ -88,7 +91,12 @@ void GameObject::PreRender()
 
 void GameObject::Render()
 {
-	//I have nothing to draw
+	Model* model = m_scene->GetModel(m_modelName);
+
+	if (model)
+	{
+		model->Render();
+	}
 }
 
 void GameObject::SetShader(Shader* _shader)
@@ -98,5 +106,12 @@ void GameObject::SetShader(Shader* _shader)
 
 void GameObject::Init(Scene* _scene)
 {
-	//I have nothing to link up to
+	m_scene = _scene;
+
+	Model* model = _scene->GetModel(m_modelName);
+	Texture* texture = _scene->GetTexture(m_textureName);
+	m_shader = _scene->GetShader(m_shaderName);
+
+	if (m_shader)
+		m_ShaderProg = m_shader->GetProg();
 }
