@@ -36,6 +36,14 @@ const std::vector<std::string>& Map::GetMap() const
 	return m_map;
 }
 
+bool Map::IsWall(int x, int z) const
+{
+	if (z < 0 || z >= m_map.size() || x < 0 || x >= m_map[z].length())
+		return true;
+
+	return m_map[z][x] == 'W';
+}
+
 void Map::SpawnTile(char tile, int x, int z)
 {
 	glm::vec3 pos = glm::vec3((float)x, 0.0f, (float)z);

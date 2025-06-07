@@ -15,6 +15,7 @@ public:
 	const std::vector<std::string>& GetMap() const;
 
 	glm::vec3 GetPlayerSpawn() const { return m_playerSpawn; }
+	bool IsWall(int x, int z) const;
 
 private:
 	std::vector<std::string> m_map;

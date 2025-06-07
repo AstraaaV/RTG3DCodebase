@@ -57,19 +57,50 @@ void Scene::Update(float _dt)
 
 	if (fpc)
 	{
+		glm::vec3 currentPos = fpc->GetPos();
+		glm::vec3 forward = glm::normalize(glm::vec3(fpc->GetForward().x, 0.0f, fpc->GetForward().z));
+		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
 		if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
-			fpc->MoveForward(moveSpeed);
+		{
+			glm::vec3 newPos = currentPos + forward * moveSpeed;
+			int x = (int)(newPos.x + 0.5f);
+			int z = (int)(newPos.z + 0.5f);
+			if (!m_map->IsWall(x, z))
+				fpc->SetPos(newPos);
+		}
+
 		if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
-			fpc->MoveForward(-moveSpeed);
+		{
+			glm::vec3 newPos = currentPos - forward * moveSpeed;
+			int x = (int)(newPos.x + 0.5f);
+			int z = (int)(newPos.z + 0.5f);
+			if (!m_map->IsWall(x, z))
+				fpc->SetPos(newPos);
+		}
+
 		if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
-			fpc->MoveRight(moveSpeed);
+		{
+			glm::vec3 newPos = currentPos + right * moveSpeed;
+			int x = (int)(newPos.x + 0.5f);
+			int z = (int)(newPos.z + 0.5f);
+			if (!m_map->IsWall(x, z))
+				fpc->SetPos(newPos);
+		}
+
 		if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
-			fpc->MoveRight(-moveSpeed);
+		{
+			glm::vec3 newPos = currentPos - right * moveSpeed;
+			int x = (int)(newPos.x + 0.5f);
+			int z = (int)(newPos.z + 0.5f);
+			if (!m_map->IsWall(x, z))
+				fpc->SetPos(newPos);
+		}
+
 		if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
-			fpc->MoveUp(moveSpeed);
+			fpc->SetPos(currentPos + glm::vec3(0.0f, moveSpeed, 0.0f));
 		if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
-			fpc->MoveUp(-moveSpeed);
-		
+			fpc->SetPos(currentPos - glm::vec3(0.0f, moveSpeed, 0.0f));
 	}
 
 	else if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(m_useCamera))
