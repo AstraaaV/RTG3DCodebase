@@ -278,7 +278,7 @@ void renderScene()
 		mat4 modelTransform = glm::translate(identity<mat4>(), vec3(2.0, 0.0, 2.0));
 		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
 
-		g_cube->render();
+		g_cube->Render();
 		break;
 	}
 	case 2:

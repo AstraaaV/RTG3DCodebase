@@ -15,6 +15,7 @@ public:
 	virtual void Render() {};
 
 	string GetName() { return m_name; }
+	void SetName(const std::string& name) { m_name = name; }
 
 protected:
 	string m_name;

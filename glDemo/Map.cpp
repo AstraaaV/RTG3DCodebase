@@ -44,7 +44,7 @@ void Map::SpawnTile(char tile, int x, int z)
 	{
 	case 'W':
 		CreateObject("Wall_" + std::to_string(x) + "_" + std::to_string(z),
-			 "CUBE", "WALL_DIFFUSE", "TEXWALL", pos, RP_OPAQUE);
+			 "CUBE", "", "FLAT", pos, RP_OPAQUE);
 		break;
 	case 'T':
 		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, RP_TRANSPARENT);

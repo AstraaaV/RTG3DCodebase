@@ -467,6 +467,8 @@ void Scene::Init(GLFWwindow* window)
 		(*it)->Init(this);
 	}
 
+	Cube* cube = new Cube();
+	cube->SetName("CUBE");
 	m_Models.push_back(new Cube());
 
 	m_map = new Map(this);
