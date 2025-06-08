@@ -95,7 +95,9 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
 	// Set callback functions to handle different events
 	glfwSetFramebufferSizeCallback(window, resizeWindow); // resize window callback
@@ -364,36 +366,50 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 	}
 
 	if(Camera* cam = g_Scene->GetActiveCamera())
-		if (FirstPersonCamera* fp = dynamic_cast<FirstPersonCamera*>(cam))
+		if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(cam))
 		{
-			fp->HandleKey(_key, _action);
+			float deltaTime = (g_gameClock) ? (float)g_gameClock->gameTimeDelta() : 0.016f;
+			fpc->HandleKey(_key, _action, deltaTime);
 		}
 }
 
 
 void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 {
-	if (g_mouseDown) {
+	static bool fpcMouse = true;
+	static double lastX = _xpos;
+	static double lastY = _ypos;
 
-		//float tDelta = gameClock->gameTimeDelta();
+	float dx = 0.0f;
+	float dy = 0.0f;
 
-		float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
-		float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
+	if(fpcMouse)
+	{
+		lastX = _xpos;
+		lastY = _ypos;
+		fpcMouse = false;
+		return;
+	}
 
-		if (Camera* cam = g_Scene->GetActiveCamera())
+	dx = static_cast<float>(_xpos - lastX);
+	dy = static_cast<float>(_ypos - lastY);
+
+	lastX = _xpos;
+	lastY = _ypos;
+
+	if (Camera* cam = g_Scene->GetActiveCamera())
+	{
+		if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(cam))
 		{
-			if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(cam))
+			if (g_mouseDown)
 			{
 				arc->rotateCamera(-dy, -dx);
 			}
-			else if (FirstPersonCamera* fp = dynamic_cast<FirstPersonCamera*>(cam))
-			{
-				fp->ProcessMouse(dx, dy);
-			}
 		}
-
-		g_prevMouseX = _xpos;
-		g_prevMouseY = _ypos;
+		else if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(cam))
+		{
+			fpc->ProcessMouse(dx, dy);
+		}
 	}
 }
 

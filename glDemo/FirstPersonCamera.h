@@ -17,7 +17,7 @@ public:
 	void Rotate(float yawDt, float pitchDt);
 
 	void ProcessMouse(float deltaX, float deltaY);
-	void HandleKey(int key, int action);
+	void HandleKey(int key, int action, float deltaTime);
 
 	glm::mat4 GetView() override { return m_viewMatrix; }
 	glm::mat4 GetProj() override { return m_projectionMatrix; }
@@ -31,7 +31,6 @@ private:
 	glm::vec3 m_front;
 	glm::vec3 m_up;
 	glm::vec3 m_right;
-	glm::vec3 m_forward;
 	float m_speed;
 	
 	glm::vec3 m_worldUp;
