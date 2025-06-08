@@ -23,11 +23,16 @@ void Map::LoadMap()
 {
 	m_map =
 	{
-		"WWWWWWWWWW",
-		"W..T..B..W",
-		"W........W",
-		"W....P...W",
-		"WWWWWWWWWW"
+		"WWWWWWWWWWWW",
+		"W..T....T..W",
+		"W.WWW..WWW.W",
+		"W.W......W.W",
+		"W.W.W££W.W.W",
+		"W.W.WBBW.W.W",
+		"W.W......W.W",
+		"W.WWW..WWW.W",
+		"W..T....T..W",
+		"WWWWWWWWWWWW"
 	};
 }
 
@@ -55,7 +60,7 @@ void Map::SpawnTile(char tile, int x, int z)
 	{
 	case 'W':
 		CreateObject("Wall_" + std::to_string(x) + "_" + std::to_string(z),
-			 "CUBE", "", "FLAT", pos, RP_OPAQUE);
+			 "WALL", "WALL_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
 		break;
 	case 'T':
 		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, RP_TRANSPARENT);
