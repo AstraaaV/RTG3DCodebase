@@ -469,6 +469,16 @@ void Scene::Init(GLFWwindow* window)
 {
 	m_window = window;
 
+	for (Camera* cam : m_Cameras)
+	{
+		if (cam)
+		{
+			cam->Init(800.0f, 600.0f, this);
+			if (cam->GetType() == "FPC")
+				m_firstPersonC = cam;
+		}
+	}
+
 	m_map = new Map(this);
 	m_map->Init();
 	//initialise all cameras
@@ -536,6 +546,11 @@ void Scene::CycleCams()
 		m_useCameraIndex = 0;
 	}
 
+	if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(m_useCamera))
+	{
+		arc->SetRadius(10.0f);
+	}
+
 	int count = 0;
 	for (Camera* cam : m_Cameras)
 	{
@@ -546,6 +561,23 @@ void Scene::CycleCams()
 			break;
 		}
 		count++;
+	}
+}
+
+void Scene::PossessBeast()
+{
+	if (m_possessBeast) return;
+
+	for (Camera* cam : m_Cameras)
+	{
+		if (cam && cam->GetType() == "FPC")
+		{
+			m_useCamera = cam;
+			m_possessBeast = true;
+
+			cout << "Beast possessed.\n";
+			break;
+		}
 	}
 }
 

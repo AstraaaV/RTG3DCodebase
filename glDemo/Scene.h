@@ -31,6 +31,7 @@ public:
 	//return a pointer to a given thing by its name
 	GameObject* GetGameObject(string _GOName);
 	Camera* GetCamera(string _camName);
+	Camera* GetActiveCamera() const { return m_useCamera; }
 	Light* GetLight(string _lightName);
 	Texture* GetTexture(string _texName);
 	Model* GetModel(string _modelName);
@@ -50,6 +51,9 @@ public:
 
 	void CycleCams();
 
+	void PossessBeast();
+	bool IsBeastPossessed() const { return m_possessBeast; }
+
 protected:
 
 	//data structures containing pointers to all our stuff
@@ -66,7 +70,10 @@ protected:
 	std::list<Shader*>		m_Shaders;
 	std::list<GameObject*> m_GameObjects;
 
+	bool m_possessBeast = false;
+
 	Camera* m_useCamera = nullptr; //current main camera in use
+	Camera* m_firstPersonC = nullptr;
 	int m_useCameraIndex = 0;
 	GLFWwindow* m_window;
 	Map* m_map;

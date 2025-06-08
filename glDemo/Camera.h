@@ -41,6 +41,9 @@ public:
 
 	virtual glm::mat4 GetProj() { return m_projectionMatrix; }
 	virtual glm::mat4 GetView() { return m_viewMatrix; }
+	
+	virtual glm::mat4 viewTransform() const { return m_viewMatrix; }
+	virtual glm::mat4 projectionTransform () const { return m_projectionMatrix; }
 
 	glm::vec3 GetPos() { return m_pos; }
 	virtual void SetPos(const glm::vec3& pos) { m_pos = pos; }
@@ -60,6 +63,8 @@ public:
 
 	//set up shader values for when using this camera
 	virtual void SetRenderValues(unsigned int _prog);
+
+	virtual void SetAspect(float aspect) { m_aspect = aspect; }
 
 protected:
 

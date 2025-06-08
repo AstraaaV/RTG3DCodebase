@@ -6,6 +6,10 @@ FirstPersonCamera::FirstPersonCamera()
 	m_type = "FPC";
 
 	m_pos = vec3(0.0f, 0.0f, 3.0f);
+	m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_speed = 0.1;
+	m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+
 	m_yaw = -90.0f;
 	m_pitch = 0.0f;
 
@@ -69,6 +73,29 @@ void FirstPersonCamera::ProcessMouse(float deltaX, float deltaY)
 	if (m_pitch < -89.0f) m_pitch = -89.0f;
 
 	updateCamVectors();
+}
+
+void FirstPersonCamera::HandleKey(int key, int action)
+{
+	if (action == GLFW_PRESS || action == GLFW_REPEAT)
+	{
+		if (key == GLFW_KEY_W)
+		{
+			m_pos += m_forward * m_speed;
+		}
+		else if (key == GLFW_KEY_S)
+		{
+			m_pos -= m_forward * m_speed;
+		}
+		else if (key == GLFW_KEY_A)
+		{
+			m_pos -= glm::normalize(glm::cross(m_forward, m_up)) * m_speed;
+		}
+		else if (key == GLFW_KEY_D)
+		{
+			m_pos += glm::normalize(glm::cross(m_forward, m_up)) * m_speed;
+		}
+	}
 }
 
 void FirstPersonCamera::updateCamVectors()

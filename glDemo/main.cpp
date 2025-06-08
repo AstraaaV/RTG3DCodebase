@@ -9,6 +9,7 @@
 #include "AIMesh.h"
 #include "Cube.h"
 #include "Scene.h"
+#include <FirstPersonCamera.h>
 
 
 using namespace std;
@@ -200,10 +201,10 @@ void renderScene()
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 cameraTransform = g_mainCamera->projectionTransform() * g_mainCamera->viewTransform();
-
-	mat4 cameraProjection = g_mainCamera->projectionTransform();
-	mat4 cameraView = g_mainCamera->viewTransform() * translate(identity<mat4>(), -g_beastPos);
+	Camera* cam = g_Scene->GetActiveCamera();
+	mat4 cameraProjection = cam->projectionTransform();
+	mat4 cameraView = cam->viewTransform();
+	mat4 cameraTransform = cameraProjection * cameraView;
 
 #// Render principle axes - no modelling transforms so just use cameraTransform
 	if (true)
@@ -310,9 +311,13 @@ void updateScene()
 // Function to call when window resized
 void resizeWindow(GLFWwindow* _window, int _width, int _height)
 {
-	if (g_mainCamera) {
-
-		g_mainCamera->setAspect((float)_width / (float)_height);
+	if (g_Scene)
+	{
+		Camera* cam = g_Scene->GetActiveCamera();
+		if (cam)
+		{
+			cam->SetAspect((float)_width / (float)_height);
+		}
 	}
 
 	glViewport(0, 0, _width, _height);		// Draw into entire window
@@ -357,6 +362,12 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		}
 		}
 	}
+
+	if(Camera* cam = g_Scene->GetActiveCamera())
+		if (FirstPersonCamera* fp = dynamic_cast<FirstPersonCamera*>(cam))
+		{
+			fp->HandleKey(_key, _action);
+		}
 }
 
 
@@ -369,8 +380,17 @@ void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 		float dx = float(_xpos - g_prevMouseX);// *360.0f * tDelta;
 		float dy = float(_ypos - g_prevMouseY);// *360.0f * tDelta;
 
-		if (g_mainCamera)
-			g_mainCamera->rotateCamera(-dy, -dx);
+		if (Camera* cam = g_Scene->GetActiveCamera())
+		{
+			if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(cam))
+			{
+				arc->rotateCamera(-dy, -dx);
+			}
+			else if (FirstPersonCamera* fp = dynamic_cast<FirstPersonCamera*>(cam))
+			{
+				fp->ProcessMouse(dx, dy);
+			}
+		}
 
 		g_prevMouseX = _xpos;
 		g_prevMouseY = _ypos;
@@ -395,12 +415,15 @@ void mouseButtonHandler(GLFWwindow* _window, int _button, int _action, int _mods
 
 void mouseScrollHandler(GLFWwindow* _window, double _xoffset, double _yoffset) {
 
-	if (g_mainCamera)
+	if (Camera* cam = g_Scene->GetActiveCamera())
 	{
-		if (_yoffset < 0.0)
-			g_mainCamera->scaleRadius(1.1f);
-		else if (_yoffset > 0.0)
-			g_mainCamera->scaleRadius(0.9f);
+		if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(cam))
+		{
+			if (_yoffset < 0.0)
+				arc->scaleRadius(1.1f);
+			else if (_yoffset > 0.0)
+				arc->scaleRadius(0.9f);
+		}
 	}
 }
 
