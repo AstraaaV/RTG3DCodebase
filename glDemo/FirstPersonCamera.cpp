@@ -33,7 +33,7 @@ void FirstPersonCamera::Tick(float _dt)
 	if (m_target)
 	{
 		glm::vec3 beastPos = m_target->GetPosition();
-		m_pos = beastPos + glm::vec3(0.0f, 1.8f, 0.0f);
+		m_pos = beastPos + glm::vec3(0.0f, 1.4f, -0.4f);
 	}
 
 	updateCamVectors();
@@ -116,6 +116,9 @@ void FirstPersonCamera::HandleKey(int key, int action, float deltaTime)
 			moveDir = glm::normalize(moveDir);
 			pos += moveDir * velocity;
 			m_target->SetPosition(pos);
+
+			float angle = atan2(moveDir.x, moveDir.z);
+			m_target->SetRotation(glm::vec3(0.0f, glm::degrees(angle), 0.0f));
 		}
 	}
 	else

@@ -91,6 +91,9 @@ void GameObject::PreRender()
 
 void GameObject::Render()
 {
+	if (!m_visible)
+		return;
+
 	Model* model = m_scene->GetModel(m_modelName);
 
 	if (model)
@@ -122,6 +125,16 @@ void GameObject::SetScale(const glm::vec3& scale)
 void GameObject::SetRenderPass(RenderPass rp)
 {
 	m_RP = rp;
+}
+
+void GameObject::SetVisible(bool visible)
+{
+	m_visible = visible;
+}
+
+bool GameObject::IsVisible() const
+{
+	return m_visible;
 }
 
 void GameObject::Init(Scene* _scene)

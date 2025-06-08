@@ -46,6 +46,9 @@ public:
 	void SetScale(const glm::vec3& scale);
 	void SetRenderPass(RenderPass rp);
 
+	void SetVisible(bool visible);
+	bool IsVisible() const;
+
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
 
@@ -72,6 +75,8 @@ protected:
 	GLuint m_ShaderProg;
 
 	RenderPass m_RP = RP_OPAQUE;
+
+	bool m_visible = true;
 
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;
