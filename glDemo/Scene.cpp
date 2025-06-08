@@ -653,9 +653,11 @@ void Scene::PossessBeast()
 			m_possessBeast = true;
 
 			glm::vec3 beastPos = beast->GetPosition();
+			glm::vec3 beastRot = beast->GetRotation();
 			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
 			{
 				fpc->SetTarget(beast);
+				fpc->SetYaw(beastRot.y);
 			}
 
 			if (m_beast)

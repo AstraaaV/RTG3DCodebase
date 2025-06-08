@@ -33,7 +33,7 @@ void FirstPersonCamera::Tick(float _dt)
 	if (m_target)
 	{
 		glm::vec3 beastPos = m_target->GetPosition();
-		m_pos = beastPos + glm::vec3(0.0f, 1.4f, -0.4f);
+		m_pos = beastPos + glm::vec3(0.0f, 0.8f, 0.0f);
 	}
 
 	updateCamVectors();
@@ -150,6 +150,11 @@ void FirstPersonCamera::HandleKey(int key, int action, float deltaTime)
 void FirstPersonCamera::SetTarget(GameObject* targ)
 {
 	m_target = targ;
+}
+
+void FirstPersonCamera::SetYaw(float yaw)
+{
+	m_yaw = yaw;
 }
 
 void FirstPersonCamera::updateCamVectors()
