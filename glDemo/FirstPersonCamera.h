@@ -27,6 +27,7 @@ public:
 	glm::vec3 GetForward() const { return m_front; }
 
 	void SetTarget(GameObject* targ);
+	float GetYaw() const { return m_yaw; }
 	void SetYaw(float yaw);
 
 private:

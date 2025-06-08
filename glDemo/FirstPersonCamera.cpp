@@ -30,12 +30,6 @@ void FirstPersonCamera::Init(float _w, float _h, Scene* scene)
 
 void FirstPersonCamera::Tick(float _dt)
 {
-	if (m_target)
-	{
-		glm::vec3 beastPos = m_target->GetPosition();
-		m_pos = beastPos + glm::vec3(0.0f, 0.8f, 0.0f);
-	}
-
 	updateCamVectors();
 }
 

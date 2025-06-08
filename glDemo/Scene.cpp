@@ -88,7 +88,12 @@ void Scene::Update(float _dt)
 			if (!m_map->IsWall(x, z))
 			{
 				beast->SetPosition(newPos);
+
+				float yaw = fpc->GetYaw();
+				beast->SetRotation(glm::vec3(0.0f, yaw, 0.0f));
 			}
+
+			fpc->SetPos(beast->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 			return;
 		}
 
@@ -632,6 +637,11 @@ void Scene::PossessBeast()
 			if (m_beast)
 				m_beast->SetVisible(true);
 
+			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
+			{
+				fpc->SetTarget(nullptr);
+			}
+
 			cout << "Beast unpossessed.\n";
 		}
 		return;
@@ -651,17 +661,19 @@ void Scene::PossessBeast()
 			m_prevCam = m_useCamera;
 			m_useCamera = cam;
 			m_possessBeast = true;
+			m_beast = beast;
 
 			glm::vec3 beastPos = beast->GetPosition();
 			glm::vec3 beastRot = beast->GetRotation();
+			
 			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
 			{
 				fpc->SetTarget(beast);
 				fpc->SetYaw(beastRot.y);
+				fpc->SetPos(beastPos + glm::vec3(0.0f, 1.5f, 0.0f));
 			}
 
-			if (m_beast)
-				m_beast->SetVisible(false);
+			m_beast->SetVisible(false);
 
 			cout << "Beast possessed.\n";
 			break;
