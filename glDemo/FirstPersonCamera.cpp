@@ -153,6 +153,12 @@ void FirstPersonCamera::SetYaw(float yaw)
 
 void FirstPersonCamera::updateCamVectors()
 {
+	if (m_target)
+	{
+		glm::vec3 offset(0.0f, 0.8f, 0.0f);
+		m_pos = m_target->GetPosition() + offset;
+	}
+
 	vec3 front;
 	front.x = cos(radians(m_yaw)) * cos(radians(m_pitch));
 	front.y = sin(radians(m_pitch));

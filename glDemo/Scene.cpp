@@ -54,20 +54,15 @@ void Scene::Update(float _dt)
 	const float moveSpeed = 5.0f * _dt;
 	const float rotateSpeed = 50.0f * _dt;
 
-	FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera);
-
-	if (fpc)
+	if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
 	{
-		GameObject* beast = m_beast;
-		if (!beast) return;
-
-		if (m_possessBeast && beast)
+		if (m_beast)
 		{
-			glm::vec3 beastPos = beast->GetPosition();
 			glm::vec3 forward = glm::normalize(glm::vec3(fpc->GetForward().x, 0.0f, fpc->GetForward().z));
 			glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-			glm::vec3 newPos = beastPos;
+			glm::vec3 currentPos = m_beast->GetPosition();
+			glm::vec3 newPos = currentPos;
 
 			if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
 				newPos += forward * moveSpeed;
@@ -77,137 +72,22 @@ void Scene::Update(float _dt)
 				newPos += right * moveSpeed;
 			if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
 				newPos -= right * moveSpeed;
-			if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
-				newPos += glm::vec3(0.0f, moveSpeed, 0.0f);
-			if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
-				newPos -= glm::vec3(0.0f, moveSpeed, 0.0f);
-		
+
 			int x = static_cast<int>(newPos.x + 0.5f);
 			int z = static_cast<int>(newPos.z + 0.5f);
 
 			if (!m_map->IsWall(x, z))
 			{
-				beast->SetPosition(newPos);
-
-				float yaw = fpc->GetYaw();
-				beast->SetRotation(glm::vec3(0.0f, yaw, 0.0f));
+				m_beast->SetPosition(newPos);
 			}
 
-			fpc->SetPos(beast->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
-			return;
+			glm::vec3 beastPos = m_beast->GetPosition() + glm::vec3(0.0f, 0.8f, 0.0f);
+			glm::vec3 offset(0.0f, 0.8f, 0.0f);
+			fpc->SetPos(beastPos + offset);
+
+			float yaw = fpc->GetYaw();
+			m_beast->SetRotation(glm::vec3(0.0f, yaw, 0.0f));
 		}
-
-		glm::vec3 currentPos = fpc->GetPos();
-		glm::vec3 forward = glm::normalize(glm::vec3(fpc->GetForward().x, 0.0f, fpc->GetForward().z));
-		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
-
-		if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			glm::vec3 newPos = currentPos + forward * moveSpeed;
-			int x = (int)(newPos.x + 0.5f);
-			int z = (int)(newPos.z + 0.5f);
-			if (!m_map->IsWall(x, z))
-				fpc->SetPos(newPos);
-		}
-
-		if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			glm::vec3 newPos = currentPos - forward * moveSpeed;
-			int x = (int)(newPos.x + 0.5f);
-			int z = (int)(newPos.z + 0.5f);
-			if (!m_map->IsWall(x, z))
-				fpc->SetPos(newPos);
-		}
-
-		if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			glm::vec3 newPos = currentPos + right * moveSpeed;
-			int x = (int)(newPos.x + 0.5f);
-			int z = (int)(newPos.z + 0.5f);
-			if (!m_map->IsWall(x, z))
-				fpc->SetPos(newPos);
-		}
-
-		if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			glm::vec3 newPos = currentPos - right * moveSpeed;
-			int x = (int)(newPos.x + 0.5f);
-			int z = (int)(newPos.z + 0.5f);
-			if (!m_map->IsWall(x, z))
-				fpc->SetPos(newPos);
-		}
-
-		if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
-			fpc->SetPos(currentPos + glm::vec3(0.0f, moveSpeed, 0.0f));
-		if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
-			fpc->SetPos(currentPos - glm::vec3(0.0f, moveSpeed, 0.0f));
-	}
-
-	else if (ArcballCamera* arc = dynamic_cast<ArcballCamera*>(m_useCamera))
-	{
-		static bool rotate = false;
-		static double lastX = 0.0, lastY = 0.0;
-
-		double xpos, ypos;
-		glfwGetCursorPos(m_window, &xpos, &ypos);
-
-		if (glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		{
-			if(!rotate)
-			{
-				rotate = true;
-				lastX = xpos;
-				lastY = ypos;
-			}
-			else
-			{
-				float dx = static_cast<float>(xpos - lastX);
-				float dy = static_cast<float>(ypos - lastY);
-				arc->rotateCamera(dy * 0.2f, -dx * 0.2f);
-				lastX = xpos;
-				lastY = ypos;
-			}
-		}
-		else
-		{
-			rotate = false;
-		}
-			arc->rotateCamera(0.0f, -rotateSpeed);
-		if (glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			arc->rotateCamera(0.0f, rotateSpeed);
-		if (glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
-			arc->rotateCamera(-rotateSpeed, 0.0f);
-		if (glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			arc->rotateCamera(rotateSpeed, 0.0f);
-
-		if (glfwGetKey(m_window, GLFW_KEY_KP_ADD) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_EQUAL) == GLFW_PRESS)
-			arc->incrementRadius(-moveSpeed);
-		if (glfwGetKey(m_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_MINUS) == GLFW_PRESS)
-			arc->incrementRadius(moveSpeed);
-	}
-
-	else if (IsometricCamera* iso = dynamic_cast<IsometricCamera*>(m_useCamera))
-	{
-		glm::vec3 panDir(0.0f);
-		float moveSpeed = 5.0f * _dt;
-
-		if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_UP) == GLFW_PRESS)
-			panDir += glm::vec3(0.0f, 0.0f, -1.0f);
-		if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			panDir += glm::vec3(0.0f, 0.0f, 1.0f);
-		if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			panDir += glm::vec3(-1.0f, 0.0f, 0.0f);
-		if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			panDir += glm::vec3(1.0f, 0.0f, 0.0f);
-	
-		if (glm::length(panDir) > 0.0f)
-			iso->Pan(glm::normalize(panDir) * moveSpeed);
-
-		if (glfwGetKey(m_window, GLFW_KEY_KP_ADD) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_EQUAL) == GLFW_PRESS)
-			iso->Zoom(-moveSpeed);
-		if (glfwGetKey(m_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_MINUS) == GLFW_PRESS)
-			iso->Zoom(moveSpeed);
-	
 	}
 }
 
@@ -637,11 +517,6 @@ void Scene::PossessBeast()
 			if (m_beast)
 				m_beast->SetVisible(true);
 
-			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
-			{
-				fpc->SetTarget(nullptr);
-			}
-
 			cout << "Beast unpossessed.\n";
 		}
 		return;
@@ -662,15 +537,17 @@ void Scene::PossessBeast()
 			m_useCamera = cam;
 			m_possessBeast = true;
 			m_beast = beast;
-
-			glm::vec3 beastPos = beast->GetPosition();
-			glm::vec3 beastRot = beast->GetRotation();
 			
 			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
 			{
-				fpc->SetTarget(beast);
+				glm::vec3 beastPos = beast->GetPosition();
+				glm::vec3 offset(0.0f, 1.8f, 0.0f);
+				fpc->SetPos(beastPos + offset);
+
+				glm::vec3 beastRot = beast->GetRotation();
 				fpc->SetYaw(beastRot.y);
-				fpc->SetPos(beastPos + glm::vec3(0.0f, 1.5f, 0.0f));
+
+				fpc->SetTarget(beast);
 			}
 
 			m_beast->SetVisible(false);
