@@ -65,7 +65,7 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 4
+MODELS 5
 {
 TYPE: AI
 NAME: BEAST
@@ -84,6 +84,10 @@ FILE: Assets\\wall\\wall.obj
 {
 TYPE: CUBE
 NAME: CUBE
+}
+{
+TYPE: PLANE
+NAME: PLANE
 }
 
 TEXTURES 8

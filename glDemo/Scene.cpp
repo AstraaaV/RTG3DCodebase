@@ -14,6 +14,7 @@
 #include "IsometricCamera.h"
 #include "Map.h"
 #include "Cube.h"
+#include "Plane.h"
 #include <assert.h>
 
 Scene::Scene()
@@ -531,7 +532,7 @@ void Scene::Init(GLFWwindow* window)
 	cube->SetName("CUBE");
 	m_Models.push_back(new Cube());
 
-	Model* floorModel = new Cube();
+	Model* floorModel = new Plane();
 	floorModel->SetName("FLOOR");
 	m_Models.push_back(floorModel);
 }

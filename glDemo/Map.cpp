@@ -46,10 +46,10 @@ bool Map::IsWall(int x, int z) const
 
 void Map::SpawnTile(char tile, int x, int z)
 {
-	glm::vec3 pos = glm::vec3((float)x, 0.0f, (float)z);
+	glm::vec3 pos = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
 	CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-		"CUBE", "FLOOR_DIFFUSE", "TEXDIR", pos - glm::vec3(0.0f, 0.5f, 0.0f), RP_OPAQUE);
+		"PLANE", "FLOOR_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
 
 	switch (tile)
 	{
@@ -75,13 +75,21 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 {
 	GameObject* obj = new GameObject(name, model, texture, shader);
 	obj->SetPosition(pos);
-	obj->SetScale(glm::vec3(1.0f));
+
+	if (model == "CUBE" && name.find("Wall") != std::string::npos)
+	{
+		obj->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+	}
+	else if (model == "PLANE")
+	{
+		obj->SetScale(glm::vec3(1.0f));
+	}
+	else
+	{
+		obj->SetScale(glm::vec3(1.0f));
+	}
+
 	obj->Init(m_scene);
 	obj->SetRenderPass(rp);
 	m_scene->AddGameObject(obj);
-
-	if (model == "CUBE" && name.find("FLOOR") != std::string::npos)
-		obj->SetScale(glm::vec3(1.0f, 0.05f, 1.0f));
-	else
-		obj->SetScale(glm::vec3(1.0f));
 }
