@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include <glm/glm.hpp>
 
+class GameObject;
+
 class FirstPersonCamera : public Camera
 {
 public:
@@ -24,6 +26,8 @@ public:
 
 	glm::vec3 GetForward() const { return m_front; }
 
+	void SetTarget(GameObject* targ);
+
 private:
 	float m_yaw, m_pitch;
 	
@@ -31,9 +35,12 @@ private:
 	glm::vec3 m_front;
 	glm::vec3 m_up;
 	glm::vec3 m_right;
+	
 	float m_speed;
 	
 	glm::vec3 m_worldUp;
+
+	GameObject* m_target = nullptr;
 
 	void updateCamVectors();
 };

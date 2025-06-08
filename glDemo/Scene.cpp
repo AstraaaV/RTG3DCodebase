@@ -58,6 +58,40 @@ void Scene::Update(float _dt)
 
 	if (fpc)
 	{
+		GameObject* beast = m_beast;
+		if (!beast) return;
+
+		if (m_possessBeast && beast)
+		{
+			glm::vec3 beastPos = beast->GetPosition();
+			glm::vec3 forward = glm::normalize(glm::vec3(fpc->GetForward().x, 0.0f, fpc->GetForward().z));
+			glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+			glm::vec3 newPos = beastPos;
+
+			if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+				newPos += forward * moveSpeed;
+			if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+				newPos -= forward * moveSpeed;
+			if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+				newPos += right * moveSpeed;
+			if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+				newPos -= right * moveSpeed;
+			if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
+				newPos += glm::vec3(0.0f, moveSpeed, 0.0f);
+			if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
+				newPos -= glm::vec3(0.0f, moveSpeed, 0.0f);
+		
+			int x = static_cast<int>(newPos.x + 0.5f);
+			int z = static_cast<int>(newPos.z + 0.5f);
+
+			if (!m_map->IsWall(x, z))
+			{
+				beast->SetPosition(newPos);
+			}
+			return;
+		}
+
 		glm::vec3 currentPos = fpc->GetPos();
 		glm::vec3 forward = glm::normalize(glm::vec3(fpc->GetForward().x, 0.0f, fpc->GetForward().z));
 		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
@@ -535,6 +569,26 @@ void Scene::Init(GLFWwindow* window)
 	Model* floorModel = new Plane();
 	floorModel->SetName("FLOOR");
 	m_Models.push_back(floorModel);
+
+	GameObject* beast = GetGameObject("BEAST");
+	if (beast)
+	{
+		for (Camera* cam : m_Cameras)
+		{
+			if (cam && cam->GetType() == "FPC")
+			{
+				if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(cam))
+				{
+					fpc->SetTarget(beast);
+					fpc->SetPos(beast->GetPosition() + glm::vec3(0.0f, 1.8f, 0.0f));
+					m_useCamera = fpc;
+					m_useCameraIndex = 0;
+				}
+			}
+		}
+	}
+
+	PossessBeast();
 }
 
 void Scene::CycleCams()
@@ -567,14 +621,38 @@ void Scene::CycleCams()
 
 void Scene::PossessBeast()
 {
-	if (m_possessBeast) return;
+	if (m_possessBeast)
+	{
+		if (m_prevCam)
+		{
+			m_useCamera = m_prevCam;
+			m_prevCam = nullptr;
+			m_possessBeast = false;
+			cout << "Beast unpossessed.\n";
+		}
+		return;
+	}
+
+	GameObject* beast = GetGameObject("BEAST");
+	if (!beast)
+	{
+		cout << "Beast not found!\n";
+		return;
+	}
 
 	for (Camera* cam : m_Cameras)
 	{
 		if (cam && cam->GetType() == "FPC")
 		{
+			m_prevCam = m_useCamera;
 			m_useCamera = cam;
 			m_possessBeast = true;
+
+			glm::vec3 beastPos = beast->GetPosition();
+			if (FirstPersonCamera* fpc = dynamic_cast<FirstPersonCamera*>(m_useCamera))
+			{
+				fpc->SetTarget(beast);
+			}
 
 			cout << "Beast possessed.\n";
 			break;

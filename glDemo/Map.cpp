@@ -28,7 +28,7 @@ void Map::LoadMap()
 		"W.WWW..WWW.W",
 		"W.W......W.W",
 		"W.W.W££W.W.W",
-		"W.W.WBBW.W.W",
+		"W.W.WWWW.W.W",
 		"W.W......W.W",
 		"W.WWW..WWW.W",
 		"W..T....T..W",
@@ -53,20 +53,34 @@ void Map::SpawnTile(char tile, int x, int z)
 {
 	glm::vec3 pos = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
-	CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-		"PLANE", "FLOOR_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
+	glm::vec3 rot(0.0f);
 
+	CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
+		"PLANE", "FLOOR_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
+	
 	switch (tile)
 	{
 	case 'W':
+	{
+		bool wallL = IsWall(x - 1, z);
+		bool wallR = IsWall(x + 1, z);
+		bool wallU = IsWall(x, z - 1);
+		bool wallD = IsWall(x, z + 1);
+
+		bool hori = (wallL || wallR);
+		bool vert = (wallU || wallD);
+
+		if (hori && !vert)
+		{
+			rot.y = 90.0f;
+		}
+
 		CreateObject("Wall_" + std::to_string(x) + "_" + std::to_string(z),
-			 "WALL", "WALL_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
+			"WALL", "WALL_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
 		break;
+	}
 	case 'T':
-		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, RP_TRANSPARENT);
-		break;
-	case 'B':
-		CreateObject("Beast", "BEAST", "BEAST_DIFFUSE", "TEXDIR", pos, RP_OPAQUE);
+		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, rot, RP_TRANSPARENT);
 		break;
 	case 'P':
 		m_playerSpawn = pos;
@@ -76,24 +90,20 @@ void Map::SpawnTile(char tile, int x, int z)
 	}
 }
 
-void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, RenderPass rp)
+void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)
 {
 	GameObject* obj = new GameObject(name, model, texture, shader);
 	obj->SetPosition(pos);
+	obj->SetRotation(rot);
 
-	if (model == "CUBE" && name.find("Wall") != std::string::npos)
+	if (model == "WALL")
 	{
-		obj->SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-	}
-	else if (model == "PLANE")
-	{
-		obj->SetScale(glm::vec3(1.0f));
+		obj->SetScale(glm::vec3(0.8f));
 	}
 	else
 	{
 		obj->SetScale(glm::vec3(1.0f));
 	}
-
 	obj->Init(m_scene);
 	obj->SetRenderPass(rp);
 	m_scene->AddGameObject(obj);

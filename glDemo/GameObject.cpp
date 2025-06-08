@@ -104,6 +104,16 @@ void GameObject::SetShader(Shader* _shader)
 	m_shader = _shader;
 }
 
+void GameObject::SetRotation(const glm::vec3& rot)
+{
+	m_rot = rot;
+}
+
+const glm::vec3& GameObject::GetRotation() const
+{
+	return m_rot;
+}
+
 void GameObject::SetScale(const glm::vec3& scale)
 {
 	m_scale = scale;

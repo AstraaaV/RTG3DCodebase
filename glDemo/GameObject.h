@@ -37,6 +37,9 @@ public:
 	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
 	glm::vec3 GetPosition() const { return m_pos; }
 
+	void SetRotation(const glm::vec3& rot);
+	const glm::vec3& GetRotation() const;
+
 	void SetTexture2(const std::string& texture) { m_textureName2 = texture; }
 	void SetTexture3(const std::string& texture) { m_textureName3 = texture; }
 

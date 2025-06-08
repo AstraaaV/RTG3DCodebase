@@ -1,4 +1,5 @@
 #include "FirstPersonCamera.h"
+#include "GameObject.h"
 #include <iostream>
 
 FirstPersonCamera::FirstPersonCamera()
@@ -29,6 +30,12 @@ void FirstPersonCamera::Init(float _w, float _h, Scene* scene)
 
 void FirstPersonCamera::Tick(float _dt)
 {
+	if (m_target)
+	{
+		glm::vec3 beastPos = m_target->GetPosition();
+		m_pos = beastPos + glm::vec3(0.0f, 1.8f, 0.0f);
+	}
+
 	updateCamVectors();
 }
 
@@ -66,14 +73,53 @@ void FirstPersonCamera::ProcessMouse(float deltaX, float deltaY)
 	m_pitch = glm::clamp(m_pitch, -89.0f, 89.0f);
 
 	updateCamVectors();
+
+	if (m_target)
+	{
+		glm::vec3 currentRot = m_target->GetRotation();
+		currentRot.y = -m_yaw;
+		m_target->SetRotation(currentRot);
+	}
 }
 
 void FirstPersonCamera::HandleKey(int key, int action, float deltaTime)
 {
-	if (action == GLFW_PRESS || action == GLFW_REPEAT)
-	{
-		const float velocity = m_speed * deltaTime;
+	if (action != GLFW_PRESS && action != GLFW_REPEAT) return;
 
+	const float velocity = m_speed * deltaTime;
+
+	if (m_target)
+	{
+		glm::vec3 pos = m_target->GetPosition();
+		glm::vec3 moveDir(0.0f);
+
+		switch (key)
+		{
+		case GLFW_KEY_W:
+			moveDir += m_front;
+			break;
+		case GLFW_KEY_S:
+			moveDir -= m_front;
+			break;
+		case GLFW_KEY_A:
+			moveDir -= m_right;
+			break;
+		case GLFW_KEY_D:
+			moveDir += m_right;
+			break;
+		}
+
+		moveDir.y = 0.0f;
+
+		if (glm::length(moveDir) > 0.0f)
+		{
+			moveDir = glm::normalize(moveDir);
+			pos += moveDir * velocity;
+			m_target->SetPosition(pos);
+		}
+	}
+	else
+	{
 		switch (key)
 		{
 		case GLFW_KEY_W:
@@ -94,10 +140,13 @@ void FirstPersonCamera::HandleKey(int key, int action, float deltaTime)
 		case GLFW_KEY_DOWN:
 			MoveUp(-velocity);
 			break;
-		default:
-			break;
 		}
 	}
+}
+
+void FirstPersonCamera::SetTarget(GameObject* targ)
+{
+	m_target = targ;
 }
 
 void FirstPersonCamera::updateCamVectors()

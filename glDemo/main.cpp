@@ -349,6 +349,13 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			}
 			break;
 
+		case GLFW_KEY_P:
+			if (_action == GLFW_PRESS && g_Scene != nullptr)
+			{
+				g_Scene->PossessBeast();
+			}
+			break;
+
 		default:
 		{
 		}

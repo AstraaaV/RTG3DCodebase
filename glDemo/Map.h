@@ -24,5 +24,5 @@ private:
 	glm::vec3 m_playerSpawn = glm::vec3(0.0f);
 	
 	void SpawnTile(char tile, int x, int z);
-	void CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, RenderPass rp);
+	void CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp);
 };

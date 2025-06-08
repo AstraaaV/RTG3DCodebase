@@ -71,6 +71,8 @@ protected:
 	std::list<GameObject*> m_GameObjects;
 
 	bool m_possessBeast = false;
+	Camera* m_prevCam = nullptr;
+	GameObject* m_beast = nullptr;
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	Camera* m_firstPersonC = nullptr;
