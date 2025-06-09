@@ -60,14 +60,14 @@ void GameObject::PreRender()
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&m_worldMatrix);
 
-	if (m_shaderName == "TEXWALL")
+	if (m_shaderName == "TEXWALL" || m_modelName == "WALLSCONCE")
 	{
 		Texture* texDiffuse = m_scene->GetTexture(m_textureName);
 		if (texDiffuse)
 		{
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texDiffuse->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "diffuseMap"), 0);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_BaseColor"), 0);
 		}
 	
 		Texture* texNormal = m_scene->GetTexture(m_textureName2);
@@ -75,7 +75,7 @@ void GameObject::PreRender()
 		{
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texNormal->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "normalMap"), 1);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_NormalMap"), 1);
 		}
 
 		Texture* texRoughness = m_scene->GetTexture(m_textureName3);
@@ -83,9 +83,24 @@ void GameObject::PreRender()
 		{
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_2D, texRoughness->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "roughnessMap"), 2);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_RoughnessMap"), 2);
 		}
 	
+		Texture* texMetallic = m_scene->GetTexture(m_textureName4);
+		if (texMetallic)
+		{
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, texMetallic->m_texID);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_MetallicMap"), 3);
+		}
+
+		Texture* texHeight = m_scene->GetTexture(m_textureName5);
+		if (texHeight)
+		{
+			glActiveTexture(GL_TEXTURE4);
+			glBindTexture(GL_TEXTURE_2D, texHeight->m_texID);
+			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_HeightMap"), 4);
+		}
 	}
 }
 
@@ -151,5 +166,12 @@ void GameObject::Init(Scene* _scene)
 	{
 		m_textureName2 = "WALL_NORMAL";
 		m_textureName3 = "WALL_ROUGHNESS";
+	}
+	else if (m_modelName == "WALLSCONCE")
+	{
+		m_textureName2 = "WALLSCONCE_NORMAL";
+		m_textureName3 = "WALLSCONCE_ROUGHNESS";
+		m_textureName4 = "WALLSCONCE_METALLIC";
+		m_textureName5 = "WALLSCONCE_HEIGHT";
 	}
 }

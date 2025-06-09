@@ -65,6 +65,8 @@ protected:
 	string m_textureName;
 	string m_textureName2; //normal
 	string m_textureName3; //roughness
+	string m_textureName4;
+	string m_textureName5;
 	string m_shaderName;
 
 	vec3		m_pos;
