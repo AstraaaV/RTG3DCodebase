@@ -26,7 +26,7 @@ void Map::LoadMap()
 		"WWWWWWWWWWWW",
 		"W..T....T..W",
 		"W.WWW..WWW.W",
-		"W.W......W.W",
+		"W.W..G...W.W",
 		"W.W.W££W.W.W",
 		"W.W.WWWW.W.W",
 		"W.W......W.W",
@@ -81,6 +81,9 @@ void Map::SpawnTile(char tile, int x, int z)
 	}
 	case 'T':
 		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, rot, RP_TRANSPARENT);
+		break;
+	case 'G':
+		CreateObject("Ghost", "GHOST", "GHOST_DIFFUSE", "TEXDIR", pos, rot, RP_TRANSPARENT);
 		break;
 	case 'P':
 		m_playerSpawn = pos;
