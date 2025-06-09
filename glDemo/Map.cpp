@@ -80,7 +80,7 @@ void Map::SpawnTile(char tile, int x, int z)
 		break;
 	}
 	case 'T':
-		CreateObject("Torch", "CUBE", "TORCH_DIFFUSE", "TEXDIR", pos, rot, RP_TRANSPARENT);
+		CreateObject("Torch_" + std::to_string(x) + "_" + std::to_string(z), "WALLSCONCE", "WALLSCONCE_BASE", "TEXDIR", pos, rot, RP_OPAQUE);
 		break;
 	case 'P':
 		m_playerSpawn = pos;
@@ -99,6 +99,11 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	if (model == "WALL")
 	{
 		obj->SetScale(glm::vec3(0.8f));
+	}
+	else if (model == "WALLSCONCE")
+	{
+		obj->SetScale(glm::vec3(0.5f));
+		obj->SetRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 	}
 	else
 	{

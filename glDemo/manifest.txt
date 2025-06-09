@@ -65,11 +65,16 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 5
+MODELS 6
 {
 TYPE: AI
 NAME: BEAST
 FILE: Assets\\beast\\beast.obj
+}
+{
+TYPE: AI
+NAME: WALLSCONCE
+FILE: Assets\\torch\\wall_sconce.obj
 }
 {
 TYPE: AI
@@ -90,7 +95,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 8
+TEXTURES 13
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -131,6 +136,31 @@ TYPE: FIF_JPEG
 NAME: WALL_ROUGHNESS
 FILE: Assets\\Textures\\roughness_old_stone_walls.jpg
 }
+{
+TYPE: FIF_PNG
+NAME: WALLSCONCE_BASE
+FILE: Assets\\Textures\\Wall_Sconce_BaseColor_4k.png
+}
+{
+TYPE: FIF_PNG
+NAME: WALLSCONCE_HEIGHT
+FILE: Assets\\Textures\\Wall_Sconce_Height_4k.png
+}
+{
+TYPE: FIF_PNG
+NAME: WALLSCONCE_METALLIC
+FILE: Assets\\Textures\\Wall_Sconce_Metallic_4k.png
+}
+{
+TYPE: FIF_PNG
+NAME: WALLSCONCE_NORMAL
+FILE: Assets\\Textures\\Wall_Sconce_Normal_4k.png
+}
+{
+TYPE: FIF_PNG
+NAME: WALLSCONCE_ROUGHNESS
+FILE: Assets\\Textures\\Wall_Sconce_Roughness_4k.png
+}
 
 SHADERS 4
 {
@@ -154,7 +184,7 @@ VERTFILE: Assets\\Shaders\\texture-wall.vert
 FRAGFILE: Assets\\Shaders\\texture-wall.frag
 }
 
-GAMEOBJECTS 3
+GAMEOBJECTS 4
 {
 TYPE: EXAMPLE
 NAME: BEAST
@@ -187,4 +217,15 @@ ROTINC: 0.0 0.0 0.0
 MODEL: WALL
 TEXTURE: WALL_DIFFUSE
 SHADER: TEXWALL
+}
+{
+TYPE: EXAMPLE
+NAME: TORCH1
+POS: 0.0 0.0 0.0
+ROT: 0.0 0.0 0.0 
+SCALE: 1.0 1.0 1.0
+ROTINC: 0.0 0.0 0.0
+MODEL: WALLSCONCE
+TEXTURE: WALLSCONCE_BASE
+SHADER: TEXDIR
 }
