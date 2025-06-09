@@ -34,6 +34,8 @@ public:
 	GLuint GetShaderProg() { return m_ShaderProg; }
 	void SetShader(Shader* _shader);
 
+	const std::string& GetShaderName() const { return m_shaderName; }
+
 	void SetPosition(const glm::vec3& pos) { m_pos = pos; }
 	glm::vec3 GetPosition() const { return m_pos; }
 

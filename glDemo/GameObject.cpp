@@ -53,8 +53,8 @@ void GameObject::Tick(float _dt)
 
 void GameObject::PreRender()
 {
-
 	if (!m_ShaderProg) return;
+
 	// Setup model transform
 	GLint pLocation;
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
