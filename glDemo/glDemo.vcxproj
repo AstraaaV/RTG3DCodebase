@@ -206,6 +206,8 @@
   <ItemGroup>
     <None Include="Assets\Shaders\flatColour.frag" />
     <None Include="Assets\Shaders\flatColour.vert" />
+    <None Include="Assets\Shaders\texpbr.frag" />
+    <None Include="Assets\Shaders\texpbr.vert" />
     <None Include="Assets\Shaders\texture-directional.frag" />
     <None Include="Assets\Shaders\texture-directional.vert" />
     <None Include="Assets\Shaders\texture-map.frag" />

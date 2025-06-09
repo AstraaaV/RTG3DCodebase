@@ -60,7 +60,7 @@ void GameObject::PreRender()
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&m_worldMatrix);
 
-	if (m_shaderName == "TEXWALL" || m_modelName == "WALLSCONCE")
+	if (m_shaderName == "TEXWALL" || m_modelName == "WALLSCONCE" || m_shaderName == "TEXPBR")
 	{
 		Texture* texDiffuse = m_scene->GetTexture(m_textureName);
 		if (texDiffuse)

@@ -243,5 +243,11 @@
     <None Include="Assets\Shaders\texture-wall.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Assets\Shaders\texpbr.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\texpbr.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

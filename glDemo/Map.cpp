@@ -81,7 +81,7 @@ void Map::SpawnTile(char tile, int x, int z)
 	}
 	case 'T':
 	{
-		CreateObject("Torch_" + std::to_string(x) + "_" + std::to_string(z), "WALLSCONCE", "WALLSCONCE_BASE", "TEXDIR", pos, rot, RP_OPAQUE);
+		CreateObject("Torch_" + std::to_string(x) + "_" + std::to_string(z), "WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
 		glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
 		glm::vec3 lightCol = glm::vec3(1.0f, 0.8f, 0.5f);

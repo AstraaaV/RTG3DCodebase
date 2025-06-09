@@ -162,7 +162,7 @@ NAME: WALLSCONCE_ROUGHNESS
 FILE: Assets\\Textures\\Wall_Sconce_Roughness_4k.png
 }
 
-SHADERS 4
+SHADERS 5
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -182,6 +182,11 @@ FRAGFILE: Assets\\Shaders\\texture-map.frag
 NAME: TEXWALL
 VERTFILE: Assets\\Shaders\\texture-wall.vert
 FRAGFILE: Assets\\Shaders\\texture-wall.frag
+}
+{
+NAME: TEXPBR
+VERTFILE: Assets\\Shaders\\texpbr.vert
+FRAGFILE: Assets\\Shaders\\texpbr.frag
 }
 
 GAMEOBJECTS 4
