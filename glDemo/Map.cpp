@@ -11,22 +11,22 @@ void Map::Init()
 	CreateFloor(24, 24);
 
 	// Outer Box
-	CreateLongWall(0, 0, 24, true); // Left
-	CreateLongWall(0, 23, 24, true); // Right
-	CreateLongWall(3, 3.8, 24, false); // Bottom
-	CreateLongWall(27, 3.8, 24, false); // Top
+	CreateLongWall(-4, 24, 24, true); // Left
+	CreateLongWall(-4, 0, 24, true); // Right
+	CreateLongWall(0, 4, 24, false); // Bottom
+	CreateLongWall(24, 4, 24, false); // Top
 
-	// Lair
-	CreateLongWall(2, 2, 8, true);
-	CreateLongWall(2, 10, 8, true);
-	CreateLongWall(5, 5, 9, false);
-	//CreateLongWall(2, 2, 4, false);
-
-	// Training
-	CreateLongWall(12, 2, 8, true); // Left
-	CreateLongWall(12, 12, 8, true); // Right
-	CreateLongWall(7, 14, 3, false); // Bottom
-	CreateLongWall(12, 15, 10, false); // Top
+	CreateLongWall(6, 5, 14, true);
+	CreateLongWall(12, 10, 6, true);
+	CreateLongWall(-4, 3, 4, true);
+	CreateLongWall(4, 19, 4, true);
+	CreateLongWall(10, 16, 4, true);
+	CreateLongWall(0, 12, 4, true);
+	CreateLongWall(8, 14, 12, false);
+	CreateLongWall(18, 15, 5, false);
+	CreateLongWall(4, 19, 9, false);
+	CreateLongWall(16, 10, 4, false);
+	CreateLongWall(4, 7, 4, false);
 
 	// Torches
 	CreateTorch(3, 1);
@@ -62,7 +62,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 
 	if (model == "WALL")
 	{
-		obj->SetScale(glm::vec3(0.8f));
+		obj->SetScale(glm::vec3(1.0f));
 	}
 	else if (model == "WALLSCONCE")
 	{

@@ -54,25 +54,24 @@ void IsometricCamera::SetFocus(const glm::vec3& f)
 
 void IsometricCamera::updateCam()
 {
-	const float angle = glm::radians(35.264f);
-	const float rotAngle = glm::radians(45.0f);
+	m_focus = glm::vec3(12.0f, 0.0f, 12.0f);
 
-	float dist = 10.0f * m_zoom;
+	float dist = 40.0f * m_zoom;
 
-	float x = dist * cos(angle) * cos(rotAngle);
-	float y = dist * sin(angle);
-	float z = dist * cos(angle) * sin(rotAngle);
+	m_pos = m_focus + glm::vec3(0.0f, dist, 0.0f);
 
-	m_pos = m_focus + glm::vec3(x, y, z);
+	glm::vec3 upVec = glm::vec3(1.0f, 0.0f, 0.0f);
 
-	m_viewMatrix = glm::lookAt(m_pos, m_focus, m_worldUp);
+	m_viewMatrix = glm::lookAt(m_pos, m_focus, upVec);
 
-	float orthoSize = 10.0f * m_zoom;
-	float halfW = orthoSize * m_aspect * 0.5f;
-	float halfH = orthoSize * 0.5f;
+	float orthoX = 30.0f * m_aspect * m_zoom;
+	float orthoZ = 30.0f * m_zoom;
+
+	float halfW = orthoX * 0.5f;
+	float halfH = orthoZ * 0.5f;
 
 	m_projectionMatrix = glm::ortho(-halfW, halfW, -halfH, halfH, m_near, m_far);
 
 	m_forward = glm::normalize(m_focus - m_pos);
-	m_up = m_worldUp;
+	m_up = upVec;
 }
