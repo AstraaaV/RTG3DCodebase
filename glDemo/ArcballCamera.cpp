@@ -4,42 +4,6 @@
 using namespace std;
 using namespace glm;
 
-//
-// Private API
-//
-
-// update position, orientation and view matrices when camera rotation and radius is modified
-void ArcballCamera::calculateDerivedValues() {
-
-	const float theta_ = glm::radians<float>(m_theta);
-	const float phi_ = glm::radians<float>(m_phi);
-
-	glm::vec3 direction;
-	direction.x = m_radius * sinf(theta_) * sinf(phi_);
-	direction.y = m_radius * cosf(theta_);
-	direction.z = m_radius * sinf(theta_) * cosf(phi_);
-
-	glm::vec3 position = m_target + direction;
-
-	glm::vec3 up(0.0f, 1.0f, 0.0f);
-
-	m_viewMatrix = glm::lookAt(position, m_target, up);
-
-	// calculate position vector
-	//cameraPos = glm::vec4(sinf(phi_) * cosf(-theta_) * radius, sinf(-theta_) * radius, cosf(phi_) * cosf(-theta_) * radius, 1.0f);
-
-	// calculate orientation basis R
-	//R = glm::eulerAngleY(phi_) * glm::eulerAngleX(theta_);
-
-	// calculate view and projection transform matrices
-	m_projectionMatrix = glm::perspective(glm::radians<float>(m_fovY), m_aspect, m_nearPlane, m_farPlane);
-}
-
-
-//
-// Public method implementation
-//
-
 // ArcballCamera constructors
 
 // initialise camera parameters so it is placed at the origin looking down the -z axis (for a right-handed camera) or +z axis (for a left-handed camera)
@@ -81,25 +45,75 @@ ArcballCamera::ArcballCamera(float _theta, float _phi, float _radius, float _fov
 	//F.calculateWorldCoordPlanes(C, R);
 }
 
+// update position, orientation and view matrices when camera rotation and radius is modified
+void ArcballCamera::calculateDerivedValues() {
+
+	float thetaRad = glm::radians(m_theta);
+	float phiRad = glm::radians(m_phi);
+
+	glm::vec3 direction;
+	direction.x = m_radius * sinf(thetaRad) * sinf(phiRad);
+	direction.y = m_radius * cosf(thetaRad);
+	direction.z = m_radius * sinf(thetaRad) * cosf(phiRad);
+
+	glm::vec3 position = m_target + direction;
+
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+	m_viewMatrix = glm::lookAt(position, m_target, up);
+
+	// calculate position vector
+	//cameraPos = glm::vec4(sinf(phi_) * cosf(-theta_) * radius, sinf(-theta_) * radius, cosf(phi_) * cosf(-theta_) * radius, 1.0f);
+
+	// calculate orientation basis R
+	//R = glm::eulerAngleY(phi_) * glm::eulerAngleX(theta_);
+
+	// calculate view and projection transform matrices
+	m_projectionMatrix = glm::perspective(glm::radians<float>(m_fovY), m_aspect, m_nearPlane, m_farPlane);
+}
+
 
 #pragma region Accessor methods for stored values
 
-// return the pivot rotation around the x axis (theta) in degrees
-float ArcballCamera::getTheta() {
-
+float ArcballCamera::getTheta()
+{
 	return m_theta;
 }
 
-// return the pivot rotation around the y axis (phi) in degrees
-float ArcballCamera::getPhi() {
-
+float ArcballCamera::getPhi()
+{
 	return m_phi;
 }
 
-void ArcballCamera::rotateCamera(float _dTheta, float _dPhi) {
+float ArcballCamera::getRadius()
+{
+	return 0.0f;
+}
 
-	m_theta += _dTheta;
-	m_phi += _dPhi;
+float ArcballCamera::getFovY()
+{
+	return 0.0f;
+}
+
+float ArcballCamera::getAspect()
+{
+	return 0.0f;
+}
+
+float ArcballCamera::getNearPlaneDistance()
+{
+	return 0.0f;
+}
+
+float ArcballCamera::getFarPlaneDistance()
+{
+	return 0.0f;
+}
+
+void ArcballCamera::rotateCamera(float dTheta, float dPhi)
+{
+	m_theta += dTheta;
+	m_phi += dPhi;
 
 	if (m_theta > 89.0f) m_theta = 89.0f;
 	if (m_theta < -89.0f) m_theta = -89.0f;
@@ -107,68 +121,43 @@ void ArcballCamera::rotateCamera(float _dTheta, float _dPhi) {
 	calculateDerivedValues();
 }
 
-float ArcballCamera::getRadius() {
-
-	return m_radius;
+void ArcballCamera::scaleRadius(float _s)
+{
+	if (_s > 0.0f)
+	{
+		m_radius *= _s;
+		calculateDerivedValues();
+	}
 }
 
-void ArcballCamera::scaleRadius(float _s) {
-
-	m_radius *= _s;
-	calculateDerivedValues();
-}
-
-void ArcballCamera::incrementRadius(float _i) {
-
+void ArcballCamera::incrementRadius(float _i)
+{
 	m_radius += _i;
-
-	if (m_radius < 2.0f) m_radius = 2.0f;
-	if (m_radius > 100.0f) m_radius = 100.0f;
-
+	if (m_radius < 0.0f) m_radius = 0.0f;
 	calculateDerivedValues();
 }
 
-float ArcballCamera::getFovY() {
-
-	return m_fovY;
-}
-
-void ArcballCamera::setFovY(float _fovY) {
-
-	this->m_fovY = _fovY;
+void ArcballCamera::setFovY(float _fovY)
+{
+	m_fovY = _fovY;
 	calculateDerivedValues();
 }
 
-float ArcballCamera::getAspect() {
-
-	return m_aspect;
-}
-
-void ArcballCamera::setAspect(float _aspect) {
-
-	this->m_aspect = _aspect;
+void ArcballCamera::setAspect(float _aspect)
+{
+	m_aspect = _aspect;
 	calculateDerivedValues();
 }
 
-float ArcballCamera::getNearPlaneDistance() {
-
-	return m_nearPlane;
-}
-
-void ArcballCamera::setNearPlaneDistance(float _nearPlaneDistance) {
-
-	this->m_nearPlane = _nearPlaneDistance;
+void ArcballCamera::setNearPlaneDistance(float _nearPlaneDistance)
+{
+	m_nearPlane = _nearPlaneDistance;
 	calculateDerivedValues();
 }
 
-float ArcballCamera::getFarPlaneDistance() {
-
-	return m_farPlane;
-}
-
-void ArcballCamera::setFarPlaneDistance(float _farPlaneDistance) {
-
-	this->m_farPlane = _farPlaneDistance;
+void ArcballCamera::setFarPlaneDistance(float _farPlaneDistance)
+{
+	m_farPlane = _farPlaneDistance;
 	calculateDerivedValues();
 }
 
@@ -181,17 +170,16 @@ void ArcballCamera::AdjustYaw(float delta)
 void ArcballCamera::AdjustPitch(float delta)
 {
 	m_theta += delta;
-
 	if (m_theta > 89.0f) m_theta = 89.0f;
 	if (m_theta < -89.0f) m_theta = -89.0f;
-
 	calculateDerivedValues();
 }
 
 void ArcballCamera::Zoom(float delta)
 {
 	m_radius += delta;
-	m_radius = std::max(2.0f, std::min(m_radius, 100.0f));
+	if (m_radius < 2.0f) m_radius = 2.0f;
+	if (m_radius > 100.0f) m_radius = 100.0f;
 	calculateDerivedValues();
 }
 
