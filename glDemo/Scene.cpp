@@ -81,13 +81,7 @@ void Scene::Update(float _dt)
 			if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
 				newPos -= right * moveSpeed;
 
-			int x = static_cast<int>(newPos.x + 0.5f);
-			int z = static_cast<int>(newPos.z + 0.5f);
-
-			if (!m_map->IsWall(x, z))
-			{
-				m_beast->SetPosition(newPos);
-			}
+			m_beast->SetPosition(newPos);
 
 			glm::vec3 beastPos = m_beast->GetPosition() + glm::vec3(0.0f, 0.8f, 0.0f);
 			glm::vec3 offset(0.0f, 0.8f, 0.0f);

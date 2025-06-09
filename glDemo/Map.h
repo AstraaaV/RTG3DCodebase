@@ -10,19 +10,22 @@ public:
 	Map(Scene* scene);
 	~Map();
 
+	// Used to load map layout and spawn stuff
 	void Init();
-	void LoadMap();
-	const std::vector<std::string>& GetMap() const;
 
+	// Returns spawn pos of player in world coords
 	glm::vec3 GetPlayerSpawn() const { return m_playerSpawn; }
-	bool IsWall(int x, int z) const;
+	void SetPlayerSpawn(int x, int z);
+
+	void CreateTorch(int x, int z);
 
 private:
-	std::vector<std::string> m_map;
-	Scene* m_scene;
+	Scene* m_scene; // Spawns the objects and lights
 
 	glm::vec3 m_playerSpawn = glm::vec3(0.0f);
-	
-	void SpawnTile(char tile, int x, int z);
+
 	void CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp);
+
+	void CreateLongWall(int startX, int startZ, int length, bool horizontal);
+	void CreateFloor(int w, int h);
 };

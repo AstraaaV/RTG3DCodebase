@@ -8,102 +8,45 @@ Map::~Map() {}
 
 void Map::Init()
 {
-	LoadMap();
+	CreateFloor(15, 15);
 
-	for (int z = 0; z < m_map.size(); ++z)
-	{
-		for (int x = 0; x < m_map[z].length(); ++x)
-		{
-			SpawnTile(m_map[z][x], x, z);
-		}
-	}
+	// Exterior
+	CreateLongWall(0, 0, 15, true);
+	CreateLongWall(0, 15, 15, true);
+
+	CreateLongWall(3, 3, 16, false);
+	CreateLongWall(18, 3, 16, false);
+
+	// Interior
+	//CreateLongWall(2, 2, 3, true);
+	//CreateLongWall(6, 2, 3, true);
+	//CreateLongWall(2, 2, 5, true);
+	//CreateLongWall(6, 2, 5, true);
+
+	// Torches
+	CreateTorch(3, 1);
+	CreateTorch(8, 1);
+
+	SetPlayerSpawn(1, 1);
 }
 
-void Map::LoadMap()
+void Map::SetPlayerSpawn(int x, int z)
 {
-	m_map =
-	{
-		"WWWWWWWWWWWW",
-		"W..T....T..W",
-		"W.WWW..WWW.W",
-		"W.W......W.W",
-		"W.W.W££W.W.W",
-		"W.W.WWWW.W.W",
-		"W.W......W.W",
-		"W.WWW..WWW.W",
-		"W..T....T..W",
-		"WWWWWWWWWWWW"
-	};
+	m_playerSpawn = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
 }
 
-const std::vector<std::string>& Map::GetMap() const
-{
-	return m_map;
-}
-
-bool Map::IsWall(int x, int z) const
-{
-	if (z < 0 || z >= m_map.size() || x < 0 || x >= m_map[z].length())
-		return true;
-
-	return m_map[z][x] == 'W';
-}
-
-void Map::SpawnTile(char tile, int x, int z)
+void Map::CreateTorch(int x, int z)
 {
 	glm::vec3 pos = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
-
 	glm::vec3 rot(0.0f);
 
-	CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-		"PLANE", "FLOOR_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
-	
-	switch (tile)
-	{
-	case 'W':
-	{
-		bool wallL = IsWall(x - 1, z);
-		bool wallR = IsWall(x + 1, z);
-		bool wallU = IsWall(x, z - 1);
-		bool wallD = IsWall(x, z + 1);
+	CreateObject("Torch_" + std::to_string(x) + "_" + std::to_string(z),
+		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
-		bool hori = (wallL || wallR) && !(wallU || wallD);
-		bool vert = (wallU || wallD);
-
-		if (hori)
-		{
-			rot.y = 90.0f;
-		}
-		else if (vert)
-		{
-			rot.y = 0.0f;
-		}
-		else
-		{
-			rot.y = 0.0f;
-		}
-
-		CreateObject("Wall_" + std::to_string(x) + "_" + std::to_string(z),
-			"WALL", "WALL_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
-		break;
-	}
-	case 'T':
-	{
-		CreateObject("Torch_" + std::to_string(x) + "_" + std::to_string(z), "WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
-
-		glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
-		glm::vec3 lightCol = glm::vec3(1.0f, 0.8f, 0.5f);
-		float lightIntensity = 1.0f;
-
-		m_scene->AddPointLight(lightPos, lightCol, lightIntensity);
-		break;
-	}
-	case 'P':
-		m_playerSpawn = pos;
-		break;
-	default:
-		break;
-	}
+	glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
+	glm::vec3 lightCol = glm::vec3(1.0f, 0.8f, 0.5f);
+	float lightIntensity = 1.0f;
+	m_scene->AddPointLight(lightPos, lightCol, lightIntensity);
 }
 
 void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)
@@ -128,4 +71,42 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	obj->Init(m_scene);
 	obj->SetRenderPass(rp);
 	m_scene->AddGameObject(obj);
+}
+
+void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal)
+{
+	glm::vec3 rot(0.0f);
+
+	if (!horizontal)
+		rot.y = 90.0f;
+
+	for (int i = 0; i < length; ++i)
+	{
+		int x = horizontal ? startX + i : startX;
+		int z = horizontal ? startZ : startZ + i;
+
+		glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
+
+		if (rot.y == 90.0f)
+			pos.z += 0.5f;
+
+		CreateObject("LongWall_" + std::to_string(x) + "_" + std::to_string(z),
+			"WALL", "WALL_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
+	}
+}
+
+void Map::CreateFloor(int w, int h)
+{
+	glm::vec3 rot(0.0f);
+
+	for (int z = 0; z < h; ++z)
+	{
+		for (int x = 0; x < w; ++x)
+		{
+			glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
+
+			CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
+				"PLANE", "FLOOR_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
+		}
+	}
 }
