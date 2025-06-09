@@ -16,6 +16,17 @@ void Map::Init()
 	CreateLongWall(3, 3.8, 24, false); // Bottom
 	CreateLongWall(27, 3.8, 24, false); // Top
 
+	// Lair
+	CreateLongWall(2, 2, 8, true);
+	CreateLongWall(2, 10, 8, true);
+	CreateLongWall(5, 5, 9, false);
+	//CreateLongWall(2, 2, 4, false);
+
+	// Training
+	CreateLongWall(12, 2, 8, true); // Left
+	CreateLongWall(12, 12, 8, true); // Right
+	CreateLongWall(7, 14, 3, false); // Bottom
+	CreateLongWall(12, 15, 10, false); // Top
 
 	// Torches
 	CreateTorch(3, 1);
