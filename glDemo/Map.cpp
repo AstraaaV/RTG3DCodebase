@@ -8,20 +8,14 @@ Map::~Map() {}
 
 void Map::Init()
 {
-	CreateFloor(15, 15);
+	CreateFloor(24, 24);
 
-	// Exterior
-	CreateLongWall(0, 0, 15, true);
-	CreateLongWall(0, 15, 15, true);
+	// Outer Box
+	CreateLongWall(0, 0, 24, true); // Left
+	CreateLongWall(0, 23, 24, true); // Right
+	CreateLongWall(3, 3.8, 24, false); // Bottom
+	CreateLongWall(27, 3.8, 24, false); // Top
 
-	CreateLongWall(3, 3, 16, false);
-	CreateLongWall(18, 3, 16, false);
-
-	// Interior
-	//CreateLongWall(2, 2, 3, true);
-	//CreateLongWall(6, 2, 3, true);
-	//CreateLongWall(2, 2, 5, true);
-	//CreateLongWall(6, 2, 5, true);
 
 	// Torches
 	CreateTorch(3, 1);
