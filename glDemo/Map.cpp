@@ -67,12 +67,20 @@ void Map::SpawnTile(char tile, int x, int z)
 		bool wallU = IsWall(x, z - 1);
 		bool wallD = IsWall(x, z + 1);
 
-		bool hori = (wallL || wallR);
+		bool hori = (wallL || wallR) && !(wallU || wallD);
 		bool vert = (wallU || wallD);
 
-		if (hori && !vert)
+		if (hori)
 		{
 			rot.y = 90.0f;
+		}
+		else if (vert)
+		{
+			rot.y = 0.0f;
+		}
+		else
+		{
+			rot.y = 0.0f;
 		}
 
 		CreateObject("Wall_" + std::to_string(x) + "_" + std::to_string(z),
