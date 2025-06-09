@@ -51,6 +51,9 @@ public:
 	void SetVisible(bool visible);
 	bool IsVisible() const;
 
+	void SetCollide(bool val) { m_collidable = val; }
+	bool IsCollide() const { return m_collidable; }
+
 	//scene maybe needed for more involved cameras to connect to relvant GOs and lights/shaders etc
 	virtual void Init(Scene* _scene);
 
@@ -81,6 +84,7 @@ protected:
 	RenderPass m_RP = RP_OPAQUE;
 
 	bool m_visible = true;
+	bool m_collidable = false;
 
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;

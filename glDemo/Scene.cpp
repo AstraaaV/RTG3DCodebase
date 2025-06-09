@@ -81,7 +81,17 @@ void Scene::Update(float _dt)
 			if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
 				newPos -= right * moveSpeed;
 
-			m_beast->SetPosition(newPos);
+			int gridX = static_cast<int>(floor(newPos.x));
+			int gridZ = static_cast<int>(floor(newPos.z));
+
+			if (CanMove(newPos))
+			{
+				m_beast->SetPosition(newPos);
+			}
+			else
+			{
+
+			}
 
 			glm::vec3 beastPos = m_beast->GetPosition() + glm::vec3(0.0f, 0.8f, 0.0f);
 			glm::vec3 offset(0.0f, 0.8f, 0.0f);
@@ -585,6 +595,25 @@ void Scene::AddPointLight(const glm::vec3& pos, const glm::vec3& col, float inte
 	newLight.col = col;
 	newLight.intensity = intensity;
 	m_pointLights.push_back(newLight);
+}
+
+bool Scene::CanMove(const glm::vec3& pos, float rad)
+{
+	for (GameObject* obj : m_GameObjects)
+	{
+		if (!obj->IsCollide())
+			continue;
+
+		glm::vec3 objPos = obj->GetPosition();
+
+		float dist = glm::distance(glm::vec2(pos.x, pos.z), glm::vec2(objPos.x, objPos.z));
+
+		if (dist < rad)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void Scene::AddGameObject(GameObject* obj)

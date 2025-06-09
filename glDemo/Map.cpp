@@ -16,6 +16,7 @@ void Map::Init()
 	CreateLongWall(0, 4, 24, false); // Bottom
 	CreateLongWall(24, 4, 24, false); // Top
 
+	// Interior Walls
 	CreateLongWall(6, 5, 14, true);
 	CreateLongWall(12, 10, 6, true);
 	CreateLongWall(-4, 3, 4, true);
@@ -59,6 +60,15 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	GameObject* obj = new GameObject(name, model, texture, shader);
 	obj->SetPosition(pos);
 	obj->SetRotation(rot);
+
+	if (model == "WALL" || model == "WALLSCONCE")
+	{
+		obj->SetCollide(true);
+	}
+	else
+	{
+		obj->SetCollide(false);
+	}
 
 	if (model == "WALL")
 	{

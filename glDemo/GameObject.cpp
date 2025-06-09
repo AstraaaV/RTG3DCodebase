@@ -67,15 +67,17 @@ void GameObject::PreRender()
 		{
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texDiffuse->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_BaseColor"), 0);
+			pLocation = glGetUniformLocation(m_ShaderProg, "u_BaseColor");
+			if (pLocation != -1) glUniform1i(pLocation, 0);
 		}
-	
+
 		Texture* texNormal = m_scene->GetTexture(m_textureName2);
 		if (texNormal)
 		{
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texNormal->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_NormalMap"), 1);
+			pLocation = glGetUniformLocation(m_ShaderProg, "u_NormalMap");
+			if (pLocation != -1) glUniform1i(pLocation, 1);
 		}
 
 		Texture* texRoughness = m_scene->GetTexture(m_textureName3);
@@ -83,7 +85,8 @@ void GameObject::PreRender()
 		{
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_2D, texRoughness->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_RoughnessMap"), 2);
+			pLocation = glGetUniformLocation(m_ShaderProg, "u_RoughnessMap");
+			if (pLocation != -1) glUniform1i(pLocation, 2);
 		}
 	
 		Texture* texMetallic = m_scene->GetTexture(m_textureName4);
@@ -91,7 +94,8 @@ void GameObject::PreRender()
 		{
 			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, texMetallic->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_MetallicMap"), 3);
+			pLocation = glGetUniformLocation(m_ShaderProg, "u_MetallicMap");
+			if (pLocation != -1) glUniform1i(pLocation, 3);
 		}
 
 		Texture* texHeight = m_scene->GetTexture(m_textureName5);
@@ -99,7 +103,8 @@ void GameObject::PreRender()
 		{
 			glActiveTexture(GL_TEXTURE4);
 			glBindTexture(GL_TEXTURE_2D, texHeight->m_texID);
-			glUniform1i(glGetUniformLocation(m_ShaderProg, "u_HeightMap"), 4);
+			pLocation = glGetUniformLocation(m_ShaderProg, "u_HeightMap");
+			if (pLocation != -1) glUniform1i(pLocation, 4);
 		}
 	}
 }

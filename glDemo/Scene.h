@@ -56,6 +56,8 @@ public:
 
 	void AddPointLight(const glm::vec3& pos, const glm::vec3& col, float intensity);
 
+	bool CanMove(const glm::vec3& pos, float rad = 0.4f);
+
 	struct PL
 	{
 		glm::vec3 pos;
