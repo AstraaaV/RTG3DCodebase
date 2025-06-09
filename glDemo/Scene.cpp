@@ -30,6 +30,14 @@ Scene::~Scene()
 //tick all my Game Objects, lights and cameras
 void Scene::Update(float _dt)
 {
+	float time = glfwGetTime();
+
+	for (auto& light : m_pointLights)
+	{
+		float flicker = 0.7f + 0.6f * ((sin(time * 15.0f) + ((rand() % 100) / 100.0f)) * 0.5f);
+		light.intensity = flicker;
+	}
+
 	//update all lights
 	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
 	{
@@ -195,6 +203,24 @@ void Scene::Render()
 
 			//loop through setting up uniform shader values for anything else
 			SetShaderUniforms(SP);
+
+			for (int i = 0; i < m_pointLights.size(); i++)
+			{
+				const PL& light = m_pointLights[i];
+				string baseName = "pointLights[" + std::to_string(i) + "].";
+
+				GLint posLoc = glGetUniformLocation(SP, (baseName + "position").c_str());
+				if (posLoc != -1)
+					glUniform3fv(posLoc, 1, &light.pos[0]);
+
+				GLint colLoc = glGetUniformLocation(SP, (baseName + "colour").c_str());
+				if (colLoc != -1)
+					glUniform3fv(colLoc, 1, &light.col[0]);
+
+				GLint intensityLoc = glGetUniformLocation(SP, (baseName + "intensity").c_str());
+				if (intensityLoc != -1)
+					glUniform1f(intensityLoc, light.intensity);
+			}
 
 			//set any uniform shader values for the actual model
 			(*it)->PreRender();
@@ -556,6 +582,15 @@ void Scene::PossessBeast()
 			break;
 		}
 	}
+}
+
+void Scene::AddPointLight(const glm::vec3& pos, const glm::vec3& col, float intensity)
+{
+	PL newLight;
+	newLight.pos = pos;
+	newLight.col = col;
+	newLight.intensity = intensity;
+	m_pointLights.push_back(newLight);
 }
 
 void Scene::AddGameObject(GameObject* obj)

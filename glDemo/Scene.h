@@ -54,6 +54,17 @@ public:
 	void PossessBeast();
 	bool IsBeastPossessed() const { return m_possessBeast; }
 
+	void AddPointLight(const glm::vec3& pos, const glm::vec3& col, float intensity);
+
+	struct PL
+	{
+		glm::vec3 pos;
+		glm::vec3 col;
+		float intensity;
+	};
+
+	std::vector<PL> m_pointLights;
+
 protected:
 
 	//data structures containing pointers to all our stuff
