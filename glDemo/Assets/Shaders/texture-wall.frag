@@ -29,7 +29,7 @@ void main()
     vec3 albedo = texture(u_BaseColor, inputFragment.texCoord).rgb;
 
     // Apply yellowish tint (like Dungeon Keeper 2 walls)
-    vec3 yellowTint = vec3(1.1, 1.05, 0.95); // Soft warm tone
+    vec3 yellowTint = vec3(1.03, 1.025, 0.99); // Soft warm tone
     albedo *= yellowTint;
     albedo = max(albedo, vec3(0.2));
 

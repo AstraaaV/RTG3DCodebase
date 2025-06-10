@@ -24,7 +24,7 @@ void main()
     outputVertex.surfaceWorldPos = worldPos.xyz;
 
     // Pass texture coordinates
-    outputVertex.texCoord = vertexTexCoord * 0.3;
+    outputVertex.texCoord = vertexTexCoord * vec2(0.3, 0.3);
 
     // Compute TBN matrix (tangent space basis)
     mat3 normalMatrix = mat3(modelMatrix);
