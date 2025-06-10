@@ -3,6 +3,7 @@
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
+uniform float time;
 
 layout(location = 0) in vec3 vertexPos;
 layout(location = 2) in vec2 vertexTexCoord;
@@ -16,6 +17,7 @@ out VS_OUT {
     vec3 tangent;
     vec3 bitangent;
     float alpha;
+    float flicker;
 } vs_out;
 
 void main() {
@@ -35,4 +37,8 @@ void main() {
     vs_out.fragPos = worldPos.xyz;
 
     gl_Position = projMatrix * viewMatrix * worldPos;
+
+    vs_out.flicker = sin(time * 10.0f + vertexTexCoord.x * 5.0) * 0.1 + 0.9;
+
+    vs_out.alpha = vertexTexCoord.y;
 }

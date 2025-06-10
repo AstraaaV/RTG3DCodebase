@@ -11,9 +11,11 @@ layout(binding = 1) uniform sampler2D u_NormalMap;
 layout(binding = 2) uniform sampler2D u_RoughnessMap;
 layout(binding = 3) uniform sampler2D u_MetallicMap;
 layout(binding = 4) uniform sampler2D u_HeightMap;
+layout(binding = 5) uniform sampler2D u_EmissiveMap;
 
 uniform DirectionalLight dirLight;
 uniform vec3 viewPos;
+uniform float time;
 
 in VS_OUT {
     vec3 fragPos;
@@ -46,13 +48,17 @@ void main()
     vec2 texCoords = ParallaxMapping(fs_in.texCoord, viewDir);
 
     // Sample textures
-    vec3 baseColor = texture(u_BaseColor, texCoords).rgb;
+    vec3 baseColor = texture(u_BaseColor, texCoords);
     vec3 normalMap = texture(u_NormalMap, texCoords).rgb;
     float roughness = texture(u_RoughnessMap, texCoords).r;
     float metallic = texture(u_MetallicMap, texCoords).r;
+    vec3 emissiveCol = texture(u_EmissiveMap, texCoords).rgb;
 
     if (baseColor.a < 0.1)
         discard;
+
+    float flicker = sin(time * 10.0) * 0.2 + 0.8;
+    emissiveCol *= flicker;
 
     // Transform normal map value from [0,1] to [-1,1]
     vec3 N = normalize(normalMap * 2.0 - 1.0);
@@ -79,7 +85,7 @@ void main()
     float spec = pow(NdotH, specularPower);
     vec3 specular = specularColor * dirLight.color * spec;
 
-    vec3 color = ambient + diffuse + specular;
+    vec3 color = ambient + diffuse + specular + emissiveCol;
 
     fragColour = vec4(color, baseColor.a);
 }
