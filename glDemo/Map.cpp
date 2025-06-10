@@ -96,7 +96,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 
 	if (model == "WALL")
 	{
-		obj->SetScale(glm::vec3(1.0f, 2.5f, 1.0f));
+		obj->SetScale(glm::vec3(1.0f, 2.0f, 1.0f));
 	}
 	else if (model == "WALLSCONCE")
 	{

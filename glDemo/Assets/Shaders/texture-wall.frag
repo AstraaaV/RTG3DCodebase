@@ -1,39 +1,59 @@
 #version 450 core
 
 in SimplePacket {
-	vec3 surfaceWorldPos;
-	vec3 surfaceNormal;
-	vec2 texCoord;
-	mat3 TBN;
+    vec3 surfaceWorldPos;
+    vec3 surfaceNormal;
+    vec2 texCoord;
+    mat3 TBN;
 } inputFragment;
 
-layout(location = 0) out vec4 fragColour;
+out vec4 FragColor;
 
-// Directional light
+// Texture samplers
+uniform sampler2D u_BaseColor;
+uniform sampler2D u_NormalMap;
+uniform sampler2D u_RoughnessMap;
+uniform sampler2D u_MetallicMap;
+
+// Directional Light
 uniform vec3 DIRDir;
 uniform vec3 DIRCol;
 uniform vec3 DIRAmb;
 
-// Texture maps
-layout(binding = 0) uniform sampler2D u_BaseColor;
-layout(binding = 1) uniform sampler2D u_NormalMap;
-layout(binding = 2) uniform sampler2D u_RoughnessMap;
-layout(binding = 3) uniform sampler2D u_MetallicMap;
-layout(binding = 4) uniform sampler2D u_HeightMap;
+// View position
+uniform vec3 viewPos;
 
-void main(void)
+void main()
 {
-	vec3 albedo = texture(u_BaseColor, inputFragment.texCoord).rgb;
+    // Sample textures
+    vec3 albedo = texture(u_BaseColor, inputFragment.texCoord).rgb;
 
-	// Normal mapping
-	vec3 normalTex = texture(u_NormalMap, inputFragment.texCoord).rgb;
-	normalTex = normalize(normalTex * 2.0 - 1.0);
-	vec3 N = normalize(inputFragment.TBN * normalTex);
+    // Apply yellowish tint (like Dungeon Keeper 2 walls)
+    vec3 yellowTint = vec3(1.1, 1.05, 0.95); // Soft warm tone
+    albedo *= yellowTint;
+    albedo = max(albedo, vec3(0.2));
 
-	// Light direction (already normalized)
-	float lambert = max(dot(N, DIRDir), 0.0);
-	vec3 diffuse = albedo * DIRCol * lambert;
+    float roughness = texture(u_RoughnessMap, inputFragment.texCoord).r;
+    float metallic = texture(u_MetallicMap, inputFragment.texCoord).r;
 
-	vec3 finalColor = DIRAmb + diffuse;
-	fragColour = vec4(finalColor, 1.0);
+    // Normal mapping
+    vec3 sampledNormal = texture(u_NormalMap, inputFragment.texCoord).rgb;
+    sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
+    vec3 N = normalize(inputFragment.TBN * sampledNormal);
+
+    vec3 V = normalize(viewPos - inputFragment.surfaceWorldPos);
+    vec3 L = normalize(-DIRDir);
+    vec3 H = normalize(V + L);
+
+    // Diffuse
+    float NdotL = max(dot(N, L), 0.0);
+    vec3 diffuse = albedo * DIRCol * NdotL;
+
+    // Specular
+    float NdotH = max(dot(N, H), 0.0);
+    float specularStrength = pow(NdotH, 32.0 * (1.0 - roughness));
+    vec3 specular = specularStrength * DIRCol * mix(vec3(0.04), albedo, metallic);
+
+    vec3 result = (DIRAmb * albedo) + diffuse + specular;
+    FragColor = vec4(result, 1.0);
 }
