@@ -15,10 +15,12 @@ out VS_OUT {
     vec3 normal;
     vec3 tangent;
     vec3 bitangent;
+    float alpha;
 } vs_out;
 
 void main() {
     vs_out.texCoord = vertexTexCoord;
+    vs.out.alpha = vertexColor.a;
     
     // Calculate TBN matrix vectors
     vec3 N = normalize((transpose(inverse(modelMatrix)) * vec4(vertexNormal, 0.0)).xyz);

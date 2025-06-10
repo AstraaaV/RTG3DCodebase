@@ -46,10 +46,13 @@ void main()
     vec2 texCoords = ParallaxMapping(fs_in.texCoord, viewDir);
 
     // Sample textures
-    vec3 albedo = texture(u_BaseColor, texCoords).rgb;
+    vec3 baseColor = texture(u_BaseColor, texCoords).rgb;
     vec3 normalMap = texture(u_NormalMap, texCoords).rgb;
     float roughness = texture(u_RoughnessMap, texCoords).r;
     float metallic = texture(u_MetallicMap, texCoords).r;
+
+    if (baseColor.a < 0.1)
+        discard;
 
     // Transform normal map value from [0,1] to [-1,1]
     vec3 N = normalize(normalMap * 2.0 - 1.0);
@@ -65,18 +68,18 @@ void main()
     float NdotH = max(dot(N, H), 0.0);
 
     // Ambient
-    vec3 ambient = dirLight.ambient * albedo;
+    vec3 ambient = dirLight.ambient * baseColor.rgb;
 
     // Diffuse
-    vec3 diffuse = albedo * dirLight.color * NdotL;
+    vec3 diffuse = baseColor.rgb * dirLight.color * NdotL;
 
     // Specular (using roughness & metallic as rough approximation)
     float specularPower = mix(256.0, 16.0, roughness); // roughness controls shininess
-    vec3 specularColor = mix(vec3(0.04), albedo, metallic); // metallic controls specular color
+    vec3 specularColor = mix(vec3(0.04), baseColor.rgb, metallic); // metallic controls specular color
     float spec = pow(NdotH, specularPower);
     vec3 specular = specularColor * dirLight.color * spec;
 
     vec3 color = ambient + diffuse + specular;
 
-    fragColour = vec4(color, 1.0);
+    fragColour = vec4(color, baseColor.a);
 }
