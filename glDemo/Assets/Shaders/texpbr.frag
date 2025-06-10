@@ -9,7 +9,7 @@ in SimplePacket {
 
 out vec4 FragColor;
 
-// PBR textures
+// PBR Textures
 uniform sampler2D u_BaseColor;
 uniform sampler2D u_NormalMap;
 uniform sampler2D u_RoughnessMap;
@@ -28,18 +28,15 @@ struct PointLight {
 uniform int numPointLights;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 
-// Constants
-const float gamma = 2.2;
-
 void main()
 {
-    vec3 albedo = pow(texture(u_BaseColor, inputFragment.texCoord).rgb, vec3(gamma));
+    vec3 albedo = texture(u_BaseColor, inputFragment.texCoord).rgb;
     float roughness = texture(u_RoughnessMap, inputFragment.texCoord).r;
     float metallic = texture(u_MetallicMap, inputFragment.texCoord).r;
 
-    // Sample and transform normal from normal map
+    // Sample and apply normal map
     vec3 sampledNormal = texture(u_NormalMap, inputFragment.texCoord).rgb;
-    sampledNormal = normalize(sampledNormal * 2.0 - 1.0); // convert from [0,1] to [-1,1]
+    sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
     vec3 N = normalize(inputFragment.TBN * sampledNormal);
 
     vec3 V = normalize(viewPos - inputFragment.surfaceWorldPos);
@@ -52,14 +49,13 @@ void main()
 
         float distance = length(pointLights[i].position - inputFragment.surfaceWorldPos);
         float attenuation = 1.0 / (distance * distance);
-
         vec3 lightColor = pointLights[i].colour * pointLights[i].intensity * attenuation;
 
-        // Diffuse shading
+        // Diffuse
         float NdotL = max(dot(N, L), 0.0);
         vec3 diffuse = albedo * lightColor * NdotL;
 
-        // Specular shading (simplified Blinn-Phong approximation)
+        // Specular (simplified Blinn-Phong)
         float NdotH = max(dot(N, H), 0.0);
         float specularStrength = pow(NdotH, 32.0 * (1.0 - roughness));
         vec3 specular = specularStrength * lightColor * mix(vec3(0.04), albedo, metallic);
@@ -67,7 +63,5 @@ void main()
         resultColor += diffuse + specular;
     }
 
-    // Gamma correction (convert back to sRGB)
-    resultColor = pow(resultColor, vec3(1.0 / gamma));
     FragColor = vec4(resultColor, 1.0);
 }

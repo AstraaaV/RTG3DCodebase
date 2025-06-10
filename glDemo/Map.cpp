@@ -106,7 +106,7 @@ void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal)
 			pos.z += 0.5f;
 
 		CreateObject("LongWall_" + std::to_string(x) + "_" + std::to_string(z),
-			"WALL", "WALL_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
+			"WALL", "WALL_DIFFUSE", "TEXWALL", pos, rot, RP_OPAQUE);
 	}
 }
 
@@ -121,7 +121,7 @@ void Map::CreateFloor(int w, int h)
 			glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
 			CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-				"PLANE", "FLOOR_DIFFUSE", "TEXDIR", pos, rot, RP_OPAQUE);
+				"PLANE", "ROCK", "TEXMAP", pos, rot, RP_OPAQUE);
 		}
 	}
 }

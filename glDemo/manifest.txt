@@ -169,27 +169,27 @@ FILE: Assets\\Textures\\Wall_Sconce_Roughness_4k.png
 {
 TYPE: FIF_PNG
 NAME: LANTERN_BASE
-FILE: Assets\\Textures\\lantern1_blinn5_BaseColor.png
+FILE: Assets\\Textures\\lantern 1_blinn5_BaseColor.png
 }
 {
 TYPE: FIF_PNG
 NAME: LANTERN_HEIGHT
-FILE: Assets\\Textures\\lantern1_blinn5_Height.png
+FILE: Assets\\Textures\\lantern 1_blinn5_Height.png
 }
 {
 TYPE: FIF_PNG
 NAME: LANTERN_METALLIC
-FILE: Assets\\Textures\\lantern1_blinn5_Metallic.png
+FILE: Assets\\Textures\\lantern 1_blinn5_Metallic.png
 }
 {
 TYPE: FIF_PNG
 NAME: LANTERN_NORMAL
-FILE: Assets\\Textures\\lantern1_blinn5_Normal.png
+FILE: Assets\\Textures\\lantern 1_blinn5_Normal.png
 }
 {
 TYPE: FIF_PNG
 NAME: LANTERN_ROUGHNESS
-FILE: Assets\\Textures\\lantern1_blinn5_Roughness.png
+FILE: Assets\\Textures\\lantern 1_blinn5_Roughness.png
 }
 
 SHADERS 5

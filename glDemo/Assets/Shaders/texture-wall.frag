@@ -1,32 +1,39 @@
 #version 450 core
 
-layout(location = 0) in vec2 TexCoord;
-layout(location = 1) in vec3 FragPos;
-layout(location = 2) in vec3 Normal;
+in SimplePacket {
+	vec3 surfaceWorldPos;
+	vec3 surfaceNormal;
+	vec2 texCoord;
+	mat3 TBN;
+} inputFragment;
 
-layout(location = 0) out vec4 FragColor;
+layout(location = 0) out vec4 fragColour;
 
-layout(binding = 0) uniform sampler2D u_DiffuseMap;
+// Directional light
+uniform vec3 DIRDir;
+uniform vec3 DIRCol;
+uniform vec3 DIRAmb;
+
+// Texture maps
+layout(binding = 0) uniform sampler2D u_BaseColor;
 layout(binding = 1) uniform sampler2D u_NormalMap;
 layout(binding = 2) uniform sampler2D u_RoughnessMap;
+layout(binding = 3) uniform sampler2D u_MetallicMap;
+layout(binding = 4) uniform sampler2D u_HeightMap;
 
-uniform vec3 lightPos = vec3(5.0, 10.0, 5.0);
-uniform vec3 viewPos = vec3(0.0, 5.0, 10.0);
-
-void main()
+void main(void)
 {
-    vec3 normalMap = texture(u_NormalMap, TexCoord).rgb;
-    vec3 norm = normalize(normalMap * 2.0 - 1.0); // unpack
+	vec3 albedo = texture(u_BaseColor, inputFragment.texCoord).rgb;
 
-    vec3 lightDir = normalize(lightPos - FragPos);
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
+	// Normal mapping
+	vec3 normalTex = texture(u_NormalMap, inputFragment.texCoord).rgb;
+	normalTex = normalize(normalTex * 2.0 - 1.0);
+	vec3 N = normalize(inputFragment.TBN * normalTex);
 
-    float diff = max(dot(norm, lightDir), 0.0);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0 * (1.0 - texture(u_RoughnessMap, TexCoord).r));
+	// Light direction (already normalized)
+	float lambert = max(dot(N, DIRDir), 0.0);
+	vec3 diffuse = albedo * DIRCol * lambert;
 
-    vec3 baseColor = texture(u_DiffuseMap, TexCoord).rgb;
-    vec3 lighting = baseColor * diff + vec3(spec);
-
-    FragColor = vec4(lighting, 1.0);
+	vec3 finalColor = DIRAmb + diffuse;
+	fragColour = vec4(finalColor, 1.0);
 }
