@@ -30,8 +30,10 @@ void Map::Init()
 	CreateLongWall(4, 7, 4, false);
 
 	// Torches
-	CreateTorch(3, 1);
-	CreateTorch(8, 1);
+	CreateTorch(1, 5, "EAST");
+	CreateTorch(22, 5, "WEST");
+	CreateTorch(10, 1, "NORTH");
+	CreateTorch(10, 22, "SOUTH");
 
 	SetPlayerSpawn(1, 1);
 }
@@ -41,13 +43,34 @@ void Map::SetPlayerSpawn(int x, int z)
 	m_playerSpawn = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
 }
 
-void Map::CreateTorch(int x, int z)
+void Map::CreateTorch(int x, int z, const std::string& direction)
 {
-	glm::vec3 pos = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
+	glm::vec3 pos = glm::vec3(static_cast<float>(x), 1.5f, static_cast<float>(z));
 	glm::vec3 rot(0.0f);
 
-	CreateObject("Lantern_" + std::to_string(x) + "_" + std::to_string(z),
-		"LANTERN", "LANTERN_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
+	if (direction == "NORTH")
+	{
+		pos.z -= 0.4f;
+		rot.y = 180.0f;
+	}
+	else if (direction == "SOUTH")
+	{
+		pos.z -= 0.4f;
+		rot.y = 0.0f;
+	}
+	else if (direction == "EAST")
+	{
+		pos.z -= 0.4f;
+		rot.y = 270.0f;
+	}
+	else if (direction == "WEST")
+	{
+		pos.z -= 0.4f;
+		rot.y = 90.0f;
+	}
+
+	CreateObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z),
+		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
 	glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
 	glm::vec3 lightCol = glm::vec3(1.0f, 0.8f, 0.5f);
@@ -62,7 +85,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	obj->SetRotation(rot);
 	obj->SetRenderPass(rp);
 
-	if (model == "WALL" || model == "LANTERN")
+	if (model == "WALL" || model == "WALLSCONCE")
 	{
 		obj->SetCollide(true);
 	}
@@ -73,12 +96,16 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 
 	if (model == "WALL")
 	{
-		obj->SetScale(glm::vec3(1.0f));
+		obj->SetScale(glm::vec3(1.0f, 2.5f, 1.0f));
 	}
-	else if (model == "LANTERN")
+	else if (model == "WALLSCONCE")
 	{
 		obj->SetScale(glm::vec3(0.5f));
 		obj->SetRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+		obj->SetTexture("WALLSCONCE_BASE");
+		obj->SetTexture2("WALLSCONCE_NORMAL");
+		obj->SetTexture3("WALLSCONCE_ROUGHNESS");
+		obj->SetTexture4("WALLSCONCE_METALLIC");
 	}
 	else
 	{
@@ -121,7 +148,7 @@ void Map::CreateFloor(int w, int h)
 			glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
 			CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-				"PLANE", "ROCK", "TEXDIR", pos, rot, RP_OPAQUE);
+				"PLANE", "", "FLAT", pos, rot, RP_OPAQUE);
 		}
 	}
 }

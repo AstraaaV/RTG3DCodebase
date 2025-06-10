@@ -4,29 +4,35 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 
-layout(location = 0) in vec3 vertexPos;
-layout(location = 2) in vec2 vertexTexCoord;
-layout(location = 3) in vec3 vertexNormal;
-layout(location = 4) in vec3 vertexTangent;
-layout(location = 5) in vec3 vertexBitangent;
+layout (location = 0) in vec3 vertexPos;
+layout (location = 2) in vec2 vertexTexCoord;
+layout (location = 3) in vec3 vertexNormal;
+layout (location = 4) in vec3 vertexTangent;
+layout (location = 5) in vec3 vertexBitangent;
 
 out SimplePacket {
-    vec3 surfaceWorldPos;
-    vec3 surfaceNormal;
-    vec2 texCoord;
-    mat3 TBN;
+	vec3 surfaceWorldPos;
+	vec3 surfaceNormal;
+	vec2 texCoord;
+	mat3 TBN;
 } outputVertex;
 
 void main(void)
 {
-    vec4 worldPos = modelMatrix * vec4(vertexPos, 1.0);
-    outputVertex.surfaceWorldPos = worldPos.xyz;
-    outputVertex.texCoord = vertexTexCoord;
+	outputVertex.texCoord = vertexTexCoord;
 
-    vec3 T = normalize(mat3(modelMatrix) * vertexTangent);
-    vec3 B = normalize(mat3(modelMatrix) * vertexBitangent);
-    vec3 N = normalize(mat3(modelMatrix) * vertexNormal);
-    outputVertex.TBN = mat3(T, B, N);
+	// transform position into world space
+	vec4 worldCoord = modelMatrix * vec4(vertexPos, 1.0);
+	outputVertex.surfaceWorldPos = worldCoord.xyz;
 
-    gl_Position = projMatrix * viewMatrix * worldPos;
+	// transform and normalize the tangent space vectors
+	vec3 T = normalize(mat3(modelMatrix) * vertexTangent);
+	vec3 B = normalize(mat3(modelMatrix) * vertexBitangent);
+	vec3 N = normalize(mat3(modelMatrix) * vertexNormal);
+
+	outputVertex.surfaceNormal = N;
+	outputVertex.TBN = mat3(T, B, N);
+
+	// final clip-space position
+	gl_Position = projMatrix * viewMatrix * worldCoord;
 }

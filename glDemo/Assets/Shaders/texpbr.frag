@@ -9,24 +9,19 @@ in SimplePacket {
 
 out vec4 FragColor;
 
-// PBR Textures
+// Textures
 uniform sampler2D u_BaseColor;
 uniform sampler2D u_NormalMap;
 uniform sampler2D u_RoughnessMap;
 uniform sampler2D u_MetallicMap;
 
-// Lighting
+// Directional Light
+uniform vec3 DIRDir;
+uniform vec3 DIRCol;
+uniform vec3 DIRAmb;
+
+// Camera position
 uniform vec3 viewPos;
-
-struct PointLight {
-    vec3 position;
-    vec3 colour;
-    float intensity;
-};
-
-#define MAX_POINT_LIGHTS 16
-uniform int numPointLights;
-uniform PointLight pointLights[MAX_POINT_LIGHTS];
 
 void main()
 {
@@ -34,34 +29,27 @@ void main()
     float roughness = texture(u_RoughnessMap, inputFragment.texCoord).r;
     float metallic = texture(u_MetallicMap, inputFragment.texCoord).r;
 
-    // Sample and apply normal map
+    // Apply normal map in tangent space
     vec3 sampledNormal = texture(u_NormalMap, inputFragment.texCoord).rgb;
     sampledNormal = normalize(sampledNormal * 2.0 - 1.0);
     vec3 N = normalize(inputFragment.TBN * sampledNormal);
 
     vec3 V = normalize(viewPos - inputFragment.surfaceWorldPos);
-    vec3 resultColor = vec3(0.0);
+    vec3 L = normalize(-DIRDir); // Directional light vector
+    vec3 H = normalize(V + L);
 
-    for (int i = 0; i < numPointLights; ++i)
-    {
-        vec3 L = normalize(pointLights[i].position - inputFragment.surfaceWorldPos);
-        vec3 H = normalize(V + L);
+    // Light color
+    vec3 lightColor = DIRCol;
 
-        float distance = length(pointLights[i].position - inputFragment.surfaceWorldPos);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 lightColor = pointLights[i].colour * pointLights[i].intensity * attenuation;
+    // Diffuse
+    float NdotL = max(dot(N, L), 0.0);
+    vec3 diffuse = albedo * lightColor * NdotL;
 
-        // Diffuse
-        float NdotL = max(dot(N, L), 0.0);
-        vec3 diffuse = albedo * lightColor * NdotL;
+    // Specular (Blinn-Phong approx)
+    float NdotH = max(dot(N, H), 0.0);
+    float specularStrength = pow(NdotH, 32.0 * (1.0 - roughness));
+    vec3 specular = specularStrength * lightColor * mix(vec3(0.04), albedo, metallic);
 
-        // Specular (simplified Blinn-Phong)
-        float NdotH = max(dot(N, H), 0.0);
-        float specularStrength = pow(NdotH, 32.0 * (1.0 - roughness));
-        vec3 specular = specularStrength * lightColor * mix(vec3(0.04), albedo, metallic);
-
-        resultColor += diffuse + specular;
-    }
-
+    vec3 resultColor = DIRAmb * albedo + diffuse + specular;
     FragColor = vec4(resultColor, 1.0);
 }

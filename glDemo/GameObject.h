@@ -42,8 +42,10 @@ public:
 	void SetRotation(const glm::vec3& rot);
 	const glm::vec3& GetRotation() const;
 
+	void SetTexture(const std::string& texture) { m_textureName = texture; }
 	void SetTexture2(const std::string& texture) { m_textureName2 = texture; }
 	void SetTexture3(const std::string& texture) { m_textureName3 = texture; }
+	void SetTexture4(const std::string& texture) { m_textureName4 = texture; }
 
 	void SetScale(const glm::vec3& scale);
 	void SetRenderPass(RenderPass rp);

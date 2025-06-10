@@ -17,7 +17,7 @@ public:
 	glm::vec3 GetPlayerSpawn() const { return m_playerSpawn; }
 	void SetPlayerSpawn(int x, int z);
 
-	void CreateTorch(int x, int z);
+	void CreateTorch(int x, int z, const std::string& direction);
 
 private:
 	Scene* m_scene; // Spawns the objects and lights

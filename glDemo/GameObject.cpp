@@ -180,11 +180,12 @@ void GameObject::Init(Scene* _scene)
 		m_textureName2 = "WALL_NORMAL";
 		m_textureName3 = "WALL_ROUGHNESS";
 	}
-	else if (m_modelName == "LANTERN")
+	else if (m_modelName == "WALLSCONCE")
 	{
-		m_textureName2 = "LANTERN_NORMAL";
-		m_textureName3 = "LANTERN_ROUGHNESS";
-		m_textureName4 = "LANTERN_METALLIC";
-		m_textureName5 = "LANTERN_HEIGHT";
+		m_textureName = "WALLSCONCE_BASE";
+		m_textureName2 = "WALLSCONCE_NORMAL";
+		m_textureName3 = "WALLSCONCE_ROUGHNESS";
+		m_textureName4 = "WALLSCONCE_METALLIC";
+		m_textureName5 = "WALLSCONCE_HEIGHT";
 	}
 }
