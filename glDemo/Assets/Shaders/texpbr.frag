@@ -1,91 +1,73 @@
 #version 450 core
 
-struct DirectionalLight {
-    vec3 direction;
-    vec3 color;
-    vec3 ambient;
+in SimplePacket {
+    vec3 surfaceWorldPos;
+    vec3 surfaceNormal;
+    vec2 texCoord;
+    mat3 TBN;
+} inputFragment;
+
+out vec4 FragColor;
+
+// PBR textures
+uniform sampler2D u_BaseColor;
+uniform sampler2D u_NormalMap;
+uniform sampler2D u_RoughnessMap;
+uniform sampler2D u_MetallicMap;
+
+// Lighting
+uniform vec3 viewPos;
+
+struct PointLight {
+    vec3 position;
+    vec3 colour;
+    float intensity;
 };
 
-layout(binding = 0) uniform sampler2D u_BaseColor;
-layout(binding = 1) uniform sampler2D u_NormalMap;
-layout(binding = 2) uniform sampler2D u_RoughnessMap;
-layout(binding = 3) uniform sampler2D u_MetallicMap;
-layout(binding = 4) uniform sampler2D u_HeightMap;
-layout(binding = 5) uniform sampler2D u_EmissiveMap;
+#define MAX_POINT_LIGHTS 16
+uniform int numPointLights;
+uniform PointLight pointLights[MAX_POINT_LIGHTS];
 
-uniform DirectionalLight dirLight;
-uniform vec3 viewPos;
-uniform float time;
-
-in VS_OUT {
-    vec3 fragPos;
-    vec2 texCoord;
-    vec3 normal;
-    vec3 tangent;
-    vec3 bitangent;
-} fs_in;
-
-layout(location = 0) out vec4 fragColour;
-
-// Parallax mapping function (simple)
-vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
-{
-    float height = texture(u_HeightMap, texCoords).r;
-    float heightScale = 0.05;  // tweak this value for depth effect
-    vec2 p = viewDir.xy / viewDir.z * (height * heightScale);
-    return texCoords - p;
-}
+// Constants
+const float gamma = 2.2;
 
 void main()
 {
-    // Build TBN matrix
-    mat3 TBN = mat3(normalize(fs_in.tangent), normalize(fs_in.bitangent), normalize(fs_in.normal));
+    vec3 albedo = pow(texture(u_BaseColor, inputFragment.texCoord).rgb, vec3(gamma));
+    float roughness = texture(u_RoughnessMap, inputFragment.texCoord).r;
+    float metallic = texture(u_MetallicMap, inputFragment.texCoord).r;
 
-    // View direction in tangent space
-    vec3 viewDir = normalize(TBN * normalize(viewPos - fs_in.fragPos));
+    // Sample and transform normal from normal map
+    vec3 sampledNormal = texture(u_NormalMap, inputFragment.texCoord).rgb;
+    sampledNormal = normalize(sampledNormal * 2.0 - 1.0); // convert from [0,1] to [-1,1]
+    vec3 N = normalize(inputFragment.TBN * sampledNormal);
 
-    // Parallax offset texture coords
-    vec2 texCoords = ParallaxMapping(fs_in.texCoord, viewDir);
+    vec3 V = normalize(viewPos - inputFragment.surfaceWorldPos);
+    vec3 resultColor = vec3(0.0);
 
-    // Sample textures
-    vec3 baseColor = texture(u_BaseColor, texCoords);
-    vec3 normalMap = texture(u_NormalMap, texCoords).rgb;
-    float roughness = texture(u_RoughnessMap, texCoords).r;
-    float metallic = texture(u_MetallicMap, texCoords).r;
-    vec3 emissiveCol = texture(u_EmissiveMap, texCoords).rgb;
+    for (int i = 0; i < numPointLights; ++i)
+    {
+        vec3 L = normalize(pointLights[i].position - inputFragment.surfaceWorldPos);
+        vec3 H = normalize(V + L);
 
-    if (baseColor.a < 0.1)
-        discard;
+        float distance = length(pointLights[i].position - inputFragment.surfaceWorldPos);
+        float attenuation = 1.0 / (distance * distance);
 
-    float flicker = sin(time * 10.0) * 0.2 + 0.8;
-    emissiveCol *= flicker;
+        vec3 lightColor = pointLights[i].colour * pointLights[i].intensity * attenuation;
 
-    // Transform normal map value from [0,1] to [-1,1]
-    vec3 N = normalize(normalMap * 2.0 - 1.0);
-    N = normalize(TBN * N);
+        // Diffuse shading
+        float NdotL = max(dot(N, L), 0.0);
+        vec3 diffuse = albedo * lightColor * NdotL;
 
-    // Simple Blinn-Phong directional light
-    vec3 L = normalize(-dirLight.direction);
-    vec3 V = normalize(viewPos - fs_in.fragPos);
-    vec3 H = normalize(L + V);
+        // Specular shading (simplified Blinn-Phong approximation)
+        float NdotH = max(dot(N, H), 0.0);
+        float specularStrength = pow(NdotH, 32.0 * (1.0 - roughness));
+        vec3 specular = specularStrength * lightColor * mix(vec3(0.04), albedo, metallic);
 
-    float NdotL = max(dot(N, L), 0.0);
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotH = max(dot(N, H), 0.0);
+        resultColor += diffuse + specular;
+    }
 
-    // Ambient
-    vec3 ambient = dirLight.ambient * baseColor.rgb;
-
-    // Diffuse
-    vec3 diffuse = baseColor.rgb * dirLight.color * NdotL;
-
-    // Specular (using roughness & metallic as rough approximation)
-    float specularPower = mix(256.0, 16.0, roughness); // roughness controls shininess
-    vec3 specularColor = mix(vec3(0.04), baseColor.rgb, metallic); // metallic controls specular color
-    float spec = pow(NdotH, specularPower);
-    vec3 specular = specularColor * dirLight.color * spec;
-
-    vec3 color = ambient + diffuse + specular + emissiveCol;
-
-    fragColour = vec4(color, baseColor.a);
+    // Gamma correction (convert back to sRGB)
+    resultColor = pow(resultColor, vec3(1.0 / gamma));
+    FragColor = vec4(resultColor, 1.0);
 }
