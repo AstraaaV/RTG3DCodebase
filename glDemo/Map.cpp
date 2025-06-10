@@ -61,6 +61,23 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	obj->SetPosition(pos);
 	obj->SetRotation(rot);
 
+	if (model == "TORCH_FLAME")
+	{
+		rp = RP_TRANSPARENT;
+	}
+	else
+	{
+		rp = RP_OPAQUE;
+	}
+
+	obj->SetRenderPass(rp);
+
+	if (rp == RP_TRANSPARENT)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+
 	if (model == "WALL" || model == "WALLSCONCE")
 	{
 		obj->SetCollide(true);
@@ -84,8 +101,12 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 		obj->SetScale(glm::vec3(1.0f));
 	}
 	obj->Init(m_scene);
-	obj->SetRenderPass(rp);
 	m_scene->AddGameObject(obj);
+
+	if (rp == RP_TRANSPARENT)
+	{
+		glDisable(GL_BLEND);
+	}
 }
 
 void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal)

@@ -116,9 +116,17 @@ void GameObject::Render()
 
 	Model* model = m_scene->GetModel(m_modelName);
 
-	if (model)
+	if (m_RP == RP_TRANSPARENT)
 	{
-		model->Render();
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+
+	model->Render();
+
+	if (m_RP == RP_TRANSPARENT)
+	{
+		glDisable(GL_BLEND);
 	}
 }
 
