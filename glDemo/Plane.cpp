@@ -28,7 +28,7 @@ static float uvArray[] =
 	1.0f, 0.0f
 };
 
-static float indexArray[] =
+static unsigned int indexArray[] =
 {
 	0, 1, 2,
 	0, 2, 3
@@ -59,8 +59,8 @@ Plane::Plane()
 	glGenBuffers(1, &m_uvBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_uvBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(uvArray), uvArray, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(2);
 
 	// Indices
 	glGenBuffers(1, &m_indexBuffer);

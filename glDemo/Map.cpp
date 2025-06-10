@@ -45,7 +45,7 @@ void Map::SetPlayerSpawn(int x, int z)
 
 void Map::CreateTorch(int x, int z, const std::string& direction)
 {
-	glm::vec3 pos = glm::vec3(static_cast<float>(x), 1.5f, static_cast<float>(z));
+	glm::vec3 pos = glm::vec3(static_cast<float>(x), 1.0f, static_cast<float>(z));
 	glm::vec3 rot(0.0f);
 
 	if (direction == "NORTH")
@@ -73,8 +73,8 @@ void Map::CreateTorch(int x, int z, const std::string& direction)
 		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
 	glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
-	glm::vec3 lightCol = glm::vec3(1.0f, 0.8f, 0.5f);
-	float lightIntensity = 1.0f;
+	glm::vec3 lightCol = glm::vec3(1.4f, 1.0f, 0.6f);
+	float lightIntensity = 1.8f;
 	m_scene->AddPointLight(lightPos, lightCol, lightIntensity);
 }
 
@@ -100,7 +100,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	}
 	else if (model == "WALLSCONCE")
 	{
-		obj->SetScale(glm::vec3(0.5f));
+		obj->SetScale(glm::vec3(0.9f));
 		obj->SetRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 		obj->SetTexture("WALLSCONCE_BASE");
 		obj->SetTexture2("WALLSCONCE_NORMAL");

@@ -106,6 +106,15 @@ void GameObject::PreRender()
 			pLocation = glGetUniformLocation(m_ShaderProg, "u_HeightMap");
 			if (pLocation != -1) glUniform1i(pLocation, 4);
 		}
+
+		Texture* texFlat = m_scene->GetTexture(m_textureName);
+		if (texFlat)
+		{
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, texFlat->m_texID);
+			pLocation = glGetUniformLocation(m_ShaderProg, "u_Diffuse");
+			if (pLocation != -1) glUniform1i(pLocation, 5);
+		}
 	}
 }
 
