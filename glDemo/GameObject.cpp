@@ -60,7 +60,7 @@ void GameObject::PreRender()
 	Helper::SetUniformLocation(m_ShaderProg, "modelMatrix", &pLocation);
 	glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&m_worldMatrix);
 
-	if (m_shaderName == "TEXWALL" || m_modelName == "WALLSCONCE" || m_shaderName == "TEXPBR")
+	if (m_shaderName == "TEXWALL" || m_modelName == "LANTERN" || m_shaderName == "TEXPBR")
 	{
 		Texture* texDiffuse = m_scene->GetTexture(m_textureName);
 		if (texDiffuse)
@@ -180,11 +180,11 @@ void GameObject::Init(Scene* _scene)
 		m_textureName2 = "WALL_NORMAL";
 		m_textureName3 = "WALL_ROUGHNESS";
 	}
-	else if (m_modelName == "WALLSCONCE")
+	else if (m_modelName == "LANTERN")
 	{
-		m_textureName2 = "WALLSCONCE_NORMAL";
-		m_textureName3 = "WALLSCONCE_ROUGHNESS";
-		m_textureName4 = "WALLSCONCE_METALLIC";
-		m_textureName5 = "WALLSCONCE_HEIGHT";
+		m_textureName2 = "LANTERN_NORMAL";
+		m_textureName3 = "LANTERN_ROUGHNESS";
+		m_textureName4 = "LANTERN_METALLIC";
+		m_textureName5 = "LANTERN_HEIGHT";
 	}
 }

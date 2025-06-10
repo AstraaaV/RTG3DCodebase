@@ -46,8 +46,8 @@ void Map::CreateTorch(int x, int z)
 	glm::vec3 pos = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
 	glm::vec3 rot(0.0f);
 
-	CreateObject("Torch_" + std::to_string(x) + "_" + std::to_string(z),
-		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
+	CreateObject("Lantern_" + std::to_string(x) + "_" + std::to_string(z),
+		"LANTERN", "LANTERN_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
 	glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
 	glm::vec3 lightCol = glm::vec3(1.0f, 0.8f, 0.5f);
@@ -60,25 +60,9 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	GameObject* obj = new GameObject(name, model, texture, shader);
 	obj->SetPosition(pos);
 	obj->SetRotation(rot);
-
-	if (model == "TORCH_FLAME")
-	{
-		rp = RP_TRANSPARENT;
-	}
-	else
-	{
-		rp = RP_OPAQUE;
-	}
-
 	obj->SetRenderPass(rp);
 
-	if (rp == RP_TRANSPARENT)
-	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-
-	if (model == "WALL" || model == "WALLSCONCE")
+	if (model == "WALL" || model == "LANTERN")
 	{
 		obj->SetCollide(true);
 	}
@@ -91,7 +75,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	{
 		obj->SetScale(glm::vec3(1.0f));
 	}
-	else if (model == "WALLSCONCE")
+	else if (model == "LANTERN")
 	{
 		obj->SetScale(glm::vec3(0.5f));
 		obj->SetRotation(glm::vec3(0.0f, 90.0f, 0.0f));
@@ -102,11 +86,6 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	}
 	obj->Init(m_scene);
 	m_scene->AddGameObject(obj);
-
-	if (rp == RP_TRANSPARENT)
-	{
-		glDisable(GL_BLEND);
-	}
 }
 
 void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal)

@@ -65,7 +65,7 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 6
+MODELS 7
 {
 TYPE: AI
 NAME: BEAST
@@ -75,6 +75,11 @@ FILE: Assets\\beast\\beast.obj
 TYPE: AI
 NAME: WALLSCONCE
 FILE: Assets\\torch\\wall_sconce.obj
+}
+{
+TYPE: AI
+NAME: LANTERN
+FILE: Assets\\torch\\lantern.obj
 }
 {
 TYPE: AI
@@ -95,7 +100,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 13
+TEXTURES 18
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -161,6 +166,31 @@ TYPE: FIF_PNG
 NAME: WALLSCONCE_ROUGHNESS
 FILE: Assets\\Textures\\Wall_Sconce_Roughness_4k.png
 }
+{
+TYPE: FIF_PNG
+NAME: LANTERN_BASE
+FILE: Assets\\Textures\\lantern1_blinn5_BaseColor.png
+}
+{
+TYPE: FIF_PNG
+NAME: LANTERN_HEIGHT
+FILE: Assets\\Textures\\lantern1_blinn5_Height.png
+}
+{
+TYPE: FIF_PNG
+NAME: LANTERN_METALLIC
+FILE: Assets\\Textures\\lantern1_blinn5_Metallic.png
+}
+{
+TYPE: FIF_PNG
+NAME: LANTERN_NORMAL
+FILE: Assets\\Textures\\lantern1_blinn5_Normal.png
+}
+{
+TYPE: FIF_PNG
+NAME: LANTERN_ROUGHNESS
+FILE: Assets\\Textures\\lantern1_blinn5_Roughness.png
+}
 
 SHADERS 5
 {
@@ -225,12 +255,12 @@ SHADER: TEXWALL
 }
 {
 TYPE: EXAMPLE
-NAME: TORCH1
+NAME: LANTERN1
 POS: 0.0 0.0 0.0
 ROT: 0.0 0.0 0.0 
 SCALE: 1.0 1.0 1.0
 ROTINC: 0.0 0.0 0.0
-MODEL: WALLSCONCE
-TEXTURE: WALLSCONCE_BASE
+MODEL: LANTERN
+TEXTURE: LANTERN_BASE
 SHADER: TEXDIR
 }
