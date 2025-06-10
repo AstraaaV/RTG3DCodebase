@@ -121,7 +121,7 @@ void Map::CreateFloor(int w, int h)
 			glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
 			CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-				"PLANE", "ROCK", "TEXMAP", pos, rot, RP_OPAQUE);
+				"PLANE", "ROCK", "TEXDIR", pos, rot, RP_OPAQUE);
 		}
 	}
 }

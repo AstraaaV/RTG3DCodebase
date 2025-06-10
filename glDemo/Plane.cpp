@@ -14,10 +14,10 @@ static float positionArray[] =
 
 static float colourArray[] =
 {
-	0.5f, 0.5f, 0.5f, 1.0f,
-	0.5f, 0.5f, 0.5f, 1.0f,
-	0.5f, 0.5f, 0.5f, 1.0f,
-	0.5f, 0.5f, 0.5f, 1.0f
+	1.0f, 1.0f, 0.6f, 1.0f,
+	1.0f, 1.0f, 0.6f, 1.0f,
+	1.0f, 1.0f, 0.6f, 1.0f,
+	1.0f, 1.0f, 0.6f, 1.0f
 };
 
 static float uvArray[] =
@@ -64,8 +64,8 @@ Plane::Plane()
 
 	// Indices
 	glGenBuffers(1, &m_indexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(indexArray), indexArray, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexArray), indexArray, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 }
