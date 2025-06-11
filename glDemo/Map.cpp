@@ -52,9 +52,10 @@ void Map::CreateTorch(int x, int z, const std::string& direction)
 	CreateObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z),
 		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
-	glm::vec3 lightPos = pos + glm::vec3(0.0f, 1.5f, 0.0f);
-	glm::vec3 lightCol = glm::vec3(1.4f, 1.0f, 0.6f);
-	float lightIntensity = 1.8f;
+	glm::vec3 flamePos = pos + glm::vec3(0.0f, 0.25f, 0.15f);
+	CreateObject("Fire_" + std::to_string(x) + "_" + std::to_string(z),
+		"CUBE", "FIRE_DIFFUSE", "TEXPOINT", flamePos, rot, RP_OPAQUE);
+
 }
 
 void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)

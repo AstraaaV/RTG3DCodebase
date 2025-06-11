@@ -55,6 +55,14 @@ void GameObject::Tick(float _dt)
 		m_rot.y = m_baseRotY + sinf(time * 1.0f) * 10.0f;
 	}
 
+	if (m_name.find("Fire_") == 0)
+	{
+		float t = glfwGetTime();
+		float flicker = 0.1f + 0.02f * sinf(t * 10.0f);
+		m_scale = glm::vec3(flicker);
+		m_pos.y = m_baseY + sinf(t * 6.0f) * 0.02f;
+	}
+
 	m_worldMatrix = glm::translate(mat4(1.0), vec3(m_pos));
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
