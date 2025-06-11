@@ -90,6 +90,7 @@ protected:
 	bool m_collidable = false;
 
 	float m_baseY = 0.0f;
+	float m_baseRotY = 0.0f;
 
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;
