@@ -29,6 +29,6 @@ private:
 
 	void CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp);
 
-	void CreateLongWall(int startX, int startZ, int length, bool horizontal);
+	void CreateLongWall(int startX, int startZ, int length, bool horizontal, bool placeTorches);
 	void CreateFloor(int w, int h);
 };

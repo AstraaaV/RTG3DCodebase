@@ -143,7 +143,6 @@
     <ClInclude Include="CameraFactory.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FirstPersonCamera.h" />
-    <ClInclude Include="GlowOrb.h" />
     <ClInclude Include="IsometricCamera.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="core.h" />
@@ -180,7 +179,6 @@
     <ClCompile Include="CameraFactory.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FirstPersonCamera.cpp" />
-    <ClCompile Include="GlowOrb.cpp" />
     <ClCompile Include="IsometricCamera.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="core.cpp" />

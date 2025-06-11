@@ -216,6 +216,26 @@ void Scene::Render()
 				if (loc3 != -1) glUniform3fv(loc3, 1, &amb.x);
 			}
 
+			else if (shaderName == "TEXPOINT")
+			{
+				Light* torch = GetLight("Torch1");
+
+				if (torch)
+				{
+					GLint loc1 = glGetUniformLocation(SP, "Torch1pos");
+					if (loc1 != -1) glUniform3fv(loc1, 1, glm::value_ptr(torch->GetPos()));
+
+					GLint loc2 = glGetUniformLocation(SP, "Torch1col");
+					if (loc2 != -1) glUniform3fv(loc2, 1, glm::value_ptr(torch->GetCol()));
+
+					GLint loc3 = glGetUniformLocation(SP, "Torch1amb");
+					if (loc3 != -1) glUniform3fv(loc3, 1, glm::value_ptr(torch->GetAmb()));
+
+					GLint loc4 = glGetUniformLocation(SP, "Torch1atten");
+					if (loc4 != -1) glUniform3fv(loc4, 1, glm::value_ptr(torch->GetAttenuation()));
+				}
+			}
+
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
 

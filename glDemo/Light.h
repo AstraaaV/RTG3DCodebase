@@ -38,6 +38,7 @@ public:
 	vec3 GetCol() { return m_col; }
 	vec3 GetAmb() { return m_amb; }
 	vec3 GetPos() { return m_pos; }
+	vec3 GetAttenuation() { return m_attenuation; }
 
 	//set my shader values
 	//base version: if name of light is LG

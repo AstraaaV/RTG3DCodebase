@@ -2,7 +2,6 @@
 #include "GameObject.h"
 #include "Scene.h"
 #include "Light.h"
-#include "GlowOrb.h"
 
 Map::Map(Scene* scene) : m_scene(scene) {}
 
@@ -13,29 +12,24 @@ void Map::Init()
 	CreateFloor(24, 24);
 
 	// Outer Box
-	CreateLongWall(-4, 24, 24, true); // Left
-	CreateLongWall(-4, 0, 24, true); // Right
-	CreateLongWall(0, 4, 24, false); // Bottom
-	CreateLongWall(24, 4, 24, false); // Top
+	CreateLongWall(-4, 24, 24, true, true); // Left
+	CreateLongWall(-4, 0, 24, true, true); // Right
+	CreateLongWall(0, 4, 24, false, true); // Bottom
+	CreateLongWall(24, 4, 24, false, true); // Top
 
 	// Interior Walls
-	CreateLongWall(6, 5, 14, true);
-	CreateLongWall(12, 10, 6, true);
-	CreateLongWall(-4, 3, 4, true);
-	CreateLongWall(4, 19, 4, true);
-	CreateLongWall(10, 16, 4, true);
-	CreateLongWall(0, 12, 4, true);
-	CreateLongWall(8, 14, 12, false);
-	CreateLongWall(18, 15, 5, false);
-	CreateLongWall(4, 19, 9, false);
-	CreateLongWall(16, 10, 4, false);
-	CreateLongWall(4, 7, 4, false);
+	CreateLongWall(6, 5, 14, true, true);
+	CreateLongWall(12, 10, 6, true, true);
+	CreateLongWall(-4, 3, 4, true, false);
+	CreateLongWall(4, 19, 4, true, false);
+	CreateLongWall(10, 16, 4, true, false);
+	CreateLongWall(0, 12, 4, true, false);
 
-	// Torches
-	CreateTorch(1, 5, "EAST");
-	CreateTorch(22, 5, "WEST");
-	CreateTorch(10, 1, "NORTH");
-	CreateTorch(10, 22, "SOUTH");
+	CreateLongWall(8, 14, 12, false, true);
+	CreateLongWall(18, 15, 5, false, true);
+	CreateLongWall(4, 19, 9, false, false);
+	CreateLongWall(16, 10, 4, false, false);
+	CreateLongWall(4, 7, 4, false, false);
 
 	SetPlayerSpawn(7, 7);
 }
@@ -55,14 +49,6 @@ void Map::CreateTorch(int x, int z, const std::string& direction)
 		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
 	GameObject* sconce = m_scene->GetGameObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z));
-
-	glm::vec3 localOff(0.0f, 0.40f, 0.15f);
-	GlowOrb* orb = new GlowOrb();
-	orb->Init(m_scene);
-	orb->SetPosition(pos + localOff);
-	orb->SetLocalOffset(localOff);
-	orb->SetParent(sconce);
-	m_scene->AddGameObject(orb);
 }
 
 void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)
@@ -93,7 +79,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	m_scene->AddGameObject(obj);
 }
 
-void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal)
+void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal, bool placeTorches)
 {
 	glm::vec3 rot(0.0f);
 
@@ -112,6 +98,12 @@ void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal)
 
 		CreateObject("LongWall_" + std::to_string(x) + "_" + std::to_string(z),
 			"WALL", "WALL_DIFFUSE", "TEXWALL", pos, rot, RP_OPAQUE);
+
+		if (placeTorches && i % 5 == 0)
+		{
+			std::string facing = horizontal ? "SOUTH" : "EAST";
+			CreateTorch(x, z, facing);
+		}
 	}
 }
 

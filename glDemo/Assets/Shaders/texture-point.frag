@@ -1,19 +1,10 @@
 #version 450 core
 
-#define MAX_POINT_LIGHTS 16
+uniform vec3 Torch1pos;
+uniform vec3 Torch1col;
+uniform vec3 Torch1amb;
+uniform vec3 Torch1atten;
 
-struct PointLight {
-    vec3 position;
-    vec3 color;
-    vec3 ambient;
-
-    float constant;
-    float linear;
-    float quadratic;
-};
-
-uniform PointLight pointLights[MAX_POINT_LIGHTS];
-uniform int numPointLights;
 uniform vec3 viewPos;
 uniform sampler2D tex;
 
@@ -27,31 +18,24 @@ void main()
 {
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 result = vec3(0.0);
 
-    for (int i = 0; i < numPointLights; ++i)
-    {
-        // Ambient
-        vec3 ambient = pointLights[i].ambient * texture(tex, TexCoord).rgb;
+    // Ambient
+    vec3 ambient = Torch1amb * texture(tex, TexCoord).rgb;
 
-        // Diffuse
-        vec3 lightDir = normalize(pointLights[i].position - FragPos);
-        float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = diff * pointLights[i].color * texture(tex, TexCoord).rgb;
+    // Diffuse
+    vec3 lightDir = normalize(Torch1pos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * Torch1col * texture(tex, TexCoord).rgb;
 
-        // Specular
-        vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-        vec3 specular = spec * pointLights[i].color;
+    // Specular
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    vec3 specular = spec * Torch1col;
 
-        // Attenuation
-        float distance = length(pointLights[i].position - FragPos);
-        float attenuation = 1.0 / (pointLights[i].constant +
-                                   pointLights[i].linear * distance +
-                                   pointLights[i].quadratic * (distance * distance));
+    // Attenuation
+    float distance = length(Torch1pos - FragPos);
+    float attenuation = 1.0 / (Torch1atten.x + Torch1atten.y * distance + Torch1atten.z * distance * distance);
 
-        result += (ambient + diffuse + specular) * attenuation;
-    }
-
+    vec3 result = (ambient + diffuse + specular) * attenuation;
     FragColor = vec4(result, 1.0);
 }
