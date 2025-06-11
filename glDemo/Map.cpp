@@ -49,6 +49,15 @@ void Map::CreateTorch(int x, int z, const std::string& direction)
 		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
 	GameObject* sconce = m_scene->GetGameObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z));
+
+	Light* torchLight = new Light();
+	torchLight->SetName("Torch1");
+	torchLight->SetType("POINT");
+	torchLight->SetPos(glm::vec3(10.0f, 1.5f, 5.0f));
+	torchLight->SetColour(glm::vec3(1.0f, 0.6f, 0.2f));
+	torchLight->SetAmbient(glm::vec3(0.05f, 0.03f, 0.01f));
+	torchLight->SetAttenuation(1.0f, 0.09f, 0.032f);
+	m_scene->AddLight(torchLight);
 }
 
 void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)

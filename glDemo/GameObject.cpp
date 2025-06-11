@@ -169,6 +169,18 @@ void GameObject::SetShader(Shader* _shader)
 	m_shader = _shader;
 }
 
+glm::mat4 GameObject::GetModelMatrix() const
+{
+	mat4 translation = translate(mat4(1.0f), m_pos);
+	mat4 rotationX = rotate(mat4(1.0f), radians(m_rot.x), vec3(1, 0, 0));
+	mat4 rotationY = rotate(mat4(1.0f), radians(m_rot.y), vec3(0, 1, 0));
+	mat4 rotationZ = rotate(mat4(1.0f), radians(m_rot.z), vec3(0, 0, 1));
+	mat4 rotation = rotationZ * rotationY * rotationX;
+	mat4 scale = glm::scale(mat4(1.0f), m_scale);
+
+	return translation * rotation * scale;
+}
+
 void GameObject::SetRotation(const glm::vec3& rot)
 {
 	m_rot = rot;

@@ -202,18 +202,22 @@ void Scene::Render()
 
 			if (shaderName == "TEXDIR")
 			{
-				glm::vec3 dir = glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f));
-				glm::vec3 col = glm::vec3(1.0f, 1.0f, 1.0f);
-				glm::vec3 amb = glm::vec3(0.2f, 0.2f, 0.2f);
-
-				GLint loc = glGetUniformLocation(SP, "DIRDir");
-				if (loc != -1) glUniform3fv(loc, 1, &dir.x);
-
-				GLint loc2 = glGetUniformLocation(SP, "DIRCol");
-				if (loc2 != -1) glUniform3fv(loc2, 1, &col.x);
-
-				GLint loc3 = glGetUniformLocation(SP, "DIRAmb");
-				if (loc3 != -1) glUniform3fv(loc3, 1, &amb.x);
+				Light* sun = GetLight("SUN");
+				if (sun)
+				{
+					glm::vec3 dir = glm::normalize(sun->GetDirection());
+					glUniform3fv(glGetUniformLocation(SP, "DIRDir"), 1, glm::value_ptr(dir));
+					glUniform3fv(glGetUniformLocation(SP, "DIRCol"), 1, glm::value_ptr(sun->GetCol()));
+					glUniform3fv(glGetUniformLocation(SP, "DIRAmb"), 1, glm::value_ptr(sun->GetAmb()));
+					
+					Camera* cam = GetActiveCamera();
+					glUniformMatrix4fv(glGetUniformLocation(SP, "modelMatrix"), 1, GL_FALSE,
+						glm::value_ptr(obj->GetModelMatrix()));
+					glUniformMatrix4fv(glGetUniformLocation(SP, "viewMatrix"), 1, GL_FALSE,
+						glm::value_ptr(cam->GetView()));
+					glUniformMatrix4fv(glGetUniformLocation(SP, "projMatrix"), 1, GL_FALSE,
+						glm::value_ptr(cam->GetProj()));
+				}
 			}
 
 			else if (shaderName == "TEXPOINT")
@@ -483,6 +487,14 @@ void Scene::Init(GLFWwindow* window)
 
 	m_map = new Map(this);
 	m_map->Init();
+
+	Light* sun = new Light();
+	sun->SetName("SUN");
+	sun->SetType("DIRECTION");
+	sun->SetDirection(glm::vec3(-0.5f, -1.0f, -0.3f));
+	sun->SetColour(glm::vec3(1.0f));
+	sun->SetAmbient(glm::vec3(0.2f));
+	m_Lights.push_back(sun);
 	//initialise all cameras
 	//scene is passed down here to allow for linking of cameras to game objects
 	int count = 0;

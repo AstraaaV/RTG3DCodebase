@@ -35,6 +35,8 @@ public:
 	const std::string& GetModelName() const { return m_modelName; }
 	void SetShader(Shader* _shader);
 
+	glm::mat4 GetModelMatrix() const;
+
 	const std::string& GetShaderName() const { return m_shaderName; }
 
 	void SetPosition(const glm::vec3& pos) { m_pos = pos; }

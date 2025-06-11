@@ -40,6 +40,9 @@ public:
 	vec3 GetPos() { return m_pos; }
 	vec3 GetAttenuation() { return m_attenuation; }
 
+	void SetDirection(const glm::vec3& dir) { m_direction = dir; }
+	vec3 GetDirection() const { return m_direction; }
+
 	//set my shader values
 	//base version: if name of light is LG
 	//sets up shader values for LGpos LGcol & LGamb
@@ -54,5 +57,6 @@ protected:
 	vec3 m_col; // colour of the light
 	vec3 m_amb; // ambient colour of the light
 	vec3 m_attenuation;
+	vec3 m_direction = glm::vec3(-0.5f, -1.0f, -0.3f);
 
 };
