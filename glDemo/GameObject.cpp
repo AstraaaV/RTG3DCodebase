@@ -34,6 +34,7 @@ void GameObject::Load(ifstream& _file)
 {
 	StringHelp::String(_file, "NAME", m_name);
 	StringHelp::Float3(_file, "POS", m_pos.x, m_pos.y, m_pos.z);
+	m_baseY = m_pos.y;
 	StringHelp::Float3(_file, "ROT", m_rot.x, m_rot.y, m_rot.z);
 	StringHelp::Float3(_file, "SCALE", m_scale.x, m_scale.y, m_scale.z);
 	StringHelp::Float3(_file, "ROT INC", m_rot_incr.x, m_rot_incr.y, m_rot_incr.z);
@@ -42,6 +43,12 @@ void GameObject::Load(ifstream& _file)
 void GameObject::Tick(float _dt)
 {
 	m_rot += m_rot_incr;
+
+	if (m_name == "BEAST")
+	{
+		float bob = sinf(glfwGetTime() * 2.0f) * 0.1f;
+		m_pos.y = m_baseY + bob;
+	}
 
 	m_worldMatrix = glm::translate(mat4(1.0), vec3(m_pos));
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.x), glm::vec3(1.0f, 0.0f, 0.0f));

@@ -89,6 +89,8 @@ protected:
 	bool m_visible = true;
 	bool m_collidable = false;
 
+	float m_baseY = 0.0f;
+
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;
 };
