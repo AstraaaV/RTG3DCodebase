@@ -249,5 +249,11 @@
     <None Include="Assets\Shaders\texpbr.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Assets\Shaders\transparent.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\transparent.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

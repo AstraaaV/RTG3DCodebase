@@ -31,4 +31,5 @@ private:
 
 	void CreateLongWall(int startX, int startZ, int length, bool horizontal);
 	void CreateFloor(int w, int h);
+	void CreateFog(float x, float z, float scale);
 };

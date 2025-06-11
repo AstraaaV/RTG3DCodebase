@@ -35,6 +35,10 @@ void Map::Init()
 	CreateTorch(10, 1, "NORTH");
 	CreateTorch(10, 22, "SOUTH");
 
+	// Fog
+	CreateFog(8.0f, 8.0f, 4.0f);
+	CreateFog(16.0f, 16.0f, 4.0f);
+
 	SetPlayerSpawn(1, 1);
 }
 
@@ -151,4 +155,13 @@ void Map::CreateFloor(int w, int h)
 				"PLANE", "", "FLAT", pos, rot, RP_OPAQUE);
 		}
 	}
+}
+
+void Map::CreateFog(float x, float z, float scale)
+{
+	glm::vec3 pos(x, 0.1f, z);
+	glm::vec3 rot(90.0f, 0.0f, 0.0f);
+
+	CreateObject("FogPlane_" + std::to_string(x) + "_" + std::to_string(z),
+		"PLANE", "MIST", "TRANSPARENT", pos, rot, RP_TRANSPARENT);
 }

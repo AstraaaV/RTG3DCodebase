@@ -65,11 +65,16 @@ AMB: 0.2 0.2 0.2
 DIR: 0.0 1.0 0.0
 }
 
-MODELS 7
+MODELS 8
 {
 TYPE: AI
 NAME: BEAST
 FILE: Assets\\beast\\beast.obj
+}
+{
+TYPE: AI
+NAME: GHOST
+FILE: Assets\\ghost\\ghost.obj
 }
 {
 TYPE: AI
@@ -100,7 +105,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 18
+TEXTURES 19
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -191,8 +196,13 @@ TYPE: FIF_PNG
 NAME: LANTERN_ROUGHNESS
 FILE: Assets\\Textures\\lantern 1_blinn5_Roughness.png
 }
+{
+TYPE: FIF_PNG
+NAME: MIST
+FILE: Assets\\Textures\\mist.png
+}
 
-SHADERS 5
+SHADERS 6
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -218,8 +228,13 @@ NAME: TEXPBR
 VERTFILE: Assets\\Shaders\\texpbr.vert
 FRAGFILE: Assets\\Shaders\\texpbr.frag
 }
+{
+NAME: TRANSPARENT
+VERTFILE: Assets\\Shaders\\transparent.vert
+FRAGFILE: Assets\\Shaders\\transparent.frag
+}
 
-GAMEOBJECTS 4
+GAMEOBJECTS 5
 {
 TYPE: EXAMPLE
 NAME: BEAST
@@ -263,4 +278,15 @@ ROTINC: 0.0 0.0 0.0
 MODEL: LANTERN
 TEXTURE: LANTERN_BASE
 SHADER: TEXDIR
+}
+{
+TYPE: EXAMPLE
+NAME: FOGPLANE
+POS: 0.0 0.0 0.0
+ROT: 0.0 0.0 0.0 
+SCALE: 10.0 1.0 10.0
+ROTINC: 0.0 0.0 0.0
+MODEL: PLANE
+TEXTURE: MIST
+SHADER: TRANSPARENT
 }

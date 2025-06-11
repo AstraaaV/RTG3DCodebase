@@ -214,6 +214,8 @@
     <None Include="Assets\Shaders\texture-map.vert" />
     <None Include="Assets\Shaders\texture-wall.frag" />
     <None Include="Assets\Shaders\texture-wall.vert" />
+    <None Include="Assets\Shaders\transparent.frag" />
+    <None Include="Assets\Shaders\transparent.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
