@@ -32,6 +32,7 @@ public:
 	void SetName(string _name) { m_name = _name; }
 	string GetName() { return m_name; }
 	GLuint GetShaderProg() { return m_ShaderProg; }
+	const std::string& GetModelName() const { return m_modelName; }
 	void SetShader(Shader* _shader);
 
 	const std::string& GetShaderName() const { return m_shaderName; }

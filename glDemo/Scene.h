@@ -56,6 +56,7 @@ public:
 
 	void AddPointLight(const glm::vec3& pos, const glm::vec3& col, float intensity);
 
+	static bool OverlapXZ(const glm::vec3& p, const glm::vec3& box, float half);
 	bool CanMove(const glm::vec3& pos, float rad = 0.4f);
 
 	struct PL

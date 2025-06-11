@@ -39,7 +39,7 @@ void Map::Init()
 	CreateFog(8.0f, 8.0f, 4.0f);
 	CreateFog(16.0f, 16.0f, 4.0f);
 
-	SetPlayerSpawn(1, 1);
+	SetPlayerSpawn(7, 7);
 }
 
 void Map::SetPlayerSpawn(int x, int z)

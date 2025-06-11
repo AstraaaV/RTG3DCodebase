@@ -597,21 +597,31 @@ void Scene::AddPointLight(const glm::vec3& pos, const glm::vec3& col, float inte
 	m_pointLights.push_back(newLight);
 }
 
+bool Scene::OverlapXZ(const glm::vec3& p, const glm::vec3& box, float half)
+{
+	return p.x > box.x - half && p.x < box.x + half &&
+		p.z > box.z - half && p.z < box.z + half;
+}
+
 bool Scene::CanMove(const glm::vec3& pos, float rad)
 {
+	const float halfTile = 0.5f + rad;
+
 	for (GameObject* obj : m_GameObjects)
 	{
 		if (!obj->IsCollide())
 			continue;
 
-		glm::vec3 objPos = obj->GetPosition();
+		if (obj->GetModelName() != "WALL")
+			continue;
 
-		float dist = glm::distance(glm::vec2(pos.x, pos.z), glm::vec2(objPos.x, objPos.z));
+		glm::vec3 wallPos = obj->GetPosition();
 
-		if (dist < rad)
-		{
+		bool overlapX = pos.x > wallPos.x - halfTile && pos.x < wallPos.x + halfTile;
+		bool overlapZ = pos.z > wallPos.z - halfTile && pos.z < wallPos.z + halfTile;
+		
+		if (overlapX && overlapZ)
 			return false;
-		}
 	}
 	return true;
 }
