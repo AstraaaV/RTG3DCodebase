@@ -29,28 +29,28 @@ FAR 100.0
 
 LIGHTS 5
 {
-TYPE: POINT
+TYPE: LIGHT
 NAME: WHITE
 POS: 0.0 5.0 0.0
 COL: 1.0 1.0 1.0
 AMB: 0.5 0.5 0.5
 }
 {
-TYPE: POINT
+TYPE: LIGHT
 NAME: RED
 POS: 5.0 5.0 0.0
 COL: 1.0 0.0 0.0
 AMB: 0.0 0.5 0.5
 }
 {
-TYPE: POINT
+TYPE: LIGHT
 NAME: GREEN
 POS: -5.0 5.0 0.0
 COL: 0.0 1.0 0.0
 AMB: 0.5 0.0 0.5
 }
 {
-TYPE: POINT
+TYPE: LIGHT
 NAME: BLUE
 POS: -5.0 5.0 5.0
 COL: 0.0 0.0 1.0
@@ -62,7 +62,7 @@ NAME: DIR
 POS: 0.0 5.0 0.0
 COL: 1.0 1.0 1.0
 AMB: 0.2 0.2 0.2
-DIR: 0.0 -1.0 0.0
+DIR: 0.0 1.0 0.0
 }
 
 MODELS 6
@@ -172,11 +172,6 @@ FRAGFILE: Assets\\Shaders\\flatColour.frag
 NAME: TEXDIR
 VERTFILE: Assets\\Shaders\\texture-directional.vert
 FRAGFILE: Assets\\Shaders\\texture-directional.frag
-}
-{
-NAME: TEXPOINT
-VERTFILE: Assets\\Shaders\\texture-point.vert
-FRAGFILE: Assets\\Shaders\\texture-point.frag
 }
 {
 NAME: TEXMAP

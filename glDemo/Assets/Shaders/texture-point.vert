@@ -1,35 +1,22 @@
 #version 450 core
 
-// ── Matrices supplied by the engine ────────────────────────────────────────
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projMatrix;
+layout(location = 0) in vec3 inPos;
+layout(location = 1) in vec3 inNormal;
+layout(location = 2) in vec2 inTexCoord;
 
-// ── Vertex attributes (match VAO layout) ───────────────────────────────────
-layout(location = 0) in vec3 vertexPos;
-layout(location = 2) in vec2 vertexTexCoord;   // you used vec3 in the old file, but only .st is needed
-layout(location = 3) in vec3 vertexNormal;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 proj;
 
-// ── Packet passed to the fragment stage ────────────────────────────────────
-out SimplePacket {
-    vec3 surfaceWorldPos;
-    vec3 surfaceNormal;
-    vec2 texCoord;
-} vsOut;
+out vec3 FragPos;
+out vec3 Normal;
+out vec2 TexCoord;
 
 void main()
 {
-    // Texture coordinates
-    vsOut.texCoord = vertexTexCoord.st;
+    FragPos = vec3(model * vec4(inPos, 1.0));
+    Normal = mat3(transpose(inverse(model))) * inNormal;
+    TexCoord = inTexCoord;
 
-    // Transform normal by inverse-transpose(model) to keep it orthogonal
-    vsOut.surfaceNormal =
-        mat3(transpose(inverse(modelMatrix))) * vertexNormal;
-
-    // World-space position
-    vec4 worldPos = modelMatrix * vec4(vertexPos, 1.0);
-    vsOut.surfaceWorldPos = worldPos.xyz;
-
-    // Standard MVP
-    gl_Position = projMatrix * viewMatrix * worldPos;
+    gl_Position = proj * view * vec4(FragPos, 1.0);
 }

@@ -17,6 +17,14 @@
 #include "Plane.h"
 #include <assert.h>
 
+static std::string Trim(const std::string& s)
+{
+	const char* ws = " \t\r\n";
+	size_t b = s.find_first_not_of(ws);
+	size_t e = s.find_last_not_of(ws);
+	return (b == std::string::npos) ? "" : s.substr(b, e - b + 1);
+}
+
 Scene::Scene()
 {
 }
@@ -329,11 +337,13 @@ void Scene::Load(ifstream& _file)
 		_file.ignore(256, '\n');
 		cout << "{\n";
 
-		string type;
-		_file >> dummy >> type; _file.ignore(256, '\n');
+		string line;
+		std::getline(_file, line);
+		size_t pos = line.find(':');
+		std::string type = Trim(line.substr(pos + 1));
+
 		Light* newLight = LightFactory::makeNewLight(type);
 		newLight->Load(_file);
-
 		m_Lights.push_back(newLight);
 
 		//skip }
