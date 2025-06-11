@@ -249,6 +249,38 @@ void Scene::Render()
 	}
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
+
+	if (IsBeastPossessed())
+	{
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho(0, 1, 0, 1, -1, 1);
+
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+
+		glBegin(GL_QUADS);
+		glColor4f(0.3f, 0.0f, 0.2f, 0.3f);
+		glVertex2f(0.0f, 0.0f);
+		glVertex2f(1.0f, 0.0f);
+		glVertex2f(1.0f, 1.0f);
+		glVertex2f(0.0f, 1.0f);
+		glEnd();
+
+		glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+	}
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)
