@@ -62,6 +62,11 @@ void GameObject::Tick(float _dt)
 		m_scale = glm::vec3(flicker);
 		m_pos.y = m_baseY + sinf(t * 6.0f) * 0.02f;
 	}
+	
+	if (m_parent)
+	{
+		m_pos = m_parent->GetPosition() + m_localOffset;
+	}
 
 	m_worldMatrix = glm::translate(mat4(1.0), vec3(m_pos));
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.x), glm::vec3(1.0f, 0.0f, 0.0f));

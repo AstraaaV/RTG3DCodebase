@@ -1,6 +1,8 @@
 #include "Map.h"
 #include "GameObject.h"
 #include "Scene.h"
+#include "Light.h"
+#include "GlowOrb.h"
 
 Map::Map(Scene* scene) : m_scene(scene) {}
 
@@ -52,10 +54,15 @@ void Map::CreateTorch(int x, int z, const std::string& direction)
 	CreateObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z),
 		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
 
-	glm::vec3 flamePos = pos + glm::vec3(0.0f, 0.25f, 0.15f);
-	CreateObject("Fire_" + std::to_string(x) + "_" + std::to_string(z),
-		"CUBE", "FIRE_DIFFUSE", "TEXPOINT", flamePos, rot, RP_OPAQUE);
+	GameObject* sconce = m_scene->GetGameObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z));
 
+	glm::vec3 localOff(0.0f, 0.40f, 0.15f);
+	GlowOrb* orb = new GlowOrb();
+	orb->Init(m_scene);
+	orb->SetPosition(pos + localOff);
+	orb->SetLocalOffset(localOff);
+	orb->SetParent(sconce);
+	m_scene->AddGameObject(orb);
 }
 
 void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)

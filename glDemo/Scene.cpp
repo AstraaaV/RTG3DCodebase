@@ -613,3 +613,8 @@ void Scene::AddGameObject(GameObject* obj)
 {
 	m_GameObjects.push_back(obj);
 }
+
+void Scene::AddLight(Light* light)
+{
+	m_Lights.push_back(light);
+}

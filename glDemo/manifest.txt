@@ -95,7 +95,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 13
+TEXTURES 14
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -161,8 +161,13 @@ TYPE: FIF_PNG
 NAME: WALLSCONCE_ROUGHNESS
 FILE: Assets\\Textures\\Wall_Sconce_Roughness_4k.png
 }
+{
+TYPE: FIF_PNG
+NAME: FIRE_DIFFUSE
+FILE: Assets\\Textures\\fire1_64.png
+}
 
-SHADERS 5
+SHADERS 6
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -187,6 +192,11 @@ FRAGFILE: Assets\\Shaders\\texture-wall.frag
 NAME: TEXPBR
 VERTFILE: Assets\\Shaders\\texpbr.vert
 FRAGFILE: Assets\\Shaders\\texpbr.frag
+}
+{
+NAME: EMISSIVE
+VERTFILE: Assets\\Shaders\\emissive.vert
+FRAGFILE: Assets\\Shaders\\emissive.frag
 }
 
 GAMEOBJECTS 3
@@ -223,3 +233,4 @@ MODEL: WALL
 TEXTURE: WALL_DIFFUSE
 SHADER: TEXWALL
 }
+

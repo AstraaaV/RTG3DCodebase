@@ -27,6 +27,7 @@ public:
 
 	//add this GO to my list
 	void AddGameObject(GameObject* obj);
+	void AddLight(Light* light);
 
 	//return a pointer to a given thing by its name
 	GameObject* GetGameObject(string _GOName);

@@ -63,6 +63,11 @@ public:
 	//this GameObject should be drawn in THIS render pass
 	RenderPass GetRP() { return m_RP; }
 
+	void SetParent(GameObject* parent) { m_parent = parent; }
+	GameObject* GetParent() const { return m_parent; }
+
+	void SetLocalOffset(const glm::vec3& offset) { m_localOffset = offset; }
+
 protected:
 
 	string m_name;
@@ -81,6 +86,7 @@ protected:
 	vec3		m_rot_incr;
 
 	glm::mat4	m_worldMatrix;
+	glm::vec3 m_localOffset = glm::vec3(0.0f);
 
 	GLuint m_ShaderProg;
 
@@ -94,4 +100,5 @@ protected:
 
 	Scene* m_scene = nullptr;
 	Shader* m_shader = nullptr;
+	GameObject* m_parent = nullptr;
 };

@@ -1,25 +1,20 @@
 #version 450 core
 
-in vec2 vTexCoord;
-out vec4 FragColor;
+in vec2 texCoord;
+out vec4 fragColor;
 
-uniform sampler2D fireTexture;
-uniform vec3 emissiveColor;
-uniform int currentFrame;
-
-const int cols = 8;
-const int rows = 8;
+uniform sampler2D textureSampler;
+uniform int frame;
 
 void main()
 {
-    int xFrame = currentFrame % cols;
-    int yFrame = currentFrame / cols;
+    // Sprite sheet layout (8x8)
+    int row = frame / 8;
+    int col = frame % 8;
 
-    vec2 frameOffset = vec2(float(xFrame) / cols, float(yFrame) / rows);
-    vec2 uvScale = vec2(1.0 / cols, 1.0 / rows);
+    vec2 spriteSize = vec2(1.0 / 8.0);
+    vec2 spriteUV = texCoord * spriteSize + vec2(col, row) * spriteSize;
 
-    vec2 finalUV = frameOffset + vTexCoord * uvScale;
-    vec4 texColor = texture(fireTexture, finalUV);
-
-    FragColor = vec4(emissiveColor * texColor.rgb, texColor.a);
+    vec4 surfaceColor = texture(textureSampler, spriteUV);
+    fragColor = surfaceColor;
 }
