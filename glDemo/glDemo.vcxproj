@@ -204,6 +204,8 @@
     <Text Include="manifest.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\emissive.frag" />
+    <None Include="Assets\Shaders\emissive.vert" />
     <None Include="Assets\Shaders\flatColour.frag" />
     <None Include="Assets\Shaders\flatColour.vert" />
     <None Include="Assets\Shaders\texpbr.frag" />

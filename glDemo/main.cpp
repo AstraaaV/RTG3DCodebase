@@ -11,7 +11,6 @@
 #include "Scene.h"
 #include <FirstPersonCamera.h>
 
-
 using namespace std;
 using namespace glm;
 
@@ -109,7 +108,6 @@ int main()
 
 	// Initialise glew
 	glewInit();
-
 
 	// Setup window's initial size
 	resizeWindow(window, g_initWidth, g_initHeight);

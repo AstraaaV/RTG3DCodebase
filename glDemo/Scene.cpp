@@ -32,12 +32,6 @@ void Scene::Update(float _dt)
 {
 	float time = glfwGetTime();
 
-	for (auto& light : m_pointLights)
-	{
-		float flicker = 0.7f + 0.6f * ((sin(time * 15.0f) + ((rand() % 100) / 100.0f)) * 0.5f);
-		light.intensity = flicker;
-	}
-
 	//update all lights
 	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
 	{
@@ -84,14 +78,7 @@ void Scene::Update(float _dt)
 			int gridX = static_cast<int>(floor(newPos.x));
 			int gridZ = static_cast<int>(floor(newPos.z));
 
-			if (CanMove(newPos))
-			{
-				m_beast->SetPosition(newPos);
-			}
-			else
-			{
-
-			}
+			m_beast->SetPosition(newPos);
 
 			glm::vec3 beastPos = m_beast->GetPosition() + glm::vec3(0.0f, 0.8f, 0.0f);
 			glm::vec3 offset(0.0f, 0.8f, 0.0f);
@@ -202,29 +189,21 @@ void Scene::Render()
 			GLuint SP = (*it)->GetShaderProg();
 			glUseProgram(SP);
 
+			float t = static_cast<float>(glfwGetTime());
+			glm::vec3 base(1.0f, 0.5f, 0.1f);
+			float flicker = 0.85f + 0.15f * sin(t * 20.0f);
+			glm::vec3 col = base * flicker;
+
+			GLint loc = glGetUniformLocation(SP, "emissiveCol");
+			glUniform3fv(loc, 1, &col.x);
+
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
 
 			//loop through setting up uniform shader values for anything else
 			SetShaderUniforms(SP);
 
-			for (int i = 0; i < m_pointLights.size(); i++)
-			{
-				const PL& light = m_pointLights[i];
-				string baseName = "pointLights[" + std::to_string(i) + "].";
-
-				GLint posLoc = glGetUniformLocation(SP, (baseName + "position").c_str());
-				if (posLoc != -1)
-					glUniform3fv(posLoc, 1, &light.pos[0]);
-
-				GLint colLoc = glGetUniformLocation(SP, (baseName + "colour").c_str());
-				if (colLoc != -1)
-					glUniform3fv(colLoc, 1, &light.col[0]);
-
-				GLint intensityLoc = glGetUniformLocation(SP, (baseName + "intensity").c_str());
-				if (intensityLoc != -1)
-					glUniform1f(intensityLoc, light.intensity);
-			}
+			GLuint shaderID = (*it)->GetShaderProg();
 
 			//set any uniform shader values for the actual model
 			(*it)->PreRender();
@@ -586,44 +565,6 @@ void Scene::PossessBeast()
 			break;
 		}
 	}
-}
-
-void Scene::AddPointLight(const glm::vec3& pos, const glm::vec3& col, float intensity)
-{
-	PL newLight;
-	newLight.pos = pos;
-	newLight.col = col;
-	newLight.intensity = intensity;
-	m_pointLights.push_back(newLight);
-}
-
-bool Scene::OverlapXZ(const glm::vec3& p, const glm::vec3& box, float half)
-{
-	return p.x > box.x - half && p.x < box.x + half &&
-		p.z > box.z - half && p.z < box.z + half;
-}
-
-bool Scene::CanMove(const glm::vec3& pos, float rad)
-{
-	const float halfTile = 0.5f + rad;
-
-	for (GameObject* obj : m_GameObjects)
-	{
-		if (!obj->IsCollide())
-			continue;
-
-		if (obj->GetModelName() != "WALL")
-			continue;
-
-		glm::vec3 wallPos = obj->GetPosition();
-
-		bool overlapX = pos.x > wallPos.x - halfTile && pos.x < wallPos.x + halfTile;
-		bool overlapZ = pos.z > wallPos.z - halfTile && pos.z < wallPos.z + halfTile;
-		
-		if (overlapX && overlapZ)
-			return false;
-	}
-	return true;
 }
 
 void Scene::AddGameObject(GameObject* obj)
