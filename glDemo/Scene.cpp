@@ -191,19 +191,30 @@ void Scene::Render()
 	//check out the example stuff back in main.cpp to see what needs setting up here
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
+		GameObject* obj = *it;
 		if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
 		{
 			//set shader program using
 			GLuint SP = (*it)->GetShaderProg();
 			glUseProgram(SP);
 
-			float t = static_cast<float>(glfwGetTime());
-			glm::vec3 base(1.0f, 0.5f, 0.1f);
-			float flicker = 0.85f + 0.15f * sin(t * 20.0f);
-			glm::vec3 col = base * flicker;
+			std::string shaderName = obj->GetShaderName();
 
-			GLint loc = glGetUniformLocation(SP, "emissiveCol");
-			glUniform3fv(loc, 1, &col.x);
+			if (shaderName == "TEXDIR")
+			{
+				glm::vec3 dir = glm::normalize(glm::vec3(-0.5f, -1.0f, -0.3f));
+				glm::vec3 col = glm::vec3(1.0f, 1.0f, 1.0f);
+				glm::vec3 amb = glm::vec3(0.2f, 0.2f, 0.2f);
+
+				GLint loc = glGetUniformLocation(SP, "DIRDir");
+				if (loc != -1) glUniform3fv(loc, 1, &dir.x);
+
+				GLint loc2 = glGetUniformLocation(SP, "DIRCol");
+				if (loc2 != -1) glUniform3fv(loc2, 1, &col.x);
+
+				GLint loc3 = glGetUniformLocation(SP, "DIRAmb");
+				if (loc3 != -1) glUniform3fv(loc3, 1, &amb.x);
+			}
 
 			//set up for uniform shader values for current camera
 			m_useCamera->SetRenderValues(SP);
