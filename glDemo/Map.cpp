@@ -42,9 +42,9 @@ void Map::Init()
 
 	CreateObject("MIST", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle, glm::vec3(-90.0f, 0.0f, 0.0f), RP_TRANSPARENT);
 
-	CreateObject("MIST2", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle + glm::vec3(0.0f, 0.05f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), RP_TRANSPARENT);
+	CreateObject("MIST2", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle + glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.0f), RP_TRANSPARENT);
 
-	CreateObject("MIST3", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle + glm::vec3(0.0f, 0.1f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), RP_TRANSPARENT);
+	CreateObject("MIST3", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle + glm::vec3(0.0f, 0.1f, 0.0f), glm::vec3(0.0f), RP_TRANSPARENT);
 }
 
 // Player spawn point (start position for player)

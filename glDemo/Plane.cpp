@@ -87,6 +87,6 @@ void Plane::Render()
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR)
 	{
-		cout << "[PLANE] OpenGL Error: " << err << endl;
+		//cout << "[PLANE] OpenGL Error: " << err << endl;
 	}
 }

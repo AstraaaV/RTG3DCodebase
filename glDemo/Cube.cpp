@@ -129,7 +129,7 @@ void Cube::Render() {
 
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
-		std::cerr << "OpenGL Error: " << err << std::endl;
+		//std::cerr << "OpenGL Error: " << err << std::endl;
 	}
 
 }

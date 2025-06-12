@@ -81,6 +81,10 @@ protected:
 	vec3		m_rot;
 	vec3		m_scale;
 
+	// Idle
+	vec3 m_lastPos;
+	bool m_isMoving = false;
+
 	vec3		m_rot_incr;
 	glm::vec3 m_localOffset = glm::vec3(0.0f);
 

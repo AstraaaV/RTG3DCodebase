@@ -150,7 +150,7 @@ Texture* Scene::GetTexture(string _texName)
 			return (*it);
 		}
 	}
-	printf("Unknown Texture NAME : %s \n", _texName.c_str());
+	//printf("Unknown Texture NAME : %s \n", _texName.c_str());
 	assert(0);
 	return nullptr;
 }
@@ -293,8 +293,12 @@ void Scene::Render()
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	if (m_useCamera->GetType() == "FIRSTPERSON")
+	if (m_currentCamera && m_currentCamera->GetType() == "FPC")
 	{
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
@@ -305,7 +309,7 @@ void Scene::Render()
 		glLoadIdentity();
 
 		glBegin(GL_QUADS);
-		glColor4f(0.3f, 0.0f, 0.2f, 0.3f);
+		glColor4f(0.4f, 0.0f, 0.0f, 0.25f);
 		glVertex2f(0.0f, 0.0f);
 		glVertex2f(1.0f, 0.0f);
 		glVertex2f(1.0f, 1.0f);
@@ -316,6 +320,9 @@ void Scene::Render()
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
+
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
 	}
 }
 

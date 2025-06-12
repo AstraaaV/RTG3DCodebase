@@ -77,6 +77,7 @@ protected:
 
 	Camera* m_useCamera = nullptr; //current main camera in use
 	Camera* m_firstPersonC = nullptr;
+	Camera* m_currentCamera = nullptr;
 	int m_useCameraIndex = 0;
 	GLFWwindow* m_window;
 	Map* m_map;

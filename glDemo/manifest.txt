@@ -95,7 +95,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 15
+TEXTURES 12
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -105,21 +105,6 @@ FILE: Assets\\beast\\beast_texture.bmp
 TYPE: FIF_JPEG
 NAME: ROCK
 FILE: Assets\\Textures\\Hodges_G_MountainRock1.jpg
-}
-{
-TYPE: FIF_JPEG
-NAME: SHIP
-FILE: Assets\\Textures\\player1_ship.jpg
-}
-{
-TYPE: FIF_JPEG
-NAME: STARS
-FILE: Assets\\Textures\\stars.jpg
-}
-{
-TYPE: FIF_JPEG
-NAME: STARS2
-FILE: Assets\\Textures\\stars2.jpg
 }
 {
 TYPE: FIF_JPEG

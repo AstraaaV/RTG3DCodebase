@@ -52,10 +52,17 @@ void GameObject::Tick(float _dt)
 	{
 		float time = glfwGetTime();
 
-		float bob = sinf(glfwGetTime() * 2.0f) * 0.1f;
-		m_pos.y = m_baseY + bob;
+		float distMoved = glm::length(m_pos - m_lastPos);
+		m_isMoving = distMoved > 0.001f;
 
-		m_rot.y = m_baseRotY + sinf(time * 1.0f) * 10.0f;
+		if (!m_isMoving)
+		{
+			float bob = sinf(glfwGetTime() * 2.0f) * 0.1f;
+			m_pos.y = m_baseY + bob;
+
+			m_rot.y = m_baseRotY + sinf(time * 1.0f) * 10.0f;
+		}
+		m_lastPos = m_pos;
 	}
 
 	// 2. Fire flicker

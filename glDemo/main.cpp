@@ -226,68 +226,10 @@ void renderScene()
 	switch (g_showing)
 	{
 	case 0:
-	{
-		glUseProgram(g_texDirLightShader);
-
-		GLint pLocation;
-		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
-		glUniform1i(pLocation, 0); // set to point to texture unit 0 for AIMeshes
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLdirection);
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
-		if (g_creatureMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), g_beastPos) * eulerAngleY<float>(glm::radians<float>(g_beastRotation));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_creatureMesh->setupTextures();
-			g_creatureMesh->render();
-		}
-
-		if (g_planetMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(4.0, 4.0, 4.0));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_planetMesh->setupTextures();
-			g_planetMesh->render();
-		}
-	}
-	break;
-
-	case 1:
-	{
-		// Render cube 
-		glUseProgram(g_flatColourShader);
-		GLint pLocation;
-		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
-		mat4 modelTransform = glm::translate(identity<mat4>(), vec3(2.0, 0.0, 2.0));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-		g_cube->Render();
-		break;
-	}
-	case 2:
 		g_Scene->Render();
 	}
 
 }
-
 
 // Function called to animate elements in the scene
 void updateScene()
@@ -335,10 +277,6 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(_window, true);
 			break;
-
-		case GLFW_KEY_SPACE:
-			g_showing++;
-			g_showing = g_showing % g_NumExamples;
 
 		case GLFW_KEY_C:
 			if (_action == GLFW_PRESS && g_Scene != nullptr)
