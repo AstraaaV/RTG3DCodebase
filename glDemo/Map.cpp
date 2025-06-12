@@ -35,6 +35,16 @@ void Map::Init()
 
 	// 4. Player start
 	SetPlayerSpawn(7, 7);
+
+	// 5. Add mist layer
+	glm::vec3 mistMiddle(12.0f, 0.05f, 12.0f);
+	glm::vec3 mistScale(24.0f);
+
+	CreateObject("MIST", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle, glm::vec3(-90.0f, 0.0f, 0.0f), RP_TRANSPARENT);
+
+	CreateObject("MIST2", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle + glm::vec3(0.0f, 0.05f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), RP_TRANSPARENT);
+
+	CreateObject("MIST3", "PLANE", "MIST_TEX", "TRANSPARENT", mistMiddle + glm::vec3(0.0f, 0.1f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), RP_TRANSPARENT);
 }
 
 // Player spawn point (start position for player)
@@ -104,6 +114,11 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	{
 		obj->SetScale(glm::vec3(0.5f));
 		obj->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	}
+	else if (model == "PLANE" && texture == "MIST_TEX")
+	{
+		obj->SetScale(glm::vec3(24.0f));
+		obj->SetRotation(glm::vec3(0.0f));
 	}
 	else
 	{

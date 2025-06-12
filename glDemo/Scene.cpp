@@ -293,12 +293,8 @@ void Scene::Render()
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	if (IsBeastPossessed())
+	if (m_useCamera->GetType() == "FIRSTPERSON")
 	{
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
@@ -320,9 +316,6 @@ void Scene::Render()
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
-
-		glDisable(GL_BLEND);
-		glEnable(GL_DEPTH_TEST);
 	}
 }
 

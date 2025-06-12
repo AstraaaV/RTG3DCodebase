@@ -13,7 +13,7 @@ FirstPersonCamera::FirstPersonCamera()
 	m_yaw = -90.0f;
 	m_pitch = 0.0f;
 
-	m_speed = 10.0f;
+	m_speed = 2.0f;
 	m_fov = 45.0f;
 	m_near = 0.1f;
 	m_far = 100.0f;

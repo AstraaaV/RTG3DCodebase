@@ -95,7 +95,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 14
+TEXTURES 15
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -166,8 +166,13 @@ TYPE: FIF_PNG
 NAME: FLAME_TEX
 FILE: Assets\\Textures\\flame.png
 }
+{
+TYPE: FIF_PNG
+NAME: MIST_TEX
+FILE: Assets\\Textures\\mist.png
+}
 
-SHADERS 6
+SHADERS 7
 {
 NAME: FLAT
 VERTFILE: Assets\\Shaders\\flatColour.vert
@@ -197,6 +202,11 @@ FRAGFILE: Assets\\Shaders\\texpbr.frag
 NAME: EMISSIVE
 VERTFILE: Assets\\Shaders\\emissive.vert
 FRAGFILE: Assets\\Shaders\\emissive.frag
+}
+{
+NAME: TRANSPARENT
+VERTFILE: Assets\\Shaders\\transparent.vert
+FRAGFILE: Assets\\Shaders\\transparent.frag
 }
 
 GAMEOBJECTS 3

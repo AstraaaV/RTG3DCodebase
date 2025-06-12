@@ -4,19 +4,19 @@ in vec2 fragUV;
 out vec4 fragColour;
 
 uniform sampler2D u_Diffuse;
-uniform float u_Time; // Passed in from your program every frame
 
-void main(void) {
-    // Scroll UV coordinates to simulate motion
-    vec2 scrolledUV = fragUV + vec2(u_Time * 0.02, u_Time * 0.01); 
+// Optional scrolling animation
+uniform float time;
 
-    // Sample texture with alpha
-    vec4 texColor = texture(u_Diffuse, scrolledUV);
+void main()
+{
+    vec2 uv = fragUV + vec2(time * 0.02, 0.0); // scrolls right
 
-    // Discard fully transparent fragments (optional)
-    if (texColor.a < 0.05)
+    vec4 tex = texture(u_Diffuse, uv);
+
+    if (tex.a < 0.05)
         discard;
 
-    // Blend texture color with some subtle tint
-    fragColour = vec4(texColor.rgb * 0.9, texColor.a * 0.5);
+    float alphaFade = 0.35; // base transparency
+    fragColour = vec4(tex.rgb, tex.a * alphaFade);
 }

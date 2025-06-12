@@ -1,20 +1,16 @@
 #version 450 core
 
-in vec2 texCoord;
-out vec4 fragColor;
+in vec2 fragUV;
+out vec4 fragColour;
 
-uniform sampler2D textureSampler;
-uniform int frame;
+uniform sampler2D u_Diffuse;
 
 void main()
 {
-    // Sprite sheet layout (8x8)
-    int row = frame / 8;
-    int col = frame % 8;
+    vec3 baseColor = texture(u_Diffuse, fragUV).rgb;
 
-    vec2 spriteSize = vec2(1.0 / 8.0);
-    vec2 spriteUV = texCoord * spriteSize + vec2(col, row) * spriteSize;
+    // Add glow by boosting brightness
+    vec3 glowColor = baseColor * vec3(2.5);
 
-    vec4 surfaceColor = texture(textureSampler, spriteUV);
-    fragColor = surfaceColor;
+    fragColour = vec4(glowColor, 1.0);
 }

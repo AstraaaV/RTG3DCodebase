@@ -162,17 +162,23 @@ void GameObject::Render()
 	Model* model = m_scene->GetModel(m_modelName);
 	
 	// Draws transparent objects
-	if (m_RP == RP_TRANSPARENT)
+	if (m_name.find("Flame_") == 0)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		model->Render();
+		glDisable(GL_BLEND);
+	}
+	else if (m_RP == RP_TRANSPARENT)
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-
-	model->Render();
-
-	if (m_RP == RP_TRANSPARENT)
-	{
+		model->Render();
 		glDisable(GL_BLEND);
+	}
+	else
+	{
+		model->Render();
 	}
 }
 
