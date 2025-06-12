@@ -79,9 +79,6 @@ protected:
 	glm::vec3 m_lookAt;
 	glm::vec3 m_worldUp;
 
-	glm::vec3 m_forward;
-	glm::vec3 m_up;
-
 	float m_fov; //field of view
 	float m_near;//near plane distance
 	float m_far;//far plane distance
