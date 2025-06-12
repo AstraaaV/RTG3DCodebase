@@ -9,17 +9,19 @@ Map::~Map() {}
 
 void Map::Init()
 {
+	// 1. Creates floor geometry
 	CreateFloor(24, 24);
 
-	// Outer Box
+	// 2. Outer Box (torches every 5 tiles)
 	CreateLongWall(-4, 24, 24, true, true); // Left
 	CreateLongWall(-4, 0, 24, true, true); // Right
 	CreateLongWall(0, 4, 24, false, true); // Bottom
 	CreateLongWall(24, 4, 24, false, true); // Top
 
-	// Interior Walls
+	// 3. Interior Walls
 	CreateLongWall(6, 5, 14, true, true);
 	CreateLongWall(12, 10, 6, true, true);
+
 	CreateLongWall(-4, 3, 4, true, false);
 	CreateLongWall(4, 19, 4, true, false);
 	CreateLongWall(10, 16, 4, true, false);
@@ -31,35 +33,48 @@ void Map::Init()
 	CreateLongWall(16, 10, 4, false, false);
 	CreateLongWall(4, 7, 4, false, false);
 
+	// 4. Player start
 	SetPlayerSpawn(7, 7);
 }
 
-
+// Player spawn point (start position for player)
 void Map::SetPlayerSpawn(int x, int z)
 {
 	m_playerSpawn = glm::vec3(static_cast<float>(x), 0.0f, static_cast<float>(z));
 }
 
+// Torch spawner
 void Map::CreateTorch(int x, int z, const std::string& direction)
 {
-	glm::vec3 pos = glm::vec3(static_cast<float>(x), 1.0f, static_cast<float>(z));
+	// 1. Basic transform
+	glm::vec3 base(x, 0.0f, z);
 	glm::vec3 rot(0.0f);
+	glm::vec3 offset(0.0f);
 
+	if (direction == "SOUTH") { rot.y = 0.0f; offset = { 0.0f, 1.2f, 0.45f }; }
+	if (direction == "NORTH") { rot.y = 180.0f; offset = { 0.0f, 1.2f, -0.45f }; }
+	if (direction == "EAST") { rot.y = 90.0f; offset = { 0.45f, 1.2f, 0.0f }; }
+	if (direction == "WEST") { rot.y = 270.0f; offset = { -0.45f, 1.2f, 0.0f }; }
+
+	glm::vec3 worldPos = base + offset;
+	std::string tag = "Torch_" + std::to_string(x) + "_" + std::to_string(z);
+
+	// 2. Sconce creator
 	CreateObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z),
-		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", pos, rot, RP_OPAQUE);
+		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", worldPos, rot, RP_OPAQUE);
 
-	GameObject* sconce = m_scene->GetGameObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z));
-
+	// 3. Pointlight
 	Light* torchLight = new Light();
-	torchLight->SetName("Torch1");
+	torchLight->SetName(tag);
 	torchLight->SetType("POINT");
-	torchLight->SetPos(glm::vec3(10.0f, 1.5f, 5.0f));
+	torchLight->SetPos(worldPos);
 	torchLight->SetColour(glm::vec3(1.0f, 0.6f, 0.2f));
 	torchLight->SetAmbient(glm::vec3(0.05f, 0.03f, 0.01f));
 	torchLight->SetAttenuation(1.0f, 0.09f, 0.032f);
 	m_scene->AddLight(torchLight);
 }
 
+// Spawns all objects
 void Map::CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp)
 {
 	GameObject* obj = new GameObject(name, model, texture, shader);
@@ -67,6 +82,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	obj->SetRotation(rot);
 	obj->SetRenderPass(rp);
 
+	// 1. Quick scaler & helps render textures
 	if (model == "WALL")
 	{
 		obj->SetScale(glm::vec3(1.0f, 2.0f, 1.0f));
@@ -88,6 +104,7 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 	m_scene->AddGameObject(obj);
 }
 
+// Builds the walls
 void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal, bool placeTorches)
 {
 	glm::vec3 rot(0.0f);
@@ -95,6 +112,7 @@ void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal, bo
 	if (!horizontal)
 		rot.y = 90.0f;
 
+	// 1. Wall maker (horizontal & vertical)
 	for (int i = 0; i < length; ++i)
 	{
 		int x = horizontal ? startX + i : startX;
@@ -103,11 +121,12 @@ void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal, bo
 		glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
 		if (rot.y == 90.0f)
-			pos.z += 0.5f;
+			pos.z += 0.5f; // Centres the z-aligned walls
 
 		CreateObject("LongWall_" + std::to_string(x) + "_" + std::to_string(z),
 			"WALL", "WALL_DIFFUSE", "TEXWALL", pos, rot, RP_OPAQUE);
 
+		// 2. Auto torch placer (Every 5 tiles)
 		if (placeTorches && i % 5 == 0)
 		{
 			std::string facing = horizontal ? "SOUTH" : "EAST";
@@ -116,10 +135,12 @@ void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal, bo
 	}
 }
 
+// Floor tiler
 void Map::CreateFloor(int w, int h)
 {
 	glm::vec3 rot(0.0f);
 
+	// 1. Floor creator
 	for (int z = 0; z < h; ++z)
 	{
 		for (int x = 0; x < w; ++x)

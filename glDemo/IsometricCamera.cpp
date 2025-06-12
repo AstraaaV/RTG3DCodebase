@@ -35,8 +35,7 @@ void IsometricCamera::Pan(const glm::vec3& direction)
 void IsometricCamera::Zoom(float amount)
 {
 	m_zoom -= amount;
-	if (m_zoom < 0.1f) m_zoom = 0.1f;
-	if (m_zoom > 10.0f) m_zoom = 10.0f;
+	m_zoom = glm::clamp(m_zoom, 0.1f, 10.0f);
 	updateCam();
 }
 
@@ -54,24 +53,29 @@ void IsometricCamera::SetFocus(const glm::vec3& f)
 
 void IsometricCamera::updateCam()
 {
-	m_focus = glm::vec3(12.0f, 0.0f, 12.0f);
+	// Iso angles
+	float pitch = glm::radians(35.264f);
+	float yaw = glm::radians(45.0f);
 
+	// Distance from focus point (for zooming)
 	float dist = 40.0f * m_zoom;
 
-	m_pos = m_focus + glm::vec3(0.0f, dist, 0.0f);
+	m_pos = m_focus + glm::vec3
+	(dist * cos(pitch) * cos(yaw),
+		dist * sin(pitch),
+		dist * cos(pitch) * sin(yaw));
 
-	glm::vec3 upVec = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_viewMatrix = glm::lookAt(m_pos, m_focus, m_worldUp);
 
-	m_viewMatrix = glm::lookAt(m_pos, m_focus, upVec);
+	// Orthographic projection
+	float orthoW = 30.0f * m_aspect * m_zoom;
+	float orthoH = 30.0f * m_zoom;
 
-	float orthoX = 30.0f * m_aspect * m_zoom;
-	float orthoZ = 30.0f * m_zoom;
-
-	float halfW = orthoX * 0.5f;
-	float halfH = orthoZ * 0.5f;
-
-	m_projectionMatrix = glm::ortho(-halfW, halfW, -halfH, halfH, m_near, m_far);
+	m_projectionMatrix = glm::ortho
+	(-orthoW * 0.5f, orthoW * 0.5f,
+		-orthoH * 0.5f, orthoH * 0.5f,
+		m_near, m_far);
 
 	m_forward = glm::normalize(m_focus - m_pos);
-	m_up = upVec;
+	m_up = m_worldUp;
 }

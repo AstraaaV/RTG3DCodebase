@@ -8,10 +8,11 @@ using namespace std;
 PointLight::PointLight()
 {
 	m_type = "POINT";
-
 	m_position = vec3(0.0f);
 	m_col = vec3(1.0f);
 	m_amb = vec3(0.05f);
+
+	// Default attenuation vlaues
 	m_constant = 1.0f;
 	m_linear = 0.09f;
 	m_quadratic = 0.032f;
@@ -21,19 +22,23 @@ PointLight::~PointLight()
 {
 }
 
+// Loads position etc
 void PointLight::Load(ifstream& _file)
 {
 	Light::Load(_file);
 	StringHelp::Float3(_file, "POS", m_position.x, m_position.y, m_position.z);
 }
 
+// Sends the light properties to shader
 void PointLight::SetRenderValues(unsigned int _prog)
 {
+	// 1. Upload base data
 	Light::SetRenderValues(_prog);
 
 	GLint loc;
 	std::string prefix = m_name;
 
+	// Upload pointlight uniforms
 	if (Helper::SetUniformLocation(_prog, (prefix + "Pos").c_str(), &loc))
 		glUniform3fv(loc, 1, glm::value_ptr(m_position));
 

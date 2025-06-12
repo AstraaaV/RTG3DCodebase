@@ -30,6 +30,7 @@ GameObject::~GameObject()
 {
 }
 
+// File -> Object
 void GameObject::Load(ifstream& _file)
 {
 	StringHelp::String(_file, "NAME", m_name);
@@ -41,10 +42,12 @@ void GameObject::Load(ifstream& _file)
 	StringHelp::Float3(_file, "ROT INC", m_rot_incr.x, m_rot_incr.y, m_rot_incr.z);
 }
 
+// Per-frame Update
 void GameObject::Tick(float _dt)
 {
 	m_rot += m_rot_incr;
 
+	// 1. Idle beast bobbing
 	if (m_name == "BEAST")
 	{
 		float time = glfwGetTime();
@@ -55,6 +58,7 @@ void GameObject::Tick(float _dt)
 		m_rot.y = m_baseRotY + sinf(time * 1.0f) * 10.0f;
 	}
 
+	// 2. Fire flicker
 	if (m_name.find("Fire_") == 0)
 	{
 		float t = glfwGetTime();
@@ -63,11 +67,13 @@ void GameObject::Tick(float _dt)
 		m_pos.y = m_baseY + sinf(t * 6.0f) * 0.02f;
 	}
 	
+	// 3. Follow parent
 	if (m_parent)
 	{
 		m_pos = m_parent->GetPosition() + m_localOffset;
 	}
 
+	// 4. Build matrix
 	m_worldMatrix = glm::translate(mat4(1.0), vec3(m_pos));
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	m_worldMatrix = glm::rotate(m_worldMatrix, glm::radians(m_rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -87,6 +93,7 @@ void GameObject::PreRender()
 
 	if (!m_textureName.empty())
 	{
+		// Diffuse map binding
 		Texture* texDiffuse = m_scene->GetTexture(m_textureName);
 		if (texDiffuse)
 		{
@@ -96,6 +103,7 @@ void GameObject::PreRender()
 			if (pLocation != -1) glUniform1i(pLocation, 0);
 		}
 
+		// Normal map binding
 		Texture* texNormal = m_scene->GetTexture(m_textureName2);
 		if (texNormal)
 		{
@@ -105,6 +113,7 @@ void GameObject::PreRender()
 			if (pLocation != -1) glUniform1i(pLocation, 1);
 		}
 
+		// ROugness map binding
 		Texture* texRoughness = m_scene->GetTexture(m_textureName3);
 		if (texRoughness)
 		{
@@ -114,6 +123,7 @@ void GameObject::PreRender()
 			if (pLocation != -1) glUniform1i(pLocation, 2);
 		}
 	
+		// Metallic map binding
 		Texture* texMetallic = m_scene->GetTexture(m_textureName4);
 		if (texMetallic)
 		{
@@ -123,6 +133,7 @@ void GameObject::PreRender()
 			if (pLocation != -1) glUniform1i(pLocation, 3);
 		}
 
+		// Height map binding
 		Texture* texHeight = m_scene->GetTexture(m_textureName5);
 		if (texHeight)
 		{
@@ -132,6 +143,7 @@ void GameObject::PreRender()
 			if (pLocation != -1) glUniform1i(pLocation, 4);
 		}
 
+		// Flat map binding
 		Texture* texFlat = m_scene->GetTexture(m_textureName);
 		if (texFlat)
 		{
@@ -143,13 +155,13 @@ void GameObject::PreRender()
 	}
 }
 
+// Draws objects
 void GameObject::Render()
 {
-	if (!m_visible)
-		return;
 
 	Model* model = m_scene->GetModel(m_modelName);
-
+	
+	// Draws transparent objects
 	if (m_RP == RP_TRANSPARENT)
 	{
 		glEnable(GL_BLEND);
@@ -201,16 +213,7 @@ void GameObject::SetRenderPass(RenderPass rp)
 	m_RP = rp;
 }
 
-void GameObject::SetVisible(bool visible)
-{
-	m_visible = visible;
-}
-
-bool GameObject::IsVisible() const
-{
-	return m_visible;
-}
-
+// Link to scene assets
 void GameObject::Init(Scene* _scene)
 {
 	m_scene = _scene;
@@ -221,6 +224,7 @@ void GameObject::Init(Scene* _scene)
 	if (m_shader)
 		m_ShaderProg = m_shader->GetProg();
 
+	// Quick texture stuff
 	if (m_shaderName == "TEXWALL" && m_modelName == "WALL")
 	{
 		m_textureName2 = "WALL_NORMAL";

@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "RenderPass.h"
 
+// Handles map layout and spawning walls, floor, torches, etc
 class Map
 {
 public:
@@ -26,9 +27,9 @@ private:
 
 	int m_width;
 	int m_height;
-
+	
+	// Helpers to make the layout and objects
 	void CreateObject(const std::string& name, const std::string& model, const std::string& texture, const std::string& shader, const glm::vec3& pos, const glm::vec3& rot, RenderPass rp);
-
 	void CreateLongWall(int startX, int startZ, int length, bool horizontal, bool placeTorches);
 	void CreateFloor(int w, int h);
 };

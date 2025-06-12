@@ -608,9 +608,6 @@ void Scene::PossessBeast()
 			m_prevCam = nullptr;
 			m_possessBeast = false;
 
-			if (m_beast)
-				m_beast->SetVisible(true);
-
 			cout << "Beast unpossessed.\n";
 		}
 		return;
@@ -643,8 +640,6 @@ void Scene::PossessBeast()
 
 				fpc->SetTarget(beast);
 			}
-
-			m_beast->SetVisible(false);
 
 			cout << "Beast possessed.\n";
 			break;
