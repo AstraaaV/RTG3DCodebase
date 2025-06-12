@@ -95,7 +95,7 @@ TYPE: PLANE
 NAME: PLANE
 }
 
-TEXTURES 13
+TEXTURES 14
 {
 TYPE: FIF_BMP
 NAME: BEAST
@@ -160,6 +160,11 @@ FILE: Assets\\Textures\\Wall_Sconce_Normal_4k.png
 TYPE: FIF_PNG
 NAME: WALLSCONCE_ROUGHNESS
 FILE: Assets\\Textures\\Wall_Sconce_Roughness_4k.png
+}
+{
+TYPE: FIF_PNG
+NAME: FLAME_TEX
+FILE: Assets\\Textures\\flame.png
 }
 
 SHADERS 6

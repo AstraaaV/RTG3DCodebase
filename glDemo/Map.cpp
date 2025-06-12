@@ -63,7 +63,11 @@ void Map::CreateTorch(int x, int z, const std::string& direction)
 	CreateObject("Sconce_" + std::to_string(x) + "_" + std::to_string(z),
 		"WALLSCONCE", "WALLSCONCE_BASE", "TEXPBR", worldPos, rot, RP_OPAQUE);
 
-	// 3. Pointlight
+	// 3. Transparent flame
+	glm::vec3 flamePos = worldPos + glm::vec3(0.0f, 0.3f, 0.0f);
+	CreateObject("Flame_" + tag, "PLANE", "FLAME_TEX", "EMISSIVE", flamePos, glm::vec3(0), RP_TRANSPARENT);
+
+	// 4. Light source
 	Light* torchLight = new Light();
 	torchLight->SetName(tag);
 	torchLight->SetType("POINT");
@@ -96,6 +100,11 @@ void Map::CreateObject(const std::string& name, const std::string& model, const 
 		obj->SetTexture3("WALLSCONCE_ROUGHNESS");
 		obj->SetTexture4("WALLSCONCE_METALLIC");
 	}
+	else if (model == "PLANE" && texture == "FLAME_TEX")
+	{
+		obj->SetScale(glm::vec3(0.5f));
+		obj->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	}
 	else
 	{
 		obj->SetScale(glm::vec3(1.0f));
@@ -127,10 +136,26 @@ void Map::CreateLongWall(int startX, int startZ, int length, bool horizontal, bo
 			"WALL", "WALL_DIFFUSE", "TEXWALL", pos, rot, RP_OPAQUE);
 
 		// 2. Auto torch placer (Every 5 tiles)
-		if (placeTorches && i % 5 == 0)
+		if (placeTorches)
 		{
-			std::string facing = horizontal ? "SOUTH" : "EAST";
-			CreateTorch(x, z, facing);
+			int centerIndex = length / 2;
+
+			if (i == centerIndex)
+			{
+				string facing = horizontal ? "SOUTH" : "EAST";
+
+				bool canPlace = false;
+
+				if (horizontal)
+					canPlace = (z + 1 < 100);
+				else
+					canPlace = (x + 1 < 100);
+
+				if (canPlace)
+				{
+					CreateTorch(x, z, facing);
+				}
+			}
 		}
 	}
 }
@@ -148,7 +173,7 @@ void Map::CreateFloor(int w, int h)
 			glm::vec3 pos(static_cast<float>(x), 0.0f, static_cast<float>(z));
 
 			CreateObject("Floor_" + std::to_string(x) + "_" + std::to_string(z),
-				"PLANE", "", "FLAT", pos, rot, RP_OPAQUE);
+				"PLANE", "ROCK", "TEXMAP", pos, rot, RP_OPAQUE);
 		}
 	}
 }

@@ -28,8 +28,8 @@ void main()
     // Sample textures
     vec3 albedo = texture(u_BaseColor, inputFragment.texCoord).rgb;
 
-    // Apply yellowish tint (like Dungeon Keeper 2 walls)
-    vec3 yellowTint = vec3(1.03, 1.025, 0.99); // Soft warm tone
+    // Apply subtle warm tint
+    vec3 yellowTint = vec3(1.03, 1.025, 0.99);
     albedo *= yellowTint;
     albedo = max(albedo, vec3(0.2));
 
@@ -54,6 +54,11 @@ void main()
     float specularStrength = pow(NdotH, 32.0 * (1.0 - roughness));
     vec3 specular = specularStrength * DIRCol * mix(vec3(0.04), albedo, metallic);
 
+    // Final lighting result
     vec3 result = (DIRAmb * albedo) + diffuse + specular;
+
+    // Slight brightness boost
+    result *= 1.50;
+
     FragColor = vec4(result, 1.0);
 }

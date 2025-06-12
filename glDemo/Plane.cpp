@@ -6,26 +6,26 @@ using namespace glm;
 
 static float positionArray[] =
 {
-	-1.0f, 0.0f, -1.0f, 1.0f,
-	-1.0f, 0.0f, 1.0f, 1.0f,
-	1.0f, 0.0f, 1.0f, 1.0f,
-	1.0f, 0.0f, -1.0f, 1.0f
+	-1.0f, 0.0f, -1.0f,
+	-1.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, -1.0f
 };
 
 static float colourArray[] =
 {
-	1.0f, 1.0f, 0.6f, 1.0f,
-	1.0f, 1.0f, 0.6f, 1.0f,
-	1.0f, 1.0f, 0.6f, 1.0f,
-	1.0f, 1.0f, 0.6f, 1.0f
+	1.3f, 1.3f, 1.3f, 1.0f,
+	1.3f, 1.3f, 1.3f, 1.0f,
+	1.3f, 1.3f, 1.3f, 1.0f,
+	1.3f, 1.3f, 1.3f, 1.0f
 };
 
 static float uvArray[] =
 {
 	0.0f, 0.0f,
-	0.0f, 1.0f,
-	1.0f, 1.0f,
-	1.0f, 0.0f
+	0.0f, 8.0f,
+	8.0f, 8.0f,
+	8.0f, 0.0f
 };
 
 static unsigned int indexArray[] =
@@ -45,7 +45,7 @@ Plane::Plane()
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(positionArray), positionArray, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
 	// Colours
